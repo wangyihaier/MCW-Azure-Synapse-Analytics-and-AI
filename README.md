@@ -22,7 +22,8 @@ In this whiteboard design session, you will work in a group to look at the proce
 At the end of this whiteboard design session, you will be better able to design and build a complete end-to-end advanced analytics solution using Azure Synapse Analytics.
 
 ### Hands-on lab
-[Coming Soon]
+
+[HOL step-by-step - Azure Synapse Analytics end-to-end solution](Hands-on%20lab/HOL%20step-by%20step%20-%20Azure%20Synapse%20Analytics%20end-to-end%20solution.md)
 
 ## Azure services and related products
 -	Azure Synapse Analytics
