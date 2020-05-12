@@ -2,7 +2,7 @@
     "name": "asamcw_product_csv",
     "properties": {
         "linkedServiceName": {
-            "referenceName": "solliancepublicdata",
+            "referenceName": "#LINKED_SERVICE_NAME#",
             "type": "LinkedServiceReference"
         },
         "annotations": [],

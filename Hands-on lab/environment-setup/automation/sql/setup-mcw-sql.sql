@@ -1,6 +1,8 @@
 create user [CEO] without login;
 create user [DataAnalystMiami] without login;
 create user [DataAnalystSanDiego] without login;
+create login [asa.sql.workload01] with password = '#PASSWORD#'
+create login [asa.sql.workload02] with password = '#PASSWORD#'
 GO
 create schema [wwi_mcw];
 GO
