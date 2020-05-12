@@ -2,7 +2,7 @@
     "name": "asamcw_product_asa",
     "properties": {
         "linkedServiceName": {
-            "referenceName": "sqlpool04",
+            "referenceName": "#LINKED_SERVICE_NAME#",
             "type": "LinkedServiceReference"
         },
         "annotations": [],

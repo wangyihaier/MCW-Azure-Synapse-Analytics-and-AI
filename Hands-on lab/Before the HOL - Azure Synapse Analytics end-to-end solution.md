@@ -31,44 +31,21 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
   - [Requirements](#requirements)
   - [Before the hands-on lab](#before-the-hands-on-lab)
     - [Task 1: Create Azure Synapse Analytics workspace](#task-1-create-azure-synapse-analytics-workspace)
-    - [Task 2: Create SQL pool](#task-2-create-sql-pool)
-    - [Task 2: Create SQL users](#task-2-create-sql-users)
 
 <!-- /TOC -->
 
-# Azure Synapse Analytics end-to-end solution before the hands-on lab setup guide 
+# Azure Synapse Analytics end-to-end solution before the hands-on lab setup guide
 
 ## Requirements
 
-1. Number and insert your custom workshop content here . . . 
+1. An Azure Account with the ability to create an Azure Synapse Workspace
 
 ## Before the hands-on lab
 
-Duration: X minutes
-
-\[insert your custom workshop content here . . . 
-
 ### Task 1: Create Azure Synapse Analytics workspace
 
-1.  Number and insert your custom workshop content here . . . 
+1. Deploy the workspace through the following Azure ARM template (press the button below):
 
-    -  Insert content here
-
-        -  
-
-### Task 2: Create SQL pool
-
-1.  Number and insert your custom workshop content here . . . 
-    -  Insert content here
-
-
-
-### Task 2: Create SQL users
-
-1.  Number and insert your custom workshop content here . . . 
-    -  Insert content here
-
-        -  
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2FMCW-Azure-Synapse-Analytics-end-to-end-solution%2Fmaster%2FHands-on%2520lab%2Fenvironment-setup%2F00-asa-workspace-core.json" target="_blank"><img src="http://azuredeploy.net/deploybutton.png" /></a>
 
 You should follow all steps provided *before* performing the Hands-on lab.
-
