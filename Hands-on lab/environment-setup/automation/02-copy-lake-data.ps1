@@ -51,8 +51,8 @@ foreach ($singleFile in $singleFiles.Keys) {
 }
 
 $dataDirectories = @{
-        data2018 = "wwi-02/sales-small/Year=2018"
-        data2019 = "wwi-02/sales-small/Year=2019"
+        data2018 = "wwi-02/sale-small/Year=2018"
+        data2019 = "wwi-02/sale-small/Year=2019"
 }
 
 foreach ($dataDirectory in $dataDirectories.Keys) {
