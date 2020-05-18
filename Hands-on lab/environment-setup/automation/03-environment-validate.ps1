@@ -1,5 +1,5 @@
 Remove-Module environment-automation
-Import-Module "environment-automation"
+Import-Module ".\environment-automation"
 
 $InformationPreference = "Continue"
 
@@ -11,26 +11,25 @@ $userName = $AzureUserName                # READ FROM FILE
 $password = $AzurePassword                # READ FROM FILE
 $clientId = $TokenGeneratorClientId       # READ FROM FILE
 $sqlPassword = $AzureSQLPassword          # READ FROM FILE
+$resourceGroupName = $AzureResourceGroupName #READ FROM FILE
+$uniqueId = $UniqueSuffix                 #READ FROM FILE
 
 $securePassword = $password | ConvertTo-SecureString -AsPlainText -Force
 $cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $userName, $SecurePassword
 
 Connect-AzAccount -Credential $cred | Out-Null
 
-$resourceGroupName = (Get-AzResourceGroup | Where-Object { $_.ResourceGroupName -like "*L400*" }).ResourceGroupName
-$uniqueId =  (Get-AzResourceGroup -Name $resourceGroupName).Tags["DeploymentId"]
 $subscriptionId = (Get-AzContext).Subscription.Id
 $tenantId = (Get-AzContext).Tenant.Id
 
-$templatesPath = "templates"
-$datasetsPath = "datasets"
-$pipelinesPath = "pipelines"
-$sqlScriptsPath = "sql"
+$templatesPath = ".\templates"
+$datasetsPath = ".\datasets"
+$pipelinesPath = ".\pipelines"
+$sqlScriptsPath = ".\sql"
 $workspaceName = "asaworkspace$($uniqueId)"
 $dataLakeAccountName = "asadatalake$($uniqueId)"
 $blobStorageAccountName = "asastore$($uniqueId)"
 $keyVaultName = "asakeyvault$($uniqueId)"
-$keyVaultSQLUserSecretName = "SQL-USER-ASA"
 $sqlPoolName = "SQLPool01"
 $integrationRuntimeName = "AzureIntegrationRuntime01"
 $sparkPoolName = "SparkPool01"
@@ -55,7 +54,6 @@ $global:tokenTimes = [ordered]@{
 $overallStateIsValid = $true
 
 $asaArtifacts = [ordered]@{
-
         "wwi02_sale_small_workload_01_asa" = @{ 
                 Category = "datasets"
                 Valid = $false
@@ -75,8 +73,7 @@ $asaArtifacts = [ordered]@{
         "ASAMCW - Exercise 6 - Machine Learning" = @{
                 Category = "notebooks"
                 Valid = $false
-        }
-     
+        }     
         "sqlpool01" = @{
                 Category = "linkedServices"
                 Valid = $false
@@ -119,14 +116,14 @@ foreach ($asaArtifactName in $asaArtifacts.Keys) {
 # the $asaArtifacts contains the current status of the workspace
 
 
-        $users = [ordered]@{
-                "CEO" = @{ Valid = $false }
-                "DataAnalystMiami" = @{ Valid = $false }
-                "DataAnalystSanDiego" = @{ Valid = $false }
-                "asa.sql.workload01" = @{ Valid = $false }
-                "asa.sql.workload02" = @{ Valid = $false }               
-                "$($userName)" = @{ Valid = $false }
-        }
+$users = [ordered]@{
+        "CEO" = @{ Valid = $false }
+        "DataAnalystMiami" = @{ Valid = $false }
+        "DataAnalystSanDiego" = @{ Valid = $false }
+        "asa.sql.workload01" = @{ Valid = $false }
+        "asa.sql.workload02" = @{ Valid = $false }               
+        "$($userName)" = @{ Valid = $false }
+}
 
 $query = @"
 select name from sys.sysusers
@@ -183,7 +180,7 @@ if ($dataLakeAccount -eq $null) {
                         "sales-small/Year=2010/Quarter=Q4/Month=12/Day=20101231/sale-small-20101231-snappy.parquet" = "file path"
                         "customer-info/customer-info.csv" = "file path"                       
                         "campaign-analytics\campaignanalytics.csv" = "file path"
-                        "data-generators/generator-product/generator-product.csv" = "file path"
+                        "data-generators\generator-product\generator-product.csv" = "file path"
                 }
         
                 foreach ($dataLakeItemName in $dataLakeItems.Keys) {

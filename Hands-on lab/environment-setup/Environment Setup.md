@@ -21,7 +21,7 @@ A SQL Pool named `SQLPool01` with a database name `SQLPool01`
 ## Linked Services
 * sqlpool01_workload01
 * sqlpool01_workload02
-* solliancepublicdata
+* asadatalakeXX
 * sqlpoolXX
 
 ## Datasets

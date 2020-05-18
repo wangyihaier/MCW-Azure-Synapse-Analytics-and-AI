@@ -25,7 +25,7 @@ GO
 CREATE DATABASE SCOPED CREDENTIAL StorageCredential
 WITH
 IDENTITY = 'SHARED ACCESS SIGNATURE'
-,SECRET = '<data_lake_account_key>';
+,SECRET = '#DATALAKESTORAGEKEY#';
 
 -- Create an external data source with CREDENTIAL option.
 -- Replace <data_lake_account_name> with the actual name of the primary data lake account
@@ -33,7 +33,7 @@ IDENTITY = 'SHARED ACCESS SIGNATURE'
 CREATE EXTERNAL DATA SOURCE ASAMCWModelStorage
 WITH
 (
-    LOCATION = 'wasbs://wwi-02@<data_lake_account_name>.blob.core.windows.net'
+    LOCATION = 'wasbs://wwi-02@#DATALAKESTORAGEACCOUNTNAME#.blob.core.windows.net'
     ,CREDENTIAL = StorageCredential
     ,TYPE = HADOOP
 );
