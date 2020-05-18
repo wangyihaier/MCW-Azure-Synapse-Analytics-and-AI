@@ -20,7 +20,7 @@
     "sqlAdministratorLogin": "asa.sql.admin",
     "workspaceName": "[concat('asaworkspace', parameters('uniqueSuffix'))]",
     "adlsStorageAccountName": "[concat('asadatalake', parameters('uniqueSuffix'))]",
-    "defaultDataLakeStorageFilesystemName": "tempdata",
+    "defaultDataLakeStorageFilesystemName": "defaultfs",
     "sqlComputeName": "SQLPool01",
     "sparkComputeName": "SparkPool01",
     "computeSubnetId": "",
