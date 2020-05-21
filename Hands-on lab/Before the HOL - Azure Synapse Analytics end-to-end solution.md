@@ -70,7 +70,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 1. Deploy the workspace through the following Azure ARM template (press the button below):
 
-    <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcodingbandit%2FMCW-Azure-Synapse-Analytics-end-to-end-solution%2Fmaster%2FHands-on%2520lab%2Fenvironment-setup%2Fautomation%2F00-asa-workspace-core.json" target="_blank"><img src="http://azuredeploy.net/deploybutton.png" /></a>
+    <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2FMCW-Azure-Synapse-Analytics-end-to-end-solution%2Fmaster%2FHands-on%2520lab%2Fenvironment-setup%2Fautomation%2F00-asa-workspace-core.json" target="_blank"><img src="http://azuredeploy.net/deploybutton.png" /></a>
 
 2. On the **Custom deployment** form, select your desired subscription and select **Synapse-MCW** for the **Resource group**. Also provide a **Unique Suffix** such as your initials followed by birth year. Finally, provide a strong **SQL Administrator Login Password**. Remember this password value, you'll be needing it!
 
@@ -127,6 +127,6 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
     > **Note**: if you experience script failures, it may be beneficial to highlight only the lines preceding the `$InformationPreference = "Continue"` line and run them separately from the rest of the script. Some people have experienced the console not stopping for user input when importing from the PowerShell Gallery. 
 
-6. Repeat step 3-5 with **Hands-on Lab/environment-setup/automation/02-copy-lake-data.ps1**.
+6. Repeat step 5 with **Hands-on Lab/environment-setup/automation/02-copy-lake-data.ps1**.
 
 You should follow all steps provided *before* performing the Hands-on lab.
