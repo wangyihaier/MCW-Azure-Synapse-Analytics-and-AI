@@ -2,7 +2,7 @@
     "name": "ASAMCW - Exercise 2 - Copy Product Information",
     "properties": {
         "activities": [
-            
+            {
                 "name": "Copy Product Information",
                 "type": "Copy",
                 "dependsOn": [],

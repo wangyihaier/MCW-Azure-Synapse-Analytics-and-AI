@@ -32,6 +32,9 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
   - [Before the hands-on lab](#before-the-hands-on-lab)
     - [Task 1: Create a resource group in Azure](#task-1-create-a-resource-group-in-azure)
     - [Task 2: Create Azure Synapse Analytics workspace](#task-2-create-azure-synapse-analytics-workspace)
+    - [Task 3: Download lab artifacts](#task-3-download-lab-artifacts)
+    - [Task 4: Create a local settings file](#task-4-create-a-local-settings-file)
+    - [Task 5: Run environment setup PowerShell scripts](#task-5-run-environment-setup-powershell-scripts)
 
 <!-- /TOC -->
 
@@ -67,6 +70,63 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 1. Deploy the workspace through the following Azure ARM template (press the button below):
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcodingbandit%2FMCW-Azure-Synapse-Analytics-end-to-end-solution%2Fmaster%2FHands-on%2520lab%2Fenvironment-setup%2Fautomation%2F00-asa-workspace-core.json" target="_blank"><img src="http://azuredeploy.net/deploybutton.png" /></a>
+    <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcodingbandit%2FMCW-Azure-Synapse-Analytics-end-to-end-solution%2Fmaster%2FHands-on%2520lab%2Fenvironment-setup%2Fautomation%2F00-asa-workspace-core.json" target="_blank"><img src="http://azuredeploy.net/deploybutton.png" /></a>
+
+2. On the **Custom deployment** form, select your desired subscription and select **Synapse-MCW** for the **Resource group**. Also provide a **Unique Suffix** such as your initials followed by birth year. Finally, provide a strong **SQL Administrator Login Password**. Remember this password value, you'll be needing it!
+
+    ![The Custom deployment form is displayed with example data populated.](media/bhol_customdeploymentform.png)
+  
+3. Check the **I agree to the terms and conditions stated above**, then select the **Purchase** button.
+
+    > **Note**: You may experience a deployment step failing in regards to Role Assignment. This error may safely be ignored.
+
+### Task 3: Download lab artifacts
+
+1. In a web browser, navigate to the [MCW Azure Synapse Analytics end-to-end solution repository](https://github.com/microsoft/MCW-Azure-Synapse-Analytics-end-to-end-solution).
+
+2. Expand the **Clone or download** button, and select **Download Zip**.
+
+    ![On the repository screen, the Clone or download button is expanded and the Download Zip button is highlighted.](media/bhol_downloadzip.png)
+
+3. Extract the downloaded zip file to the location of your choice.
+
+### Task 4: Create a local settings file
+
+1. On your local machine, create a folder **C:\LabFiles**. Inside this folder, create a new file named **AzureCreds.ps1**. In this file, you will set parameters necessary to complete the workspace setup.
+
+    ```PowerShell
+    $AzureUserName = "<enter your azure username>"
+    $AzurePassword = "<enter your azure password>"
+    $TokenGeneratorClientId = "1950a258-227b-4e31-a9cf-717495945fc2"
+    $AzureSQLPassword = "<enter the same password you chose when deploying the workspace>"
+    $AzureResourceGroupName = "Synapse-MCW"
+    $UniqueSuffix = "<enter the same suffix you chose when deploying the workspace>"
+    ```
+
+### Task 5: Run environment setup PowerShell scripts
+
+1. Open **Visual Studio Code** and open the folder to where you extracted the lab files (extracted in Task 3). **Be sure to run this application as Administrator**.
+
+2. Open **Hands-on Lab/environment-setup/automation/01-environment-setup.ps1**.
+
+3. Open a Terminal Window (ctrl + shift + `). Ensure **PowerShell** or **PowerShell Integrated Console** is selected on the Terminal pane toolbar.
+
+    ![The Visual Studio Code terminal toolbar is displayed with the PowerShell Integrated Console item selected.](media/bhol_powershellintegratedselection.png)
+
+4. Change the directory to the **automation** folder.
+
+    ```PowerShell
+    cd '.\Hands-on lab\environment-setup\automation'
+    ```
+
+5. In the editor window, select the entire script (ctrl + a), then right-click and select **Run selection** _OR_ you may press **F8** to run the selection.
+
+    ![The Visual Studio Code editor window is shown with a script file contents fully selected and the right-click context menu expanded with the Run selection option highlighted.](media/bhol_selectallrun.png)
+
+    > **Note**: if you see an error regarding `No modules were removed` or `Uninstall-AzureRm`, it is safe to ignore. If the script pauses for prompts, enter the `A` (Yes to All) option.
+
+    > **Note**: if you experience script failures, it may be beneficial to highlight only the lines preceding the `$InformationPreference = "Continue"` line and run them separately from the rest of the script. Some people have experienced the console not stopping for user input when importing from the PowerShell Gallery. 
+
+6. Repeat step 3-5 with **Hands-on Lab/environment-setup/automation/02-copy-lake-data.ps1**.
 
 You should follow all steps provided *before* performing the Hands-on lab.

@@ -36,12 +36,12 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
   - [Exercise 1: Accessing the Azure Synapse Analytics workspace](#exercise-1-accessing-the-azure-synapse-analytics-workspace)
     - [Task 1: Launching Synapse Studio](#task-1-launching-synapse-studio)
   - [Exercise 2: Create and populate the supporting tables in the SQL Pool](#exercise-2-create-and-populate-the-supporting-tables-in-the-sql-pool)
-    - [Task 1: Create the customer information table](#task-1-create-the-customer-information-table)
-    - [Task 2: Populate the customer information table](#task-2-populate-the-customer-information-table)
-    - [Task 3: Create the campaign analytics table](#task-3-create-the-campaign-analytics-table)
-    - [Task 4: Populate the campaign analytics table](#task-4-populate-the-campaign-analytics-table)
-    - [Task 5: Create the sale table](#task-5-create-the-sale-table)
-    - [Task 6: Populate the sale table](#task-6-populate-the-sale-table)
+    - [Task 1: Create the sale table](#task-1-create-the-sale-table)
+    - [Task 2: Populate the sale table](#task-2-populate-the-sale-table)
+    - [Task 3: Create the customer information table](#task-3-create-the-customer-information-table)
+    - [Task 4: Populate the customer information table](#task-4-populate-the-customer-information-table)
+    - [Task 5: Create the campaign analytics table](#task-5-create-the-campaign-analytics-table)
+    - [Task 6: Populate the campaign analytics table](#task-6-populate-the-campaign-analytics-table)
     - [Task 7: Populate the product table](#task-7-populate-the-product-table)
   - [Exercise 3: Exploring raw parquet data](#exercise-3-exploring-raw-parquet-data)
     - [Task 1: Query sales Parquet data with Synapse SQL Serverless](#task-1-query-sales-parquet-data-with-synapse-sql-serverless)
@@ -102,12 +102,12 @@ For the remainder of this lab, the following terms will be used for various ASA 
 | Azure Subscription                | `WorkspaceSubscription`                                                            |
 | Azure Region                      | `WorkspaceRegion`                                                                  |
 | Workspace resource group          | `WorkspaceResourceGroup`                                                           |
-| Workspace / workspace name        | `Workspace`                                                                        |
-| Primary Storage Account           | `PrimaryStorage`                                                                   |
+| Workspace / workspace name        | `asaworkspace{suffix}`                                                             |
+| Primary Storage Account           | `asadatalake{suffix}`                                                              |
 | Default file system container     | `DefaultFileSystem`                                                                |
 | SQL Pool                          | `SqlPool01`                                                                        |
 | SQL Serverless Endpoint           | `SqlServerless01`                                                                  |
-| Azure Key Vault                   | `KeyVault01`                                                                       |
+| Azure Key Vault                   | `asakeyvault{suffix}`                                                              |
 
 ## Exercise 1: Accessing the Azure Synapse Analytics workspace
 
@@ -123,7 +123,7 @@ All exercises in this lab utilize the workspace Synapse Studio user interface. T
 
 3. From the list of resource groups, select `WorkspaceResourceGroup`.
   
-4. From the list of resources, select the **Synapse Workspace** resource, `Workspace`.
+4. From the list of resources, select the **Synapse Workspace** resource, `asaworkspace{suffix}`.
   
     ![In the resource list, the Synapse Workspace item is selected.](media/resourcelist_synapseworkspace.png)
 
@@ -133,7 +133,7 @@ All exercises in this lab utilize the workspace Synapse Studio user interface. T
 
 ## Exercise 2: Create and populate the supporting tables in the SQL Pool
 
-The first step in querying meaningful data is to create tables to house the data. In this case, we will create two different tables: CustomerInfo and Sales. When designing tables in Azure Synapse Analytics, we need to take into account the expected amount of data in each table, as well as how each table will be used. Utilize the following guidance when designing your tables to ensure the best experience and performance.
+The first step in querying meaningful data is to create tables to house the data. In this case, we will create three different tables SaleSmall, CustomerInfo, CampaignAnalytics, and Sales. When designing tables in Azure Synapse Analytics, we need to take into account the expected amount of data in each table, as well as how each table will be used. Utilize the following guidance when designing your tables to ensure the best experience and performance.
 
 Table design performance considerations
 
@@ -150,7 +150,206 @@ Table design performance considerations
 | Round robin distribution | default distribution, when little is known about the data or how it will be used. Use this distribution for staging tables |
 | Replicated tables | smaller lookup tables less than 1.5 GB in size |
 
-### Task 1: Create the customer information table
+### Task 1: Create the sale table
+
+Over the past 5 years, Wide World Importers has amassed over 3 billion rows of sales data. With this quantity of data, the storage consumed would be greater than 2 GB. While we will be using only a subset of this data for the lab, we will design the table for the production environment. Using the guidance outlined in the current Exercise description, we can ascertain that we will need a **Clustered Columnstore** table with a **Hash** table distribution based on the **CustomerId** field which will be used in most queries. For further performance gains, the table will be partitioned by transaction date to ensure queries that include dates or date arithmetic are returned in a favorable amount of time.
+
+1. Expand the left menu and select the **Develop** item. From the **Develop** blade, expand the **+** button and select the **SQL script** item.
+
+    ![The left menu is expanded with the Develop item selected. The Develop blade has the + button expanded with the SQL script item highlighted.](media/develop_newsqlscript_menu.png)
+
+2. In the query tab toolbar menu, ensure you connect to your SQL Pool, `SQLPool01`.
+
+    ![The query tab toolbar menu is displayed with the Connect to set to the SQL Pool.](media/querytoolbar_connecttosqlpool.png)
+
+3. In the query window, copy and paste the following query to create the customer information table. Then select the **Run** button in the query tab toolbar.
+
+    ```sql
+      CREATE TABLE [wwi_mcw].[SaleSmall]
+      (
+        [TransactionId] [uniqueidentifier]  NOT NULL,
+        [CustomerId] [int]  NOT NULL,
+        [ProductId] [smallint]  NOT NULL,
+        [Quantity] [tinyint]  NOT NULL,
+        [Price] [decimal](9,2)  NOT NULL,
+        [TotalAmount] [decimal](9,2)  NOT NULL,
+        [TransactionDateId] [int]  NOT NULL,
+        [ProfitAmount] [decimal](9,2)  NOT NULL,
+        [Hour] [tinyint]  NOT NULL,
+        [Minute] [tinyint]  NOT NULL,
+        [StoreId] [smallint]  NOT NULL
+      )
+      WITH
+      (
+        DISTRIBUTION = HASH ( [CustomerId] ),
+        CLUSTERED COLUMNSTORE INDEX,
+        PARTITION
+        (
+          [TransactionDateId] RANGE RIGHT FOR VALUES (
+            20180101, 20180201, 20180301, 20180401, 20180501, 20180601, 20180701, 20180801, 20180901, 20181001, 20181101, 20181201,
+            20190101, 20190201, 20190301, 20190401, 20190501, 20190601, 20190701, 20190801, 20190901, 20191001, 20191101, 20191201)
+        )
+      );
+    ```
+
+4. From the top toolbar, select the **Discard all** button as we will not be saving this query. When prompted, choose to **Discard all changes**.
+
+   ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png)
+  
+### Task 2: Populate the sale table
+
+The data that we will be retrieving to populate the sale table is currently stored as a series of parquet files in the **asadatalake{SUFFIX}** in the data lake (Azure Data Lake Storage Gen 2). This storage account has already been added as a linked service in Azure Synapse Analytics when the environment was provisioned. Linked Services are synonymous with connection strings in Azure Synapse Analytics. Azure Synapse Analytics linked services provides the ability to connect to nearly 100 different types of external services ranging from Azure Storage Accounts to Amazon S3 and more.
+
+1. Review the presence of the **asadatalake{SUFFIX}** linked service, by selecting **Manage** from the left menu, and selecting **Linked services** from the blade menu. Filter the linked services by the term **asadatalake** to find the **asadatalake{SUFFIX}** item. Further investigating this item will unveil that it makes a connection to the storage account using a storage account key.
+  
+   ![The Manage item is selected from the left menu. The Linked services menu item is selected on the blade. On the Linked services screen the term asadatalake{SUFFIX} is entered in the search box and the asadatalake{SUFFIX} Azure Blob Storage item is selected from the filtered results list.](media/manage_linkedservices_solliancepublicdata.png)
+
+2. The sale data for each day is stored in a separate parquet file which is placed in storage following a known convention. In this lab, we are interested in populating the Sale table with only 2018 and 2019 data. Investigate the structure of the data by selecting the **Data** tab, and in the **Data** pane, select the **Linked** tab, and expanding the `asadatalake{SUFFIX}` Storage account.
+
+    > **Note**: The current folder structure for daily sales data is as follows: /wwi-02/sale-small/Year=`YYYY`/Quarter=`Q#`/Month=`M`/Day=`YYYYMMDD` - where `YYYY` is the 4 digit year (eg. 2019), `Q#` represents the quarter (eg. Q1), `M` represents the numerical month (eg. 1 for January) and finally `YYYYMMDD` represents a numeric date format representation (eg. `20190516` for May 16, 2019).
+    > A single parquet file is stored each day folder with the name **sale-small-YYYYMMDD-snappy.parquet** (replacing `YYYYMMDD` with the numeric date representation).
+
+    ```text
+    Sample path to the parquet folder for January 1st, 2019:
+    /wwi-02/sale-small/Year=2019/Quarter=Q1/Month=1/Day=20190101/sale-small-20190101-snappy.parquet
+    ```
+
+3. Create a new Dataset by selecting **Data** from the left menu, expanding the **+** button on the Data blade and selecting **Dataset**. We will be creating a dataset that will point to the root folder of the sales data in the data lake.
+
+4. In the **New dataset** blade, with the **All** tab selected, choose the **Azure Data Lake Storage Gen2** item. Select **Continue**.
+
+5. In the **Select format** screen, choose the **Parquet** item. Select **Continue**.
+
+    ![In the Select format screen, the Parquet item is highlighted.](media/dataset_format_parquet.png)
+
+6. In the **Set properties** blade, populate the form as follows then select **OK**.
+  
+   | Field | Value |
+   |-------|-------|
+   | Name  | Enter **asamcw_sales_parquet** |
+   | Linked service | Select **asadatalake{SUFFIX}** |
+   | File path - Container | Enter **wwi-02** |  
+   | File path - Folder | Enter **sale-small** |
+   | Import schema | Select **From connection/store** |
+
+    ![The Set properties blade is displayed with fields populated with the values from the preceding table.](media/dataset_salesparquet_propertiesform.png)
+
+7. Now we will need to define the destination dataset for our data. In this case we will be storing sale data in our SQL Pool. Create a new dataset by expanding the **+** button on the **Data** blade and selecting **Dataset**.
+
+8. On the **New dataset** blade, with the **Azure** tab selected, enter **synapse** as a search term and select the **Azure Synapse Analytics (formerly SQL DW)** item. Select **Continue**.
+  
+9. On the **Set properties** blade, set the field values to the following, then select **OK**.
+
+   | Field | Value |
+   |-------|-------|
+   | Name  | Enter **asamcw_sale_asa** |
+   | Linked service | Select `SQLPool01`. |
+   | Table name | Select **wwi_mcw.SaleSmall**. |  
+   | Import schema | Select **From connection/store** |
+
+    ![The Set properties blade is populated with the values specified in the preceding table.](media/dataset_saleasaform.png)
+  
+10. In the top toolbar, select **Publish all** to publish the new dataset definitions. When prompted, select the **Publish** button to deploy the changes to the workspace.
+
+    ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png)
+
+11. Since we want to filter on multiple sale year folders (Year=2018 and Year=2019) and copy only the 2018 and 2019 sales data, we will need to create a data flow to define the specific data that we wish to retrieve from our source dataset. To create a new data flow, start by selecting **Develop** from the left menu, and in the **Develop** blade, expand the **+** button and select **Data flow**.
+
+    ![From the left menu, the Develop item is selected. From the Develop blade the + button is expanded with the Data flow item highlighted.](media/develop_newdataflow_menu.png)
+
+12. In the side pane on the **General** tab, name the data flow by entering **ASAMCW - Exercise 2 - 2018 and 2019 Sales** in the **Name** field.
+
+    ![The General tab is displayed with ASAMCW - Exercise 2 - 2018 and 2019 Sales entered as the name of the data flow.](media/dataflow_generaltab_name.png)
+
+13. In the data flow designer window, select the **Add Source** box.
+
+    ![The Add source box is highlighted in the data flow designer window.](media/dataflow_addsourcebox.png)
+
+14. With the added source selected in the designer, in the lower pane with the **Source settings** tab selected, set the **Output stream name** to **salesdata** and for the **Dataset**, select **asamcw_sales_parquet**.
+  
+    ![The Source settings tab is selected displaying the Output stream name set to salesdata and the selected dataset being asamcw_sales_parquet.](media/dataflow_source_sourcesettings.png)
+
+15. Select the **Source options** tab, and add the following as **Wildcard paths**, this will ensure that we only pull data from the parquet files for the sales years of 2018 and 2019:
+
+    1. sale-small/Year=2018/\*/\*/\*/\*
+
+    2. sale-small/Year=2019/\*/\*/\*/\*
+
+      ![The Source options tab is selected with the above wildcard paths highlighted.](media/dataflow_source_sourceoptions.png)
+
+16. Select the **Project** tab, then select **Import projection**
+
+17. At the bottom right of the **salesdata** source, expand the **+** button and select the **Sink** item located in the **Destination** section of the menu.
+
+      ![The + button is highlighted toward the bottom right of the source element on the data flow designer.](media/dataflow_source_additem.png)
+
+18. In the designer, select the newly added **Sink** element and in the bottom pane with the **Sink** tab selected, fill the form as follows:
+
+    | Field | Value |
+    |-------|-------|
+    | Output stream name  | Enter **sale** |
+    | Incoming stream | Select **salesdata**. |
+    | Dataset | Select **asamcw_sale_asa**. |
+
+    ![The Sink tab is displayed with the form populated with the values from the preceding table.](media/dataflow_sink_sinktab.png)
+
+19. Select the **Mapping** tab and toggle the **Auto mapping** setting to the off position. You will need to add the following input to output column mappings. Add a mapping by selecting the **+ Add mapping** button.
+  
+    | Input column | Output column |
+    |-------|-------|
+    | TransactionDate  | TransactionDateId |
+    | Hour | Hour |
+    | Minute | Minute |
+    | Quantity | Quantity |
+
+    ![The Mapping tab is selected with the Auto mapping toggle set to the off position. The + Add mapping button is highlighted along with the mapping entries specified in the preceding table.](media/dataflow_sink_mapping.png)
+
+20. In the top toolbar, select **Publish all** to publish the new dataset definitions. When prompted, select the **Publish** button to deploy the new data flow to the workspace.
+
+    ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png)
+
+21. We can now use this data flow as an activity in a pipeline. Create a new pipeline by selecting **Orchestrate** from the left menu, and in the **Orchestrate** blade, expand the **+** button and select **Pipeline**.
+
+22. Select the **Properties** button from the right side of the designer toolbar. On the **Properties** blade, Enter **ASAMCW - Exercise 2 - Copy Sale Data** as the Name of the pipeline.
+
+23. From the **Activities** menu, expand the **Move & transform** section and drag an instance of **Data flow** to the design surface of the pipeline.
+  
+    ![The Activities menu of the pipeline is displayed with the Move and transform section expanded. An arrow indicating a drag operation shows adding a Data flow activity to the design surface of the pipeline.](media/pipeline_sales_dataflowactivitymenu.png)
+
+24. With the newly added data flow activity selected in the designer, in the side pane with the **General** tab selected, Name the data flow **ASAMCW - Exercise 2 - 2018 and 2019 Sales**.
+
+25. Select the **Settings** tab and set the form fields to the following values:
+
+    | Field | Value |
+    |-------|-------|
+    | Data flow  | Select **ASAMCW - Exercise 2 - 2018 and 2019 Sales** |
+    | Staging linked service | Select `asadatalake{SUFFIX}`. |
+    | Staging storage folder - Container | Enter **staging** |
+    | Staging storage folder - Folder | Enter **mcwsales** |
+
+    ![The data flow activity Settings tab is displayed with the fields specified in the preceding table highlighted.](media/pipeline_sales_dataflowsettings.png)
+
+26. In the top toolbar, select **Publish all** to publish the new dataset definitions. When prompted, select the **Publish** button to commit the changes.
+
+    ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png)
+
+27. Once published, expand the **Add trigger** item on the pipeline designer toolbar, and select **Trigger now**. In the **Pipeline run** blade, select **OK** to proceed with the latest published configuration. You will see notification toast windows indicating the pipeline is running and when it has completed.
+
+28. View the status of the pipeline run by locating the **ASAMCW - Exercise 2 - Copy Sale Data** pipeline in the Orchestrate blade. Expand the actions menu, and select the **Monitor** item.
+
+    ![In the Orchestrate blade, the Action menu is displayed with the Monitor item selected on the ASAMCW - Exercise 2 - Copy Sale Data pipeline.](media/orchestrate_pipeline_monitor_copysaledata.png)
+  
+29. You should see a run of the pipeline we created in the **Pipeline runs** table showing as in progress. It will take approximately 45 minutes for this pipeline operation to complete. You will need to refresh this table from time to time to see updated progress. Once it has completed. You should see the pipeline run displayed with a Status of **Succeeded**. _Feel free to proceed to the following tasks in this exercise while this pipeline runs_.
+  
+    ![On the pipeline runs screen, a successful pipeline run is highlighted in the table.](media/pipeline_run_sales_successful.png)
+
+30. Verify the table has populated by creating a new query. Select the **Develop** item from the left menu, and in the **Develop** blade, expand the **+** button, and select **SQL script**. In the query window, be sure to connect to the SQL Pool database (`SQLPool01`), then paste and run the following query. When complete, select the **Discard all** button from the top toolbar.
+
+  ```sql
+    select count(TransactionId) from wwi_mcw.SaleSmall;
+  ```
+
+### Task 3: Create the customer information table
 
 Over the past 5 years, Wide World Importers has amassed over 3 billion rows of sales data. With this quantity of data, the customer information lookup table is estimated to have over 100 million rows but will consume less than 1.5 GB of storage. While we will be using only a subset of this data for the lab, we will design the table for the production environment. Using the guidance outlined in the Exercising description, we can ascertain that we will need a **Clustered Columnstore** table with a **Replicated** table distribution to hold customer data.
 
@@ -187,11 +386,9 @@ Over the past 5 years, Wide World Importers has amassed over 3 billion rows of s
 
    ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png)
 
-### Task 2: Populate the customer information table
+### Task 4: Populate the customer information table
 
-1. The data that we will be retrieving to populate the customer information table is currently stored in CSV format in a public blob storage container. The storage account that possesses this data has already been added as a linked service in Azure Synapse Analytics when the environment was provisioned.  Linked Services are synonymous with connection strings in Azure Synapse Analytics. Azure Synapse Analytics linked services provides the ability to connect to nearly 100 different types of external services ranging from Azure Storage Accounts to Amazon S3 and more. Review the presence of the **asastore{SUFFIX}*** linked service, by selecting **Manage** from the left menu, and selecting **Linked services** from the blade menu. Filter the linked services by the term **asadatalake** to find the **asadatalake{SUFFIX}** item. Further investigating this item will unveil that it makes a connection to the storage account using a storage account key.
-  
-   ![The Manage item is selected from the left menu. The Linked services menu item is selected on the blade. On the Linked services screen the term asastore is entered in the search box and the asastore Azure Blob Storage item is selected from the filtered results list.](media/manage_linkedservices_solliancepublicdata.png)
+1. The data that we will be retrieving to populate the customer information table is currently stored in CSV format in the data lake (Azure Data Lake Storage Gen2 account). The storage account that possesses this data has already been added as a linked service in Azure Synapse Analytics when the environment was provisioned. 
 
 2. Similar to the previous step, the destination for our data has also been added as a linked service. In this case, the destination for our data is our SQL Pool, `SQLPool01`. Repeat the previous step, this time filtering with the term **sqlpool** to verify the existence of the linked service.
 
@@ -212,7 +409,7 @@ Over the past 5 years, Wide World Importers has amassed over 3 billion rows of s
    | Field | Value |
    |-------|-------|
    | Name  | Enter **asamcw_customerinfo_csv** |
-   | Linked service | Select **asastore{SUFFIX}**.|
+   | Linked service | Select **asadatalake{SUFFIX}**.|
    | File Path - Container | Enter **wwi-02** |
    | File Path - Directory | Enter **customer-info** |
    | File Path - File | Enter **customerinfo.csv** |
@@ -294,7 +491,7 @@ Over the past 5 years, Wide World Importers has amassed over 3 billion rows of s
     select * from wwi_mcw.CustomerInfo;
   ```
   
-### Task 3: Create the campaign analytics table
+### Task 5: Create the campaign analytics table
 
 The campaign analytics table will be queried primarily for dashboard and KPI purposes. Performance is a large factor in the design of this table, and as such  we can ascertain that we will need a **Clustered Columnstore** table with a **Hash** table distribution based on the **Region** field which will fairly evenly distribute the data.
 
@@ -334,9 +531,9 @@ The campaign analytics table will be queried primarily for dashboard and KPI pur
 
    ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png)
 
-### Task 4: Populate the campaign analytics table
+### Task 6: Populate the campaign analytics table
 
-Similar to the customer information table, we will also be populating the campaign analytics table via a CSV file located in the public storage account. This will require source and sink datasets to point to the CSV file in storage and the campaign analytics table that you just created in the SQL Pool. The source CSV file that was received is poorly formatted - we will need to add data transformations to make adjustments to this data before it is imported into the data warehouse.
+Similar to the customer information table, we will also be populating the campaign analytics table via a CSV file located in the data lake. This will require source and sink datasets to point to the CSV file in storage and the campaign analytics table that you just created in the SQL Pool. The source CSV file that was received is poorly formatted - we will need to add data transformations to make adjustments to this data before it is imported into the data warehouse.
 
 1. The source dataset will reference the CSV file containing campaign analytics information. From the left menu, select **Data**. From the **Data** blade, expand the **+** button and select **Dataset**.
 
@@ -355,7 +552,7 @@ Similar to the customer information table, we will also be populating the campai
    | Field | Value |
    |-------|-------|
    | Name  | Enter **asamcw_campaignanalytics_csv** |
-   | Linked service | Select **asastore{SUFFIX}**.|
+   | Linked service | Select **asadatalake{SUFFIX}**.|
    | File Path - Container | Enter **wwi-02** |
    | File Path - Directory | Enter **campaign-analytics** |
    | File Path - File | Enter **campaignanalytics.csv** |
@@ -431,7 +628,7 @@ Similar to the customer information table, we will also be populating the campai
         skipLines: 1) ~> campaignanalyticscsv
     ```
 
-> NOTE: We are changing the mappings as the source file was corrupted with the wrong headers.
+    > NOTE: We are changing the mappings as the source file was corrupted with the wrong headers.
 
 15. Select the **campaignanalyticscsv** data source, then select **Projection**. The projection should display the following schema:
 
@@ -530,7 +727,7 @@ Similar to the customer information table, we will also be populating the campai
     | Field | Value |
     |-------|-------|
     | Data flow  | Select **ASAMCW - Exercise 2 - Campaign Analytics Data** |
-    | Staging linked service | Select `asastore{SUFFIX}`. |
+    | Staging linked service | Select `asadatalake{SUFFIX}`. |
     | Staging storage folder - Container | Enter **staging** |
     | Staging storage folder - Directory | Enter **mcwcampaignanalytics** |
 
@@ -552,199 +749,6 @@ Similar to the customer information table, we will also be populating the campai
 
   ```sql
     select count(Region) from wwi_mcw.CampaignAnalytics;
-  ```
-
-### Task 5: Create the sale table
-
-Over the past 5 years, Wide World Importers has amassed over 3 billion rows of sales data. With this quantity of data, the storage consumed would be greater than 2 GB. While we will be using only a subset of this data for the lab, we will design the table for the production environment. Using the guidance outlined in the current Exercise description, we can ascertain that we will need a **Clustered Columnstore** table with a **Hash** table distribution based on the **CustomerId** field which will be used in most queries. For further performance gains, the table will be partitioned by transaction date to ensure queries that include dates or date arithmetic are returned in a favorable amount of time.
-
-1. Expand the left menu and select the **Develop** item. From the **Develop** blade, expand the **+** button and select the **SQL script** item.
-
-    ![The left menu is expanded with the Develop item selected. The Develop blade has the + button expanded with the SQL script item highlighted.](media/develop_newsqlscript_menu.png)
-
-2. In the query tab toolbar menu, ensure you connect to your SQL Pool, `SQLPool01`.
-
-    ![The query tab toolbar menu is displayed with the Connect to set to the SQL Pool.](media/querytoolbar_connecttosqlpool.png)
-
-3. In the query window, copy and paste the following query to create the customer information table. Then select the **Run** button in the query tab toolbar.
-
-    ```sql
-      CREATE TABLE [wwi_mcw].[SaleSmall]
-      (
-        [TransactionId] [uniqueidentifier]  NOT NULL,
-        [CustomerId] [int]  NOT NULL,
-        [ProductId] [smallint]  NOT NULL,
-        [Quantity] [tinyint]  NOT NULL,
-        [Price] [decimal](9,2)  NOT NULL,
-        [TotalAmount] [decimal](9,2)  NOT NULL,
-        [TransactionDateId] [int]  NOT NULL,
-        [ProfitAmount] [decimal](9,2)  NOT NULL,
-        [Hour] [tinyint]  NOT NULL,
-        [Minute] [tinyint]  NOT NULL,
-        [StoreId] [smallint]  NOT NULL
-      )
-      WITH
-      (
-        DISTRIBUTION = HASH ( [CustomerId] ),
-        CLUSTERED COLUMNSTORE INDEX,
-        PARTITION
-        (
-          [TransactionDateId] RANGE RIGHT FOR VALUES (
-            20180101, 20180201, 20180301, 20180401, 20180501, 20180601, 20180701, 20180801, 20180901, 20181001, 20181101, 20181201,
-            20190101, 20190201, 20190301, 20190401, 20190501, 20190601, 20190701, 20190801, 20190901, 20191001, 20191101, 20191201)
-        )
-      );
-    ```
-
-4. From the top toolbar, select the **Discard all** button as we will not be saving this query. When prompted, choose to **Discard all changes**.
-
-   ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png)
-  
-### Task 6: Populate the sale table
-
-The data that we will be retrieving to populate the sale table is currently stored as a series of parquet files in the **asastore{SUFFIX}** public blob storage account. This storage account has already been added as a linked service in Azure Synapse Analytics when the environment was provisioned. The sale data for each day is stored in a separate parquet file which is placed in storage following a known convention. In this lab, we are interested in populating the Sale table with only 2018 and 2019 data.
-
-> **Note**: The current folder structure for daily sales data is as follows: /wwi-02/sale-small/Year=`YYYY`/Quarter=`Q#`/Month=`M`/Day=`YYYYMMDD` - where `YYYY` is the 4 digit year (eg. 2019), `Q#` represents the quarter (eg. Q1), `M` represents the numerical month (eg. 1 for January) and finally `YYYYMMDD` represents a numeric date format representation (eg. `20190516` for May 16, 2019).
-> A single parquet file is stored each day folder with the name **sale-small-YYYYMMDD-snappy.parquet** (replacing `YYYYMMDD` with the numeric date representation).
-
-```text
-  Sample path to the parquet folder for January 1st, 2019:
-  /wwi-02/sale-small/Year=2019/Quarter=Q1/Month=1/Day=20190101/sale-small-20190101-snappy.parquet
-```
-
-1. Similar to how we've done it before, create a new Dataset by selecting **Data** from the left menu, expanding the **+** button on the Data blade and selecting **Dataset**. We will be creating a dataset that will point to the root folder of the sales data in the public storage account.
-
-2. In the **New dataset** blade, with the **All** tab selected, choose the **Azure Data Lake Storage Gen2** item. Select **Continue**.
-
-3. In the **Select format** screen, choose the **Parquet** item. Select **Continue**.
-
-    ![In the Select format screen, the Parquet item is highlighted.](media/dataset_format_parquet.png)
-
-4. In the **Set properties** blade, populate the form as follows then select **OK**.
-  
-   | Field | Value |
-   |-------|-------|
-   | Name  | Enter **asamcw_sales_parquet** |
-   | Linked service | Select **asadatalake{SUFFIX}** |
-   | File path - Container | Enter **wwi-02** |  
-   | File path - Folder | Enter **sale-small** |
-   | Import schema | Select **From connection/store** |
-
-    ![The Set properties blade is displayed with fields populated with the values from the preceding table.](media/dataset_salesparquet_propertiesform.png)
-
-5. Now we will need to define the destination dataset for our data. In this case we will be storing sale data in our SQL Pool. Create a new dataset by expanding the **+** button on the **Data** blade and selecting **Dataset**.
-
-6. On the **New dataset** blade, with the **Azure** tab selected, enter **synapse** as a search term and select the **Azure Synapse Analytics (formerly SQL DW)** item. Select **Continue**.
-  
-7. On the **Set properties** blade, set the field values to the following, then select **OK**.
-
-   | Field | Value |
-   |-------|-------|
-   | Name  | Enter **asamcw_sale_asa** |
-   | Linked service | Select `SQLPool01`. |
-   | Table name | Select **wwi_mcw.SaleSmall**. |  
-   | Import schema | Select **From connection/store** |
-
-    ![The Set properties blade is populated with the values specified in the preceding table.](media/dataset_saleasaform.png)
-  
-8. In the top toolbar, select **Publish all** to publish the new dataset definitions. When prompted, select the **Publish** button to deploy the changes to the workspace.
-
-    ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png)
-
-9. Since we want to filter on multiple sale year folders (Year=2018 and Year=2019) and copy only the 2018 and 2019 sales data, we will need to create a data flow to define the specific data that we wish to retrieve from our source dataset. To create a new data flow, start by selecting **Develop** from the left menu, and in the **Develop** blade, expand the **+** button and select **Data flow**.
-
-    ![From the left menu, the Develop item is selected. From the Develop blade the + button is expanded with the Data flow item highlighted.](media/develop_newdataflow_menu.png)
-
-10. In the side pane on the **General** tab, name the data flow by entering **ASAMCW - Exercise 2 - 2018 and 2019 Sales** in the **Name** field.
-
-    ![The General tab is displayed with ASAMCW - Exercise 2 - 2018 and 2019 Sales entered as the name of the data flow.](media/dataflow_generaltab_name.png)
-
-11. In the data flow designer window, select the **Add Source** box.
-
-    ![The Add source box is highlighted in the data flow designer window.](media/dataflow_addsourcebox.png)
-
-12. With the added source selected in the designer, in the lower pane with the **Source settings** tab selected, set the **Output stream name** to **salesdata** and for the **Dataset**, select **asamcw_sales_parquet**.
-  
-    ![The Source settings tab is selected displaying the Output stream name set to salesdata and the selected dataset being asamcw_sales_parquet.](media/dataflow_source_sourcesettings.png)
-
-13. Select the **Source options** tab, and add the following as **Wildcard paths**, this will ensure that we only pull data from the parquet files for the sales years of 2018 and 2019:
-
-    1. sale-small/Year=2018/\*/\*/\*/\*
-
-    2. sale-small/Year=2019/\*/\*/\*/\*
-
-      ![The Source options tab is selected with the above wildcard paths highlighted.](media/dataflow_source_sourceoptions.png)
-
-14. Select the **Project** tab, then select **Import projection**
-
-15. At the bottom right of the **salesdata** source, expand the **+** button and select the **Sink** item located in the **Destination** section of the menu.
-
-      ![The + button is highlighted toward the bottom right of the source element on the data flow designer.](media/dataflow_source_additem.png)
-
-16. In the designer, select the newly added **Sink** element and in the bottom pane with the **Sink** tab selected, fill the form as follows:
-
-    | Field | Value |
-    |-------|-------|
-    | Output stream name  | Enter **sale** |
-    | Incoming stream | Select **salesdata**. |
-    | Dataset | Select **asamcw_sale_asa**. |
-
-    ![The Sink tab is displayed with the form populated with the values from the preceding table.](media/dataflow_sink_sinktab.png)
-
-17. Select the **Mapping** tab and toggle the **Auto mapping** setting to the off position. You will need to add the following input to output column mappings. Add a mapping by selecting the **+ Add mapping** button.
-  
-    | Input column | Output column |
-    |-------|-------|
-    | TransactionDate  | TransactionDateId |
-    | Hour | Hour |
-    | Minute | Minute |
-    | Quantity | Quantity |
-
-    ![The Mapping tab is selected with the Auto mapping toggle set to the off position. The + Add mapping button is highlighted along with the mapping entries specified in the preceding table.](media/dataflow_sink_mapping.png)
-
-18. In the top toolbar, select **Publish all** to publish the new dataset definitions. When prompted, select the **Publish** button to deploy the new data flow to the workspace.
-
-    ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png)
-
-19. We can now use this data flow as an activity in a pipeline. Create a new pipeline by selecting **Orchestrate** from the left menu, and in the **Orchestrate** blade, expand the **+** button and select **Pipeline**.
-
-20. Select the **Properties** button from the right side of the designer toolbar. On the **Properties** blade, Enter **ASAMCW - Exercise 2 - Copy Sale Data** as the Name of the pipeline.
-
-21. From the **Activities** menu, expand the **Move & transform** section and drag an instance of **Data flow** to the design surface of the pipeline.
-  
-    ![The Activities menu of the pipeline is displayed with the Move and transform section expanded. An arrow indicating a drag operation shows adding a Data flow activity to the design surface of the pipeline.](media/pipeline_sales_dataflowactivitymenu.png)
-
-22. With the newly added data flow activity selected in the designer, in the side pane with the **General** tab selected, Name the data flow **ASAMCW - Exercise 2 - 2018 and 2019 Sales**.
-
-23. Select the **Settings** tab and set the form fields to the following values:
-
-    | Field | Value |
-    |-------|-------|
-    | Data flow  | Select **ASAMCW - Exercise 2 - 2018 and 2019 Sales** |
-    | Staging linked service | Select `asastore{SUFFIX}`. |
-    | Staging storage folder - Container | Enter **staging** |
-    | Staging storage folder - Folder | Enter **mcwsales** |
-
-    ![The data flow activity Settings tab is displayed with the fields specified in the preceding table highlighted.](media/pipeline_sales_dataflowsettings.png)
-
-24. In the top toolbar, select **Publish all** to publish the new dataset definitions. When prompted, select the **Publish** button to commit the changes.
-
-    ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png)
-
-25. Once published, expand the **Add trigger** item on the pipeline designer toolbar, and select **Trigger now**. In the **Pipeline run** blade, select **OK** to proceed with the latest published configuration. You will see notification toast windows indicating the pipeline is running and when it has completed.
-
-26. View the status of the pipeline run by locating the **ASAMCW - Exercise 2 - Copy Sale Data** pipeline in the Orchestrate blade. Expand the actions menu, and select the **Monitor** item.
-
-    ![In the Orchestrate blade, the Action menu is displayed with the Monitor item selected on the ASAMCW - Exercise 2 - Copy Sale Data pipeline.](media/orchestrate_pipeline_monitor_copysaledata.png)
-  
-27. You should see a run of the pipeline we created in the **Pipeline runs** table showing as in progress. It will take approximately 45 minutes for this pipeline operation to complete. You will need to refresh this table from time to time to see updated progress. Once it has completed. You should see the pipeline run displayed with a Status of **Succeeded**.
-  
-    ![On the pipeline runs screen, a successful pipeline run is highlighted in the table.](media/pipeline_run_sales_successful.png)
-
-28. Verify the table has populated by creating a new query. Select the **Develop** item from the left menu, and in the **Develop** blade, expand the **+** button, and select **SQL script**. In the query window, be sure to connect to the SQL Pool database (`SQLPool01`), then paste and run the following query. When complete, select the **Discard all** button from the top toolbar.
-
-  ```sql
-    select count(TransactionId) from wwi_mcw.SaleSmall;
   ```
 
 ### Task 7: Populate the product table
@@ -783,13 +787,13 @@ When you query Parquet files using Synapse SQL Serverless, you can explore the d
 
 3. Navigate to the **sale-small/Year=2010/Quarter=Q4/Month=12/Day=20101231** folder. Right-click on the **sale-small-20101231-snappy.parquet** file, select **New SQL script**, then **Select TOP 100 rows**.
 
-    ![The Storage accounts section is expanded with the context menu visible on the PrimaryStorage account with the Select TOP 100 rows option highlighted.](media/data-hub-parquet-select-rows.png)
+    ![The Storage accounts section is expanded with the context menu visible on the asadatalake{SUFFIX} account with the Select TOP 100 rows option highlighted.](media/data-hub-parquet-select-rows.png)
 
 4. Ensure **SQL on-demand** is selected in the **Connect to** dropdown list above the query window, then run the query. Data is loaded by the Synapse SQL Serverless endpoint and processed as if was coming from any regular relational database.
 
     ![The SQL on-demand connection is highlighted on the query window toolbar.](media/sql-on-demand-selected.png "SQL on-demand")
 
-5. Modify the SQL query to perform aggregates and grouping operations to better understand the data. Replace the query with the following, making sure that the file path in **OPENROWSET** matches your current file path, be sure to substitute `PrimaryStorage` for the appropriate value in your environment:
+5. Modify the SQL query to perform aggregates and grouping operations to better understand the data. Replace the query with the following, making sure that the file path in **OPENROWSET** matches your current file path, be sure to substitute `asadatalake{SUFFIX}` for the appropriate value in your environment:
 
     ```sql
     SELECT
@@ -799,21 +803,21 @@ When you query Parquet files using Synapse SQL Serverless, you can explore the d
         SUM(Quantity) AS [(sum) Quantity]
     FROM
         OPENROWSET(
-            BULK 'https://<PrimaryStorage>.dfs.core.windows.net/wwi-02/sale-small/Year=2010/Quarter=Q4/Month=12/Day=20101231/sale-small-20101231-snappy.parquet',
+            BULK 'https://asadatalake{SUFFIX}.dfs.core.windows.net/wwi-02/sale-small/Year=2010/Quarter=Q4/Month=12/Day=20101231/sale-small-20101231-snappy.parquet',
             FORMAT='PARQUET'
         ) AS [r] GROUP BY r.TransactionDate, r.ProductId;
     ```
 
     ![The T-SQL query above is displayed within the query window.](media/sql-serverless-aggregates.png "Query window")
 
-6. Now let's figure out how many records are contained within the Parquet files for 2019 data. This information is important for planning how we optimize for importing the data into Azure Synapse Analytics. To do this, replace your query with the following (be sure to update the name of your data lake in BULK statement, by replacing `PrimaryStorage`):
+6. Now let's figure out how many records are contained within the Parquet files for 2019 data. This information is important for planning how we optimize for importing the data into Azure Synapse Analytics. To do this, replace your query with the following (be sure to update the name of your data lake in BULK statement, by replacing `asadatalake{SUFFIX}`):
 
     ```sql
     SELECT
         COUNT_BIG(*)
     FROM
         OPENROWSET(
-            BULK 'https://<PrimaryStorage>.dfs.core.windows.net/wwi-02/sale-small/Year=2019/*/*/*/*',
+            BULK 'https://asadatalake{SUFFIX}.dfs.core.windows.net/wwi-02/sale-small/Year=2019/*/*/*/*',
             FORMAT='PARQUET'
         ) AS [r];
     ```
@@ -824,7 +828,7 @@ When you query Parquet files using Synapse SQL Serverless, you can explore the d
 
 ### Task 2: Query sales Parquet data with Azure Synapse Spark
 
-1. Select **Data** from the left menu, then browse to the data lake storage account folder **sale-small/Year=2010/Quarter=Q4/Month=12/Day=20101231** located in `PrimaryStorage` if needed, then right-click the Parquet file and select New notebook.
+1. Select **Data** from the left menu, then browse to the data lake storage account folder **sale-small/Year=2010/Quarter=Q4/Month=12/Day=20101231** located in `asadatalake{SUFFIX}` if needed, then right-click the Parquet file and select New notebook.
 
     ![The Parquet file is displayed with the New notebook menu item highlighted.](media/new-spark-notebook-sales.png "New notebook")
 
@@ -896,14 +900,14 @@ A common format for exporting and storing data is with text based files. These c
 
     ![The SQL on-demand connection is highlighted on the query window toolbar.](media/sql-on-demand-selected.png "SQL on-demand")
 
-3. In this scenario, we will be querying into the CSV file that was used to populate the product table. This file is located in the `PrimaryStorage` account at: **wwi-02/data-generators/generator-product.csv**. We will select all data from this file. Copy and paste the following query into the query window and select **Run** from the query window toolbar menu. Remember to replace `PrimaryStorage` with your storage account name.
+3. In this scenario, we will be querying into the CSV file that was used to populate the product table. This file is located in the `asadatalake{SUFFIX}` account at: **wwi-02/data-generators/generator-product.csv**. We will select all data from this file. Copy and paste the following query into the query window and select **Run** from the query window toolbar menu. Remember to replace `asadatalake{SUFFIX}` with your storage account name.
 
     ```sql
     SELECT
        csv.*
     FROM
         OPENROWSET(
-            BULK 'https://<PrimaryStorage>.dfs.core.windows.net/wwi-02/data-generators/generator-product/generator-product.csv',
+            BULK 'https://asadatalake{SUFFIX}.dfs.core.windows.net/wwi-02/data-generators/generator-product/generator-product.csv',
             FORMAT='CSV',
             FIRSTROW = 1
         ) WITH (
@@ -916,7 +920,7 @@ A common format for exporting and storing data is with text based files. These c
 
     > **Note**: In this query we are querying only a single file. Azure Synapse Analytics allows you to query across a series of CSV files (structured identically) by using wildcards in the path to the file(s).
 
-4. You are also able to perform aggregations on this data. Replace the query with the following, and select **Run** from the toolbar menu. Remember to replace `PrimaryStorage` with your storage account name.
+4. You are also able to perform aggregations on this data. Replace the query with the following, and select **Run** from the toolbar menu. Remember to replace `asadatalake{SUFFIX}` with your storage account name.
 
     ```sql
     SELECT
@@ -925,7 +929,7 @@ A common format for exporting and storing data is with text based files. These c
         SUM(Profit) as TotalProfit
     FROM
         OPENROWSET(
-            BULK 'https://<PrimaryStorage>.dfs.core.windows.net/wwi-02/data-generators/generator-product/generator-product.csv',
+            BULK 'https://asadatalake{SUFFIX}.dfs.core.windows.net/wwi-02/data-generators/generator-product/generator-product.csv',
             FORMAT='CSV',
             FIRSTROW = 1
         ) WITH (
@@ -954,14 +958,14 @@ A common format for exporting and storing data is with text based files. These c
 
     ![The SQL on-demand connection is highlighted on the query window toolbar.](media/sql-on-demand-selected.png "SQL on-demand")
 
-3. Replace the query with the following, remember to replace `PrimaryStorage` with the name of your storage account:
+3. Replace the query with the following, remember to replace `asadatalake{SUFFIX}` with the name of your storage account:
 
     ```sql
     SELECT
         products.*
     FROM
         OPENROWSET(
-            BULK 'https://<PrimaryStorage>.dfs.core.windows.net/wwi-02/product-json/json-data/*.json',
+            BULK 'https://asadatalake{SUFFIX}.dfs.core.windows.net/wwi-02/product-json/json-data/*.json',
             FORMAT='CSV',
             FIELDTERMINATOR ='0x0b',
             FIELDQUOTE = '0x0b',
@@ -1473,11 +1477,13 @@ Setting importance in Synapse SQL for Azure Synapse allows you to influence the 
 
 13. Select **Run** from the toolbar menu to execute the SQL command.
 
-14. Let's flood the system again with queries and see what happens this time for `asa.sql.workload01` and `asa.sql.workload02` queries. To do this, we'll run an Azure Synapse Pipeline which triggers queries. 
+14. Let's flood the system again with queries and see what happens this time for `asa.sql.workload01` and `asa.sql.workload02` queries. To do this, we'll run an Azure Synapse Pipeline which triggers queries.
+
     - **Select** the `Orchestrate` Tab
+
     - **Run** the **Exercise 7 - Execute Data Analyst and CEO Queries** Pipeline, which will run / trigger the `asa.sql.workload01` and `asa.sql.workload02` queries.
 
-15.  In the query window, replace the script with the following to see what happens to the `asa.sql.workload01` queries this time:
+15. In the query window, replace the script with the following to see what happens to the `asa.sql.workload01` queries this time:
 
     ```sql
     SELECT s.login_name, r.[Status], r.Importance, submit_time, start_time ,s.session_id FROM sys.dm_pdw_exec_sessions s
@@ -1487,11 +1493,11 @@ Setting importance in Synapse SQL for Azure Synapse allows you to influence the 
     ORDER BY submit_time ,status desc
     ```
 
-16.  Select **Run** from the toolbar menu to execute the SQL command. You should see an output similar to the following that shows query executions for the `asa.sql.workload01` user having a **high** importance.
+16. Select **Run** from the toolbar menu to execute the SQL command. You should see an output similar to the following that shows query executions for the `asa.sql.workload01` user having a **high** importance.
 
     ![SQL query results.](media/sql-query-4-results.png "SQL script")
 
-17.  Navigate to the **Monitor** hub, select **Pipeline runs**, and then select **Cancel recursive** for each running Exercise 7 pipelines. This will help speed up the remaining tasks.
+17. Navigate to the **Monitor** hub, select **Pipeline runs**, and then select **Cancel recursive** for each running Exercise 7 pipelines. This will help speed up the remaining tasks.
 
     ![The cancel recursive option is shown.](media/cancel-recursive.png "Pipeline runs - Cancel recursive")
 

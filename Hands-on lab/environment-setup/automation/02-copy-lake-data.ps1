@@ -1,5 +1,3 @@
-cd "C:\github\codingbandit\MCW-Azure-Synapse-Analytics-end-to-end-solution\Hands-on lab\environment-setup\automation"
-
 Install-Module -Name Az -AllowClobber
 Install-Module -Name Azure.Storage -AllowClobber
 

@@ -79,7 +79,7 @@ CREATE EXTERNAL TABLE [wwi_mcw].[ASAMCWMLModelExt]
 )
 WITH
 (
-    LOCATION='/ml/onnx-hex' ,
+    LOCATION='/azureml/onnx-hex' ,
     DATA_SOURCE = ASAMCWModelStorage ,
     FILE_FORMAT = csv ,
     REJECT_TYPE = VALUE ,
