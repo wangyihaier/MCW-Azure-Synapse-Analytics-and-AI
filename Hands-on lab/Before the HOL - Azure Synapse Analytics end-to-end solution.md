@@ -30,7 +30,8 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 - [Azure Synapse Analytics end-to-end solution before the hands-on lab setup guide](#azure-synapse-analytics-end-to-end-solution-before-the-hands-on-lab-setup-guide)
   - [Requirements](#requirements)
   - [Before the hands-on lab](#before-the-hands-on-lab)
-    - [Task 1: Create Azure Synapse Analytics workspace](#task-1-create-azure-synapse-analytics-workspace)
+    - [Task 1: Create a resource group in Azure](#task-1-create-a-resource-group-in-azure)
+    - [Task 2: Create Azure Synapse Analytics workspace](#task-2-create-azure-synapse-analytics-workspace)
 
 <!-- /TOC -->
 
@@ -42,7 +43,27 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 ## Before the hands-on lab
 
-### Task 1: Create Azure Synapse Analytics workspace
+### Task 1: Create a resource group in Azure
+
+1. Log into the [Azure Portal](https://portal.azure.com) using your Azure credentials.
+
+2. On the Azure Portal home screen, select the **+ Create a resource** tile.
+
+    ![A portion of the Azure Portal home screen is displayed with the + Create a resource tile highlighted.](media/bhol_createaresource.png)
+
+3. In the **Search the Marketplace** text box, type **Resource group** and press the **Enter** key.
+
+    ![On the new resource screen Resource group is entered as a search term.](media/bhol_searchmarketplaceresourcegroup.png)
+
+4. Select the **Create** button on the **Resource group** overview page.
+
+5. On the **Create a resource group** screen, select your desired Subscription and Region. For Resource group, enter **Synapse-MCW**, then select the **Review + Create** button.
+
+    ![The Create a resource group form is displayed populated with Synapse-MCW as the resource group name.](media/bhol_resourcegroupform.png)
+
+6. Select the **Create** button once validation has passed.
+
+### Task 2: Create Azure Synapse Analytics workspace
 
 1. Deploy the workspace through the following Azure ARM template (press the button below):
 
