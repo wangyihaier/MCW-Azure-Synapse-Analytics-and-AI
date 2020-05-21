@@ -1,9 +1,10 @@
+cd "C:\github\codingbandit\MCW-Azure-Synapse-Analytics-end-to-end-solution\Hands-on lab\environment-setup\automation"
+
 Install-Module -Name Az -AllowClobber
 Install-Module -Name Azure.Storage -AllowClobber
 
 $InformationPreference = "Continue"
 
-#
 # TODO: Keep all required configuration in C:\LabFiles\AzureCreds.ps1 file
 . C:\LabFiles\AzureCreds.ps1
 
@@ -37,10 +38,11 @@ $azCopyCommand = (Get-ChildItem -Path C:\LabFiles -Recurse azcopy.exe).Directory
 $Env:Path += ";"+ $azCopyCommand
 
 $singleFiles = @{
-        parquet_query_file = "wwi-02/sales-small/Year=2010/Quarter=Q4/Month=12/Day=20101231/sale-small-20101231-snappy.parquet"
-        customer_info = "wwi-02/customer-info/customer-info.csv"
+        parquet_query_file = "wwi-02/sale-small/Year=2010/Quarter=Q4/Month=12/Day=20101231/sale-small-20101231-snappy.parquet"
+        customer_info = "wwi-02/customer-info/customerinfo.csv"
         campaign_analytics = "wwi-02/campaign-analytics/campaignanalytics.csv"
         products = "wwi-02/data-generators/generator-product/generator-product.csv"
+        model = "wwi-02/ml/onnx-hex/product_seasonality_classifier.onnx.hex"
 }
 
 foreach ($singleFile in $singleFiles.Keys) {
@@ -51,15 +53,21 @@ foreach ($singleFile in $singleFiles.Keys) {
 }
 
 $dataDirectories = @{
-        data2018 = "wwi-02/sale-small/Year=2018"
-        data2019 = "wwi-02/sale-small/Year=2019"
+        data2018 = "wwi-02/sale-small,wwi-02/sale-small/Year=2018/"
+        data2019 = "wwi-02/sale-small,wwi-02/sale-small/Year=2019/"
 }
 
 foreach ($dataDirectory in $dataDirectories.Keys) {
-        $source = $publicDataUrl + $dataDirectories[$dataDirectory]
-        $destination = $dataLakeStorageBlobUrl + $dataDirectories[$dataDirectory] + $destinationSasKey
+
+        $vals = $dataDirectories[$dataDirectory].tostring().split(",");
+
+        $source = $publicDataUrl + $vals[1];
+
+        $path = $vals[0];
+
+        $destination = $dataLakeStorageBlobUrl + $path + $destinationSasKey
         Write-Information "Copying directory $($source) to $($destination)"
-        azcopy copy $source $destination --recursive
+        azcopy copy $source $destination --recursive=true
 }
 
 $rawData = "./rawdata/json-data"

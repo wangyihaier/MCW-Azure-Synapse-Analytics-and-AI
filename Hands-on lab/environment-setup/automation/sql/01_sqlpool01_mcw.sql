@@ -1,13 +1,38 @@
-create user [CEO] without login;
-create user [DataAnalystMiami] without login;
-create user [DataAnalystSanDiego] without login;
-create login [asa.sql.workload01] with password = '#PASSWORD#'
-create login [asa.sql.workload02] with password = '#PASSWORD#'
-GO
+if not exists(select * from sys.database_principals where name = 'asa.sql.workload01')
+begin
+    create user [asa.sql.workload01] from login [asa.sql.workload01]
+end
+
+if not exists(select * from sys.database_principals where name = 'asa.sql.workload02')
+begin
+    create user [asa.sql.workload02] from login [asa.sql.workload02]
+end
+
+if not exists(select * from sys.database_principals where name = 'ceo')
+begin
+    create user [CEO] without login;
+end
+
+execute sp_addrolemember 'db_datareader', 'asa.sql.workload01' 
+execute sp_addrolemember 'db_datareader', 'asa.sql.workload02' 
+execute sp_addrolemember 'db_datareader', 'CEO' 
+
+if not exists(select * from sys.database_principals where name = 'DataAnalystMiami')
+begin
+    create user [DataAnalystMiami] without login;
+end
+
+if not exists(select * from sys.database_principals where name = 'DataAnalystSanDiego')
+begin
+    create user [DataAnalystSanDiego] without login;
+end
+go
+
 create schema [wwi_mcw];
-GO
+go
+
 create master key;
-GO
+
 create table [wwi_mcw].[Product]
 (
     ProductId SMALLINT NOT NULL,
@@ -19,7 +44,6 @@ WITH
 (
     DISTRIBUTION = REPLICATE
 );
-GO
 -- Replace <data_lake_account_key> with the key of the primary data lake account
 
 CREATE DATABASE SCOPED CREDENTIAL StorageCredential
@@ -56,7 +80,7 @@ CREATE EXTERNAL TABLE [wwi_mcw].[ASAMCWMLModelExt]
 WITH
 (
     LOCATION='/ml/onnx-hex' ,
-    DATA_SOURCE = ModelStorage ,
+    DATA_SOURCE = ASAMCWModelStorage ,
     FILE_FORMAT = csv ,
     REJECT_TYPE = VALUE ,
     REJECT_VALUE = 0

@@ -1,6 +1,14 @@
 Remove-Module environment-automation
 Import-Module ".\environment-automation"
 
+# requires at least 1.8.0 for Az.Accounts
+# requires at least 2.0.0 for Az.Storage
+uninstall-package AZ.Accounts -AllVersions
+install-package AZ.Accounts
+
+uninstall-package AZ.Storage -AllVersions
+install-package AZ.Storage
+
 $InformationPreference = "Continue"
 
 #
@@ -54,20 +62,8 @@ $global:tokenTimes = [ordered]@{
 $overallStateIsValid = $true
 
 $asaArtifacts = [ordered]@{
-        "wwi02_sale_small_workload_01_asa" = @{ 
+        "asamcw_wwi_salesmall_workload1_asa" = @{ 
                 Category = "datasets"
-                Valid = $false
-        }
-        "wwi02_sale_small_workload_02_asa" = @{ 
-                Category = "datasets"
-                Valid = $false
-        }
-        "ASAMCW - Exercise 7 - Execute Business Analyst Queries" = @{
-                Category = "pipelines"
-                Valid = $false
-        }
-        "ASAMCW - Exercise 7 - Execute Data Analyst and CEO Queries" = @{
-                Category = "pipelines"
                 Valid = $false
         }
         "ASAMCW - Exercise 6 - Machine Learning" = @{
@@ -128,24 +124,25 @@ $users = [ordered]@{
 $query = @"
 select name from sys.sysusers
 "@
-        $result = Execute-SQLQuery -WorkspaceName $workspaceName -SQLPoolName $sqlPoolName -SQLQuery $query
 
-        foreach ($dataRow in $result.data) {
-                $name = $dataRow[0]
+$result = Execute-SQLQuery -WorkspaceName $workspaceName -SQLPoolName $sqlPoolName -SQLQuery $query
 
-                if ($users[$name]) {
-                        Write-Information "Found user $($name)."
-                        $users[$name]["Valid"] = $true
-                }
-        }
+foreach ($dataRow in $result.data) {
+        $name = $dataRow[0]
 
-        foreach ($name in $users.Keys) {
-                if (-not $users[$name]["Valid"]) {
-                        Write-Warning "User $($name) was not found."
-                        $overallStateIsValid = $false
-                }
+        if ($users[$name]) {
+                Write-Information "Found user $($name)."
+                $users[$name]["Valid"] = $true
         }
 }
+
+foreach ($name in $users.Keys) {
+        if (-not $users[$name]["Valid"]) {
+                Write-Warning "User $($name) was not found."
+                $overallStateIsValid = $false
+        }
+}
+
 
 Write-Information "Checking Spark pool $($sparkPoolName)"
 $sparkPool = Get-SparkPool -SubscriptionId $subscriptionId -ResourceGroupName $resourceGroupName -WorkspaceName $workspaceName -SparkPoolName $sparkPoolName

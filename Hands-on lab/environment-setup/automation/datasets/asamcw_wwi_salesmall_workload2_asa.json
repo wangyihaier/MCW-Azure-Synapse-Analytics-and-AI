@@ -1,5 +1,5 @@
 {
-    "name": "asamcw_wwi_salesmall_workload1_asa",
+    "name": "asamcw_wwi_salesmall_workload2_asa",
     "properties": {
         "linkedServiceName": {
             "referenceName": "#LINKED_SERVICE_NAME#",
