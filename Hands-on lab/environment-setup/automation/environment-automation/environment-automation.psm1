@@ -263,6 +263,35 @@ function Create-IntegrationRuntime {
     return $result
 }
 
+function Get-Workspace {
+    
+    param(
+    [parameter(Mandatory=$true)]
+    [String]
+    $SubscriptionId,
+
+    [parameter(Mandatory=$true)]
+    [String]
+    $ResourceGroupName,
+
+    [parameter(Mandatory=$true)]
+    [String]
+    $WorkspaceName
+    )
+
+    $uri = "https://management.azure.com/subscriptions/$($SubscriptionId)/resourcegroups/$($ResourceGroupName)/providers/Microsoft.Synapse/workspaces/$($WorkspaceName)?api-version=2019-06-01-preview"
+
+    Ensure-ValidTokens
+
+    try {
+        $result = Invoke-RestMethod  -Uri $uri -Method GET -Headers @{ Authorization="Bearer $managementToken" }  
+        return $result  
+    }
+    catch {
+        return $null
+    }
+}
+
 function Get-IntegrationRuntime {
     
     param(
@@ -734,6 +763,71 @@ function Wait-ForSQLQuery {
     Write-Information "The query was successfully executed."
 }
 
+function CallJavascript($message, $secret)
+{
+    $url = "https://ciprian-hash.azurewebsites.net/hash.html"
+ 
+    $ie = New-Object -comobject InternetExplorer.Application
+    $ie.visible = $true;
+
+    $ie.Navigate($url)
+    $ie.visible = $false;
+ 
+    while($ie.Busy) 
+    {
+        start-sleep -m 100
+    } 
+
+    $inputs = $ie.Document.body.getElementsByTagName("input");
+
+    $msgInput = $inputs | where {$_.name -eq "msg"}
+    $secretInput = $inputs | where {$_.name -eq "secret"}
+    $outputInput = $inputs | where {$_.name -eq "output"}
+
+    $buttons = $ie.Document.body.getElementsByTagName("button");
+    $btnGo = $buttons | where {$_.name -eq "btnGo"}
+ 
+    $msgInput.value = $message.replace("`r","\r").replace("`n","\n");
+    $secretInput.value = $secret;
+    $btnGo.click();
+    
+    $ret = $outputInput.value;
+    $ie.quit();
+
+    if (!$ret)
+    {
+        write-host "Error getting CSRF" -ForegroundColor red;
+    }
+ 
+    return $ret;
+}
+
+function GetCSRF($token, $azurehost, $msTime)
+{
+    $start = [Datetime]::UtcNow.tostring("yyyy-MM-ddTHH:mm:ssZ");
+    $end = [Datetime]::UtcNow.AddMilliseconds($msTime).tostring("yyyy-MM-ddTHH:mm:ssZ");
+
+    <#
+    # Test values
+    $start = "2020-05-13T19:46:18Z";
+    $end = "2020-05-13T19:56:18Z";
+    $token = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkN0VHVoTUptRDVNN0RMZHpEMnYyeDNRS1NSWSIsImtpZCI6IkN0VHVoTUptRDVNN0RMZHpEMnYyeDNRS1NSWSJ9.eyJhdWQiOiJodHRwczovL3NxbC5henVyZXN5bmFwc2UubmV0IiwiaXNzIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvY2VmY2I4ZTctZWUzMC00OWI4LWIxOTAtMTMzZjFkYWFmZDg1LyIsImlhdCI6MTU4OTM5NjQ2NCwibmJmIjoxNTg5Mzk2NDY0LCJleHAiOjE1ODk0MDAzNjQsImFjciI6IjEiLCJhaW8iOiI0MmRnWUVpS1BHSnQ0S2lUZCtxSXdmNEhpeC81clZ4Z29MUEFsY2RGNEkvL1V2MHdIaU1BIiwiYW1yIjpbInB3ZCJdLCJhcHBpZCI6ImVjNTJkMTNkLTJlODUtNDEwZS1hODlhLThjNzlmYjZhMzJhYyIsImFwcGlkYWNyIjoiMCIsImZhbWlseV9uYW1lIjoiMTc3OTA0IiwiZ2l2ZW5fbmFtZSI6Ik9ETF9Vc2VyIiwiaWR0eXAiOiJ1c2VyIiwiaXBhZGRyIjoiMTA0LjIuODUuMTM3IiwibmFtZSI6Ik9ETF9Vc2VyIDE3NzkwNCIsIm9pZCI6IjQ1YWYyNWIwLTRlZjAtNDczNS04YWY5LTUzYWMzZmVmYTA3YiIsInB1aWQiOiIxMDAzMjAwMEJDMTIyN0QwIiwic2NwIjoidXNlcl9pbXBlcnNvbmF0aW9uIiwic3ViIjoiTWRIYjZ0a0tfVXdHOVNTdnE0Szd2UmdkUmF5c0pkQlB4QmxWdzk5SkNTUSIsInRpZCI6ImNlZmNiOGU3LWVlMzAtNDliOC1iMTkwLTEzM2YxZGFhZmQ4NSIsInVuaXF1ZV9uYW1lIjoib2RsX3VzZXJfMTc3OTA0QG1zYXp1cmVsYWJzLm9ubWljcm9zb2Z0LmNvbSIsInVwbiI6Im9kbF91c2VyXzE3NzkwNEBtc2F6dXJlbGFicy5vbm1pY3Jvc29mdC5jb20iLCJ1dGkiOiJ0VnJ5Qi1ab3AwaWlmUlNHeWVzUUFBIiwidmVyIjoiMS4wIn0.E1RLg9Od_Mk63apevX-lf4NQCF-5Y-9kgKLUxLBYxp9wlTXpiXZdL8VaWLMQLro3ox7ZbYDUSv5WGq9fAC_sET74KM-J_Bx7Ks-qyFmYErAoNtMUG1_YfjeQlbfj4Ar5PxVQB0radZtTtWY2xvx4c_F-9cZR-4duap3PIsSW4yYfTuaoglsgIUjscetlXARkdwweAiAyYlxNYbIys6S6HXNFAM1Kaqa0mF4y49NQBsLgK5A8DpPmfw-hqou9Z6du_W_Wp4igpvPDsg_BjWfUvq29v0JLWCmIls_YR75q0p0ASTX50hLOcKuRJc9LmehNTcjevWzN4YI-_LXdXi7S6g";
+    $azureHost = "asaworkspace177904-ondemand.sql.azuresynapse.net:1443";
+    #>
+
+    $rawsig = "not-before=$($start)`r`nnot-after=$($end)`r`nauthorization: $($token)`r`nhost: $($azurehost)`r`n";
+
+    #$hash = Hash $rawsig $token;
+    #$signed = ToBase64 $hash;
+
+    $signed = CallJavascript $rawsig $token;
+
+    $sig = "$($signed); not-before=$($start); not-after=$($end); signed-headers=authorization,host"
+    
+    #test result : u3fEvp2502DbFuSArb0sPGB7ODi40KxrsYVTjlVQlhQ=
+    return $sig;
+}
+
 function Execute-SQLQuery {
 
     param(
@@ -768,9 +862,13 @@ function Execute-SQLQuery {
         return
     }
 
-    Ensure-ValidTokens
-    $rawResult = Invoke-WebRequest -Uri $uri -Method POST -Body $SQLQuery -Headers $headers `
-        -ContentType "application/x-www-form-urlencoded; charset=UTF-8" -UseBasicParsing
+    Ensure-ValidTokens;
+
+    $csrf = GetCSRF "Bearer $synapseSQLToken" "$($WorkspaceName).sql.azuresynapse.net:1443" 300000;
+
+    $headers.add("X-CSRF-Signature", $csrf);
+
+    $rawResult = Invoke-WebRequest -Uri $uri -Method POST -Body $SQLQuery -Headers $headers -ContentType "application/x-www-form-urlencoded; charset=UTF-8" -UseBasicParsing
 
     $result = ConvertFrom-Json $rawResult.Content
 
@@ -781,6 +879,7 @@ function Execute-SQLQuery {
             $errors += $partialResult.message
         }
     }
+
     if ($errors.Count -gt 0) {
         throw (-join $errors)
     }
@@ -815,6 +914,9 @@ function Execute-SQLScriptFile {
     [Boolean]
     $ForceReturn
     )
+
+    $vals = $filename.split("_");
+    $sqlpoolname = $vals[1];
 
     $sqlQuery = Get-Content -Raw -Path "$($SQLScriptsPath)/$($FileName).sql"
 
@@ -1301,15 +1403,15 @@ function Refresh-Token {
     )
 
     if ($TokenType -eq "Synapse") {
-        $result = Invoke-RestMethod  -Uri "https://login.microsoftonline.com/msazurelabs.onmicrosoft.com/oauth2/v2.0/token" `
+        $result = Invoke-RestMethod  -Uri "https://login.microsoftonline.com/$($global:logindomain)/oauth2/v2.0/token" `
             -Method POST -Body $global:ropcBodySynapse -ContentType "application/x-www-form-urlencoded"
         $global:synapseToken = $result.access_token
     } elseif ($TokenType -eq "SynapseSQL") {
-        $result = Invoke-RestMethod  -Uri "https://login.microsoftonline.com/msazurelabs.onmicrosoft.com/oauth2/v2.0/token" `
+        $result = Invoke-RestMethod  -Uri "https://login.microsoftonline.com/$($global:logindomain)/oauth2/v2.0/token" `
             -Method POST -Body $global:ropcBodySynapseSQL -ContentType "application/x-www-form-urlencoded"
         $global:synapseSQLToken = $result.access_token
     } elseif ($TokenType -eq "Management") {
-        $result = Invoke-RestMethod  -Uri "https://login.microsoftonline.com/msazurelabs.onmicrosoft.com/oauth2/v2.0/token" `
+        $result = Invoke-RestMethod  -Uri "https://login.microsoftonline.com/$($global:logindomain)/oauth2/v2.0/token" `
             -Method POST -Body $global:ropcBodyManagement -ContentType "application/x-www-form-urlencoded"
         $global:managementToken = $result.access_token
     } else {
@@ -1404,3 +1506,4 @@ Export-ModuleMember -Function Assign-SynapseRole
 Export-ModuleMember -Function Refresh-Token
 Export-ModuleMember -Function Generate-CosmosDbMasterKeyAuthorizationSignature
 Export-ModuleMember -Function Count-CosmosDbDocuments
+Export-ModuleMember -Function Get-Workspace

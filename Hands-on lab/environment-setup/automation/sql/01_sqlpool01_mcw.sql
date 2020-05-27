@@ -1,13 +1,38 @@
-create user [CEO] without login;
-create user [DataAnalystMiami] without login;
-create user [DataAnalystSanDiego] without login;
-create login [asa.sql.workload01] with password = '#PASSWORD#'
-create login [asa.sql.workload02] with password = '#PASSWORD#'
-GO
+if not exists(select * from sys.database_principals where name = 'asa.sql.workload01')
+begin
+    create user [asa.sql.workload01] from login [asa.sql.workload01]
+end
+
+if not exists(select * from sys.database_principals where name = 'asa.sql.workload02')
+begin
+    create user [asa.sql.workload02] from login [asa.sql.workload02]
+end
+
+if not exists(select * from sys.database_principals where name = 'ceo')
+begin
+    create user [CEO] without login;
+end
+
+execute sp_addrolemember 'db_datareader', 'asa.sql.workload01' 
+execute sp_addrolemember 'db_datareader', 'asa.sql.workload02' 
+execute sp_addrolemember 'db_datareader', 'CEO' 
+
+if not exists(select * from sys.database_principals where name = 'DataAnalystMiami')
+begin
+    create user [DataAnalystMiami] without login;
+end
+
+if not exists(select * from sys.database_principals where name = 'DataAnalystSanDiego')
+begin
+    create user [DataAnalystSanDiego] without login;
+end
+go
+
 create schema [wwi_mcw];
-GO
+go
+
 create master key;
-GO
+
 create table [wwi_mcw].[Product]
 (
     ProductId SMALLINT NOT NULL,
@@ -19,13 +44,12 @@ WITH
 (
     DISTRIBUTION = REPLICATE
 );
-GO
 -- Replace <data_lake_account_key> with the key of the primary data lake account
 
 CREATE DATABASE SCOPED CREDENTIAL StorageCredential
 WITH
 IDENTITY = 'SHARED ACCESS SIGNATURE'
-,SECRET = '<data_lake_account_key>';
+,SECRET = '#DATALAKESTORAGEKEY#';
 
 -- Create an external data source with CREDENTIAL option.
 -- Replace <data_lake_account_name> with the actual name of the primary data lake account
@@ -33,7 +57,7 @@ IDENTITY = 'SHARED ACCESS SIGNATURE'
 CREATE EXTERNAL DATA SOURCE ASAMCWModelStorage
 WITH
 (
-    LOCATION = 'wasbs://wwi-02@<data_lake_account_name>.blob.core.windows.net'
+    LOCATION = 'wasbs://wwi-02@#DATALAKESTORAGEACCOUNTNAME#.blob.core.windows.net'
     ,CREDENTIAL = StorageCredential
     ,TYPE = HADOOP
 );
@@ -55,8 +79,8 @@ CREATE EXTERNAL TABLE [wwi_mcw].[ASAMCWMLModelExt]
 )
 WITH
 (
-    LOCATION='/ml/onnx-hex' ,
-    DATA_SOURCE = ModelStorage ,
+    LOCATION='/azureml/onnx-hex' ,
+    DATA_SOURCE = ASAMCWModelStorage ,
     FILE_FORMAT = csv ,
     REJECT_TYPE = VALUE ,
     REJECT_VALUE = 0

@@ -9,7 +9,7 @@
       }
     },
     "sqlAdministratorLoginPassword": {
-      "type": "String",
+      "type": "SecureString",
       "metadata": {
         "description": "Password for SQL Admin"
       }
@@ -20,7 +20,7 @@
     "sqlAdministratorLogin": "asa.sql.admin",
     "workspaceName": "[concat('asaworkspace', parameters('uniqueSuffix'))]",
     "adlsStorageAccountName": "[concat('asadatalake', parameters('uniqueSuffix'))]",
-    "defaultDataLakeStorageFilesystemName": "tempdata",
+    "defaultDataLakeStorageFilesystemName": "defaultfs",
     "sqlComputeName": "SQLPool01",
     "sparkComputeName": "SparkPool01",
     "computeSubnetId": "",
@@ -290,7 +290,7 @@
     },
     {
       "type": "Microsoft.MachineLearningServices/workspaces",
-      "apiVersion": "2019-11-01",
+      "apiVersion": "2020-03-01",
       "name": "[variables('amlWorkspaceName')]",
       "location": "[variables('location')]",
       "dependsOn": [
@@ -303,13 +303,15 @@
         "name": "Enterprise"
       },
       "identity": {
-        "type": "systemAssigned"
+        "type": "SystemAssigned"
       },
       "properties": {
         "friendlyName": "[variables('amlWorkspaceName')]",
         "keyVault": "[resourceId('Microsoft.KeyVault/vaults',variables('keyVaultName'))]",
         "applicationInsights": "[resourceId('Microsoft.Insights/components',variables('applicationInsightsName'))]",
-        "storageAccount": "[resourceId('Microsoft.Storage/storageAccounts/',variables('blobStorageAccountName'))]"
+        "storageAccount": "[resourceId('Microsoft.Storage/storageAccounts/',variables('blobStorageAccountName'))]",
+        "hbiWorkspace": false,
+        "allowPublicAccessWhenBehindVnet": false
       }
     },
     {
@@ -340,6 +342,30 @@
       "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
       "apiVersion": "2019-06-01",
       "name": "[concat(variables('blobStorageAccountName'), '/default/staging')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('blobStorageAccountName'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('blobStorageAccountName'))]"
+      ],
+      "properties": {
+        "publicAccess": "None"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "apiVersion": "2019-06-01",
+      "name": "[concat(variables('blobStorageAccountName'), '/default/azureml')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('blobStorageAccountName'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('blobStorageAccountName'))]"
+      ],
+      "properties": {
+        "publicAccess": "None"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "apiVersion": "2019-06-01",
+      "name": "[concat(variables('blobStorageAccountName'), '/default/azureml/onnx-hex')]",
       "dependsOn": [
         "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('blobStorageAccountName'), 'default')]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('blobStorageAccountName'))]"

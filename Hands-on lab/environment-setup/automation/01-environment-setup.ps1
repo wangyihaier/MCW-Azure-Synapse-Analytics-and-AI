@@ -1,5 +1,15 @@
-Remove-Module environment-automation
-Import-Module "environment-automation"
+Remove-Module "environment-automation"
+Import-Module ".\environment-automation"
+
+Uninstall-AzureRm
+
+Install-Module -Name Az -AllowClobber 
+Install-Module -Name Az.Storage -AllowClobber
+Install-Module -Name Az.Resources -AllowClobber
+Install-Module -Name Az.KeyVault -AllowClobber
+
+Import-Module Az.KeyVault;
+Import-Module Az.Resources;
 
 $InformationPreference = "Continue"
 
@@ -11,21 +21,21 @@ $userName = $AzureUserName                # READ FROM FILE
 $password = $AzurePassword                # READ FROM FILE
 $clientId = $TokenGeneratorClientId       # READ FROM FILE
 $sqlPassword = $AzureSQLPassword          # READ FROM FILE
+$resourceGroupName = $AzureResourceGroupName #READ FROM FILE
+$uniqueId = $UniqueSuffix                 #READ FROM FILE
 
 $securePassword = $password | ConvertTo-SecureString -AsPlainText -Force
 $cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $userName, $SecurePassword
 
 Connect-AzAccount -Credential $cred | Out-Null
 
-$resourceGroupName = (Get-AzResourceGroup | Where-Object { $_.ResourceGroupName -like "ASAMCW*" }).ResourceGroupName
-$uniqueId =  (Get-AzResourceGroup -Name $resourceGroupName).Tags["DeploymentId"]
 $subscriptionId = (Get-AzContext).Subscription.Id
-$tenantId = (Get-AzContext).Tenant.Id
+$global:logindomain = (Get-AzContext).Tenant.Id
 
-$templatesPath = "templates"
-$datasetsPath = "datasets"
-$pipelinesPath = "pipelines"
-$sqlScriptsPath = "sql"
+$templatesPath = ".\templates"
+$datasetsPath = ".\datasets"
+$pipelinesPath = ".\pipelines"
+$sqlScriptsPath = ".\sql"
 $workspaceName = "asaworkspace$($uniqueId)"
 $dataLakeAccountName = "asadatalake$($uniqueId)"
 $blobStorageAccountName = "asastore$($uniqueId)"
@@ -35,7 +45,6 @@ $sqlPoolName = "SQLPool01"
 $integrationRuntimeName = "AzureIntegrationRuntime01"
 $sparkPoolName = "SparkPool01"
 $amlWorkspaceName = "amlworkspace$($uniqueId)"
-
 
 $ropcBodyCore = "client_id=$($clientId)&username=$($userName)&password=$($password)&grant_type=password"
 $global:ropcBodySynapse = "$($ropcBodyCore)&scope=https://dev.azuresynapse.net/.default"
@@ -56,6 +65,22 @@ Write-Information "Assign Ownership on Synapse Workspace"
 Assign-SynapseRole -WorkspaceName $workspaceName -RoleId "6e4bf58a-b8e1-4cc3-bbf9-d73143322b78" -PrincipalId "37548b2e-e5ab-4d2b-b0da-4d812f56c30e"  # Workspace Admin
 Assign-SynapseRole -WorkspaceName $workspaceName -RoleId "7af0c69a-a548-47d6-aea3-d00e69bd83aa" -PrincipalId "37548b2e-e5ab-4d2b-b0da-4d812f56c30e"  # SQL Admin
 Assign-SynapseRole -WorkspaceName $workspaceName -RoleId "c3a6d2f1-a26f-4810-9b0f-591308d5cbf1" -PrincipalId "37548b2e-e5ab-4d2b-b0da-4d812f56c30e"  # Apache Spark Admin
+
+#add the permission to the datalake to workspace
+$id = (Get-AzADServicePrincipal -DisplayName $workspacename).id
+New-AzRoleAssignment -Objectid $id -RoleDefinitionName "Storage Blob Data Owner" -Scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$dataLakeAccountName" -ErrorAction SilentlyContinue;
+New-AzRoleAssignment -SignInName $username -RoleDefinitionName "Storage Blob Data Owner" -Scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$dataLakeAccountName" -ErrorAction SilentlyContinue;
+
+Write-Information "Setting Key Vault Access Policy"
+Set-AzKeyVaultAccessPolicy -ResourceGroupName $resourceGroupName -VaultName $keyVaultName -UserPrincipalName $userName -PermissionsToSecrets set,delete,get,list
+
+$ws = Get-Workspace $SubscriptionId $ResourceGroupName $WorkspaceName;
+$upid = $ws.identity.principalid
+Set-AzKeyVaultAccessPolicy -ResourceGroupName $resourceGroupName -VaultName $keyVaultName -ObjectId $upid -PermissionsToSecrets set,delete,get,list
+
+Write-Information "Create SQL-USER-ASA Key Vault Secret"
+$secretValue = ConvertTo-SecureString $sqlPassword -AsPlainText -Force
+$secret = Set-AzKeyVaultSecret -VaultName $keyVaultName -Name $keyVaultSQLUserSecretName -SecretValue $secretValue
 
 Write-Information "Create KeyVault linked service $($keyVaultName)"
 
@@ -87,11 +112,33 @@ if ($result.properties.status -ne "Online") {
     Wait-ForSQLPool -SubscriptionId $subscriptionId -ResourceGroupName $resourceGroupName -WorkspaceName $workspaceName -SQLPoolName $sqlPoolName -TargetStatus Online
 }
 
-
 Write-Information "Setup $($sqlPoolName)"
 
-$params = @{}
-$result = Execute-SQLScriptFile -SQLScriptsPath $sqlScriptsPath -WorkspaceName $workspaceName -SQLPoolName $sqlPoolName -FileName "setup-mcw-sql" -Parameters $params
+$params = @{
+        "PASSWORD" = $sqlPassword
+        "DATALAKESTORAGEKEY" = $dataLakeAccountKey
+        "DATALAKESTORAGEACCOUNTNAME" = $dataLakeAccountName
+}
+
+try
+{
+    $result = Execute-SQLScriptFile -SQLScriptsPath $sqlScriptsPath -WorkspaceName $workspaceName -SQLPoolName "master" -FileName "00_master_setup" -Parameters $params
+}
+catch 
+{
+    write-host $_.exception
+}
+
+try
+{
+    $result = Execute-SQLScriptFile -SQLScriptsPath $sqlScriptsPath -WorkspaceName $workspaceName -SQLPoolName $sqlPoolName -FileName "01_sqlpool01_mcw" -Parameters $params
+}
+catch 
+{
+    write-host $_.exception
+}
+
+
 $result
 
 Write-Information "Create linked service for SQL pool $($sqlPoolName) with user asa.sql.admin"
@@ -116,14 +163,17 @@ $result = Create-SQLPoolKeyVaultLinkedService -TemplatesPath $templatesPath -Wor
 Wait-ForOperation -WorkspaceName $workspaceName -OperationId $result.operationId
 
 
-Write-Information "Create data sets for Lab 08"
+Write-Information "Create data sets"
 
 $datasets = @{
-        wwi02_sale_small_workload_01_asa = "$($sqlPoolName.ToLower())_workload01"
-        wwi02_sale_small_workload_02_asa = "$($sqlPoolName.ToLower())_workload02"
+        asamcw_product_asa = $sqlPoolName.ToLower()
+        asamcw_product_csv = $dataLakeAccountName
+        asamcw_wwi_salesmall_workload1_asa = "$($sqlPoolName.ToLower())_workload01"      
+        asamcw_wwi_salesmall_workload2_asa = "$($sqlPoolName.ToLower())_workload02" 
 }
 
-foreach ($dataset in $datasets.Keys) {
+foreach ($dataset in $datasets.Keys) 
+{
         Write-Information "Creating dataset $($dataset)"
         $result = Create-Dataset -DatasetsPath $datasetsPath -WorkspaceName $workspaceName -Name $dataset -LinkedServiceName $datasets[$dataset]
         Wait-ForOperation -WorkspaceName $workspaceName -OperationId $result.operationId
@@ -133,33 +183,43 @@ Write-Information "Create pipelines for Exercise 7"
 
 $params = @{}
 $workloadPipelines = [ordered]@{
-        execute_business_analyst_queries = "ASAMCW - Exercise 7 - Execute Business Analyst Queries"
-        execute_data_analyst_and_ceo_queries = "ASAMCW - Exercise 7 - Execute Data Analyst and CEO Queries"
+        copy_products_pipeline = "ASAMCW - Exercise 2 - Copy Product Information"
+        execute_business_analyst_queries = "ASAMCW - Exercise 7 - ExecuteBusinessAnalystQueries"
+        execute_data_analyst_and_ceo_queries = "ASAMCW - Exercise 7 - ExecuteDataAnalystandCEOQueries"
 }
 
-foreach ($pipeline in $workloadPipelines.Keys) {
+foreach ($pipeline in $workloadPipelines.Keys) 
+{
+    try
+    {
         Write-Information "Creating workload pipeline $($workloadPipelines[$pipeline])"
-        $result = Create-Pipeline -PipelinesPath $pipelinesPath -WorkspaceName $workspaceName -Name $workloadPipelines[$pipeline] -FileName $pipeline -Parameters $params
+        $result = Create-Pipeline -PipelinesPath $pipelinesPath -WorkspaceName $workspaceName -Name $workloadPipelines[$pipeline] -FileName $workloadPipelines[$pipeline] -Parameters $params
         Wait-ForOperation -WorkspaceName $workspaceName -OperationId $result.operationId
+    }
+    catch
+    {
+        write-host $_.exception;
+    }
 }
-
 
 Write-Information "Creating Spark notebooks..."
 
 $notebooks = [ordered]@{
-        "ASAMCW - Exercise 6 - Machine Learning" = "notebooks\ASAMCW - Exercise 6 - Machine Learning"      
+        "ASAMCW - Exercise 6 - Machine Learning" = ".\notebooks\ASAMCW - Exercise 6 - Machine Learning.ipynb"      
 }
 
 $cellParams = [ordered]@{
+        "#DATALAKEACCOUNTNAME#" = $dataLakeAccountName
+        "#DATALAKEACCOUNTKEY#" = $dataLakeAccountKey
         "#SQL_POOL_NAME#" = $sqlPoolName
         "#SUBSCRIPTION_ID#" = $subscriptionId
         "#RESOURCE_GROUP_NAME#" = $resourceGroupName
         "#AML_WORKSPACE_NAME#" = $amlWorkspaceName
 }
 
-foreach ($notebookName in $notebooks.Keys) {
-
-        $notebookFileName = "$($notebooks[$notebookName])\$($notebookName).ipynb"
+foreach ($notebookName in $notebooks.Keys) 
+{
+        $notebookFileName = "$($notebooks[$notebookName])"
         Write-Information "Creating notebook $($notebookName) from $($notebookFileName)"
         
         $result = Create-SparkNotebook -TemplatesPath $templatesPath -SubscriptionId $subscriptionId -ResourceGroupName $resourceGroupName `

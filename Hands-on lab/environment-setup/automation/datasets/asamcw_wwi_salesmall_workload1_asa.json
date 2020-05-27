@@ -1,5 +1,5 @@
 {
-    "name": "wwi02_sale_small_workload_01_asa",
+    "name": "asamcw_wwi_salesmall_workload1_asa",
     "properties": {
         "linkedServiceName": {
             "referenceName": "#LINKED_SERVICE_NAME#",
@@ -24,8 +24,8 @@
             },
             {
                 "name": "Quantity",
-                "type": "smallint",
-                "precision": 5
+                "type": "tinyint",
+                "precision": 3
             },
             {
                 "name": "Price",
@@ -67,7 +67,7 @@
             }
         ],
         "typeProperties": {
-            "schema": "wwi",
+            "schema": "wwi_mcw",
             "table": "SaleSmall"
         }
     },
