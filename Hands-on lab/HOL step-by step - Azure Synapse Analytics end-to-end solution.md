@@ -708,7 +708,7 @@ Similar to the customer information table, we will also be populating the campai
   
 26. Select **Publish all** to save your new data flow.
 
-    ![Publish all is highlighted.](media/publish-all-1.png "Publish all")
+    ![Publish all is highlighted.](media/publishall_toolbarmenu.png "Publish all")
 
 27. Now that the data flow is published, we can use it in a pipeline. Create a new pipeline by selecting **Orchestrate** from the left menu, then in the **Orchestrate** blade, expand the **+** button and select **Pipeline**.
 
