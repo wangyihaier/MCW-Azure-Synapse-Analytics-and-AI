@@ -361,18 +361,6 @@
       "properties": {
         "publicAccess": "None"
       }
-    },
-    {
-      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-      "apiVersion": "2019-06-01",
-      "name": "[concat(variables('blobStorageAccountName'), '/default/azureml/onnx-hex')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('blobStorageAccountName'), 'default')]",
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('blobStorageAccountName'))]"
-      ],
-      "properties": {
-        "publicAccess": "None"
-      }
     }
   ],
   "outputs": {}

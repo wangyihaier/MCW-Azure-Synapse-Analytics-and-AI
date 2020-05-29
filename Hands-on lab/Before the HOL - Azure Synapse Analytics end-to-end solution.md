@@ -125,8 +125,10 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
     > **Note**: if you see an error regarding `No modules were removed` or `Uninstall-AzureRm`, it is safe to ignore. If the script pauses for prompts, enter the `A` (Yes to All) option.
 
-    > **Note**: if you experience script failures, it may be beneficial to highlight only the lines preceding the `$InformationPreference = "Continue"` line and run them separately from the rest of the script. Some people have experienced the console not stopping for user input when importing from the PowerShell Gallery. 
+    > **Note**: if you experience script failures, it may be beneficial to highlight only the lines preceding the `$InformationPreference = "Continue"` line and run them separately from the rest of the script. Some people have experienced the console not stopping for user input when importing from the PowerShell Gallery.
 
 6. Repeat step 5 with **Hands-on Lab/environment-setup/automation/02-copy-lake-data.ps1**.
+
+7. Repeat step 5 with **Hands-on Lab/environment-setup/automation/03-finalize-deployment.ps1**
 
 You should follow all steps provided *before* performing the Hands-on lab.
