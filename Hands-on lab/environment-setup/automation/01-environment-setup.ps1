@@ -227,4 +227,3 @@ foreach ($notebookName in $notebooks.Keys)
         $result = Wait-ForOperation -WorkspaceName $workspaceName -OperationId $result.operationId
         $result
 }
-

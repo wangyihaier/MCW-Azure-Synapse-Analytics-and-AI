@@ -133,7 +133,7 @@ All exercises in this lab utilize the workspace Synapse Studio user interface. T
 
 ## Exercise 2: Create and populate the supporting tables in the SQL Pool
 
-The first step in querying meaningful data is to create tables to house the data. In this case, we will create three different tables SaleSmall, CustomerInfo, CampaignAnalytics, and Sales. When designing tables in Azure Synapse Analytics, we need to take into account the expected amount of data in each table, as well as how each table will be used. Utilize the following guidance when designing your tables to ensure the best experience and performance.
+The first step in querying meaningful data is to create tables to house the data. In this case, we will create four different tables: SaleSmall, CustomerInfo, CampaignAnalytics, and Sales. When designing tables in Azure Synapse Analytics, we need to take into account the expected amount of data in each table, as well as how each table will be used. Utilize the following guidance when designing your tables to ensure the best experience and performance.
 
 Table design performance considerations
 
@@ -708,7 +708,7 @@ Similar to the customer information table, we will also be populating the campai
   
 26. Select **Publish all** to save your new data flow.
 
-    ![Publish all is highlighted.](media/publish-all-1.png "Publish all")
+    ![Publish all is highlighted.](media/publishall_toolbarmenu.png "Publish all")
 
 27. Now that the data flow is published, we can use it in a pipeline. Create a new pipeline by selecting **Orchestrate** from the left menu, then in the **Orchestrate** blade, expand the **+** button and select **Pipeline**.
 
@@ -1279,7 +1279,7 @@ In this task, you will explore the model registration process in Azure Synapse A
 
     ![Persisted ONNX model in hexadecimal format](media/lab06-persisted-model.png)
 
-5. `MLModelExt` is an external table that maps to the data lake location where the trained model was persisted (and then converted to hexadecimal format). Take a moment to read through the code that was used to create the external table (you don't need to run this code as it was already run during the deployment of your environment):
+5. **ASAMCWMLModelExt** is an external table that maps to the data lake location where the trained model was persisted (and then converted to hexadecimal format). Take a moment to read through the code that was used to create the external table (you don't need to run this code as it was already run during the deployment of your environment):
 
     ``` sql
       -- Replace <data_lake_account_key> with the key of the primary data lake account
