@@ -1,33 +1,29 @@
-Remove-Module "environment-automation"
+#Remove-Module "environment-automation"
 Import-Module ".\environment-automation"
 
-Uninstall-AzureRm
+#Uninstall-AzureRm
 
-Install-Module -Name Az -AllowClobber 
-Install-Module -Name Az.Storage -AllowClobber
-Install-Module -Name Az.Resources -AllowClobber
-Install-Module -Name Az.KeyVault -AllowClobber
+#Install-Module -Name Az -AllowClobber 
+#Install-Module -Name Az.Storage -AllowClobber
+#Install-Module -Name Az.Resources -AllowClobber
+#Install-Module -Name Az.KeyVault -AllowClobber
 
-Import-Module Az.KeyVault;
-Import-Module Az.Resources;
+#Import-Module Az.KeyVault;
+#Import-Module Az.Resources;
 
 $InformationPreference = "Continue"
 
-#
-# TODO: Keep all required configuration in C:\LabFiles\AzureCreds.ps1 file
-. C:\LabFiles\AzureCreds.ps1
+$userName = Read-Host -Prompt "Enter your Azure portal username"
+$password = Read-Host -Prompt "Enter your Azure portal password"
+$clientId = "1950a258-227b-4e31-a9cf-717495945fc2"       
+$sqlPassword = Read-Host -Prompt "Enter the SQL Administrator password you used in the deployment"
+$resourceGroupName = "Synapse-MCW"
+$uniqueId = Read-Host -Prompt "Enter the unique suffix you used in the deployment"
 
-$userName = $AzureUserName                # READ FROM FILE
-$password = $AzurePassword                # READ FROM FILE
-$clientId = $TokenGeneratorClientId       # READ FROM FILE
-$sqlPassword = $AzureSQLPassword          # READ FROM FILE
-$resourceGroupName = $AzureResourceGroupName #READ FROM FILE
-$uniqueId = $UniqueSuffix                 #READ FROM FILE
+#$securePassword = $password | ConvertTo-SecureString -AsPlainText -Force
+#$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $userName, $SecurePassword
 
-$securePassword = $password | ConvertTo-SecureString -AsPlainText -Force
-$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $userName, $SecurePassword
-
-Connect-AzAccount -Credential $cred | Out-Null
+# Connect-AzAccount -Credential $cred | Out-Null
 
 $subscriptionId = (Get-AzContext).Subscription.Id
 $global:logindomain = (Get-AzContext).Tenant.Id
