@@ -1,9 +1,4 @@
-#Remove-Module "environment-automation"
 Import-Module ".\environment-automation"
-
-#Uninstall-AzureRm
-
-#Install-Module -Name Az -AllowClobber 
 
 $InformationPreference = "Continue"
      

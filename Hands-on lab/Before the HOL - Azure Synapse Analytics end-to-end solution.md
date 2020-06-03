@@ -33,8 +33,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
     - [Task 1: Create a resource group in Azure](#task-1-create-a-resource-group-in-azure)
     - [Task 2: Create Azure Synapse Analytics workspace](#task-2-create-azure-synapse-analytics-workspace)
     - [Task 3: Download lab artifacts](#task-3-download-lab-artifacts)
-    - [Task 4: Create a local settings file](#task-4-create-a-local-settings-file)
-    - [Task 5: Run environment setup PowerShell scripts](#task-5-run-environment-setup-powershell-scripts)
+    - [Task 4: Run environment setup PowerShell scripts](#task-4-run-environment-setup-powershell-scripts)
 
 <!-- /TOC -->
 
@@ -82,53 +81,66 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 ### Task 3: Download lab artifacts
 
-1. In a web browser, navigate to the [MCW Azure Synapse Analytics end-to-end solution repository](https://github.com/microsoft/MCW-Azure-Synapse-Analytics-end-to-end-solution).
+1. In the Azure Portal, open the Azure Cloud Shell by selecting its icon from the right side of the top toolbar.
 
-2. Expand the **Clone or download** button, and select **Download Zip**.
+    ![A portion of the Azure Portal taskbar is displayed with the Cloud Shell icon highlighted.](media/bhol_azurecloudshellmenu.png)
 
-    ![On the repository screen, the Clone or download button is expanded and the Download Zip button is highlighted.](media/bhol_downloadzip.png)
+    > **Note**: If you are prompted to create a storage account for the Cloud Shell, agree to have it created.
 
-3. Extract the downloaded zip file to the location of your choice.
-
-### Task 4: Create a local settings file
-
-1. On your local machine, create a folder **C:\LabFiles**. Inside this folder, create a new file named **AzureCreds.ps1**. In this file, you will set parameters necessary to complete the workspace setup.
+2. In the Cloud Shell window, enter the following command to clone the repository files.
 
     ```PowerShell
-    $AzureUserName = "<enter your azure username>"
-    $AzurePassword = "<enter your azure password>"
-    $TokenGeneratorClientId = "1950a258-227b-4e31-a9cf-717495945fc2"
-    $AzureSQLPassword = "<enter the same password you chose when deploying the workspace>"
-    $AzureResourceGroupName = "Synapse-MCW"
-    $UniqueSuffix = "<enter the same suffix you chose when deploying the workspace>"
+    git clone https://github.com/codingbandit/MCW-Azure-Synapse-Analytics-end-to-end-solution.git Synapse-MCW
     ```
 
-### Task 5: Run environment setup PowerShell scripts
+3. Keep the Cloud Shell open for the following task.
 
-1. Open **Visual Studio Code** and open the folder to where you extracted the lab files (extracted in Task 3). **Be sure to run this application as Administrator**.
+### Task 4: Run environment setup PowerShell scripts
 
-2. Open **Hands-on Lab/environment-setup/automation/01-environment-setup.ps1**.
-
-3. Open a Terminal Window (ctrl + shift + `). Ensure **PowerShell** or **PowerShell Integrated Console** is selected on the Terminal pane toolbar.
-
-    ![The Visual Studio Code terminal toolbar is displayed with the PowerShell Integrated Console item selected.](media/bhol_powershellintegratedselection.png)
-
-4. Change the directory to the **automation** folder.
+1. In the Cloud Shell, change the current directory to the **automation** folder of the cloned repository by executing the following:
 
     ```PowerShell
-    cd '.\Hands-on lab\environment-setup\automation'
+    cd './Synapse-MCW/Hands-on lab/environment-setup/automation'
     ```
 
-5. In the editor window, select the entire script (ctrl + a), then right-click and select **Run selection** _OR_ you may press **F8** to run the selection.
+2. Execute the **01-environment-setup.ps1** script by executing the following command:
 
-    ![The Visual Studio Code editor window is shown with a script file contents fully selected and the right-click context menu expanded with the Run selection option highlighted.](media/bhol_selectallrun.png)
+    ```PowerShell
+    './01-environment-setup.ps1'
+    ```
 
-    > **Note**: if you see an error regarding `No modules were removed` or `Uninstall-AzureRm`, it is safe to ignore. If the script pauses for prompts, enter the `A` (Yes to All) option.
+    You will be prompted for the following information for this script:
 
-    > **Note**: if you experience script failures, it may be beneficial to highlight only the lines preceding the `$InformationPreference = "Continue"` line and run them separately from the rest of the script. Some people have experienced the console not stopping for user input when importing from the PowerShell Gallery.
+    | Prompt |
+    |--------|
+    | Enter your Azure portal username |
+    | Enter your Azure portal password |
+    | Enter the SQL Administrator password you used in the deployment |
+    | Enter the unique suffix you used in the deployment |
 
-6. Repeat step 5 with **Hands-on Lab/environment-setup/automation/02-copy-lake-data.ps1**.
+3. Execute the **02-copy-lake-data.ps1** script by executing the following command:
 
-7. Repeat step 5 with **Hands-on Lab/environment-setup/automation/03-finalize-deployment.ps1**
+    ```PowerShell
+    './02-copy-lake-data.ps1'
+    ```
+
+    You will be prompted for the following information for this script:
+
+    | Prompt |
+    |--------|
+    | Enter the unique suffix you used in the deployment |
+
+4. Execute the **03-finalize-deployment.ps1** script by executing the following command:
+
+    ```PowerShell
+    './03-finalize-deployment.ps1'
+    ```
+
+    You will be prompted for the following information for this script:
+
+    | Prompt |
+    |--------|
+    | Enter the SQL Administrator password you used in the deployment |
+    | Enter the unique suffix you used in the deployment |
 
 You should follow all steps provided *before* performing the Hands-on lab.

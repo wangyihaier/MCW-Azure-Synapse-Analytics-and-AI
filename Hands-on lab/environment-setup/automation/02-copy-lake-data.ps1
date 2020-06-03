@@ -1,6 +1,3 @@
-#Install-Module -Name Az -AllowClobber
-#Install-Module -Name Azure.Storage -AllowClobber
-
 $InformationPreference = "Continue"
 
 $resourceGroupName = "Synapse-MCW"

@@ -1,15 +1,4 @@
-#Remove-Module "environment-automation"
 Import-Module ".\environment-automation"
-
-#Uninstall-AzureRm
-
-#Install-Module -Name Az -AllowClobber 
-#Install-Module -Name Az.Storage -AllowClobber
-#Install-Module -Name Az.Resources -AllowClobber
-#Install-Module -Name Az.KeyVault -AllowClobber
-
-#Import-Module Az.KeyVault;
-#Import-Module Az.Resources;
 
 $InformationPreference = "Continue"
 
@@ -19,11 +8,6 @@ $clientId = "1950a258-227b-4e31-a9cf-717495945fc2"
 $sqlPassword = Read-Host -Prompt "Enter the SQL Administrator password you used in the deployment"
 $resourceGroupName = "Synapse-MCW"
 $uniqueId = Read-Host -Prompt "Enter the unique suffix you used in the deployment"
-
-#$securePassword = $password | ConvertTo-SecureString -AsPlainText -Force
-#$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $userName, $SecurePassword
-
-# Connect-AzAccount -Credential $cred | Out-Null
 
 $subscriptionId = (Get-AzContext).Subscription.Id
 $global:logindomain = (Get-AzContext).Tenant.Id
