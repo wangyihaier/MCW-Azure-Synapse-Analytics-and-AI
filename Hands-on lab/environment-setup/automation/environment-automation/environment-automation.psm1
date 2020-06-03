@@ -1001,7 +1001,7 @@ function Execute-SQLScriptFile-SqlCmd {
         }
     }
 
-    return Execute-SQLQuery-SqlCmd -WorkspaceName $WorkspaceName -SQLPoolName $SQLPoolName -SQLQuery -SQLUserName $SQLUserName -SQLPassword $SQLPassword $sqlQuery
+    return Execute-SQLQuery-SqlCmd -WorkspaceName $WorkspaceName -SQLPoolName $SQLPoolName -SQLQuery $sqlQuery -SQLUserName $SQLUserName -SQLPassword $SQLPassword $sqlQuery
 }
 
 function Create-SQLScript {
