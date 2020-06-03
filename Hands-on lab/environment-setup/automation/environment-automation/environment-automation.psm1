@@ -1005,7 +1005,7 @@ function Execute-SQLScriptFile-SqlCmd {
     $result = 0
     ForEach ($line in $($sqlQuery -split "`r`n"))
     {
-        $result = Execute-SQLQuery-SqlCmd -WorkspaceName $WorkspaceName -SQLPoolName $SQLPoolName -SQLQuery "$($line)" -SQLUserName $SQLUserName -SQLPassword $SQLPassword $sqlQuery
+        $result = Execute-SQLQuery-SqlCmd -WorkspaceName $WorkspaceName -SQLPoolName $SQLPoolName -SQLQuery $line -SQLUserName $SQLUserName -SQLPassword $SQLPassword $sqlQuery
     }
     return $result
 }
