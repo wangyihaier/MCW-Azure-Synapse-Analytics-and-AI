@@ -52,9 +52,9 @@ $global:synapseSQLToken = ""
 $global:managementToken = ""
 
 $global:tokenTimes = [ordered]@{
-        Synapse = (Get-Date -Year 1)
-        SynapseSQL = (Get-Date -Year 1)
-        Management = (Get-Date -Year 1)
+        Synapse = (Get-Date ([datetime]::UtcNow) -Year 1)
+        SynapseSQL = (Get-Date ([datetime]::UtcNow) -Year 1)
+        Management = (Get-Date ([datetime]::UtcNow) -Year 1)
 }
 
 Write-Information "Assign Ownership on Synapse Workspace"
