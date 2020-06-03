@@ -38,6 +38,7 @@ $blobStorageAccountName = "asastore$($uniqueId)"
 $keyVaultName = "asakeyvault$($uniqueId)"
 $keyVaultSQLUserSecretName = "SQL-USER-ASA"
 $sqlPoolName = "SQLPool01"
+$sqlUserName = "asa.sql.admin"
 $integrationRuntimeName = "AzureIntegrationRuntime01"
 $sparkPoolName = "SparkPool01"
 $amlWorkspaceName = "amlworkspace$($uniqueId)"
@@ -118,7 +119,7 @@ $params = @{
 
 try
 {
-    $result = Execute-SQLScriptFile -SQLScriptsPath $sqlScriptsPath -WorkspaceName $workspaceName -SQLPoolName "master" -FileName "00_master_setup" -Parameters $params
+   $result = Execute-SQLScriptFile-SqlCmd -SQLScriptsPath $sqlScriptsPath -WorkspaceName $workspaceName -SQLPoolName "master" -SQLUserName $sqlUserName -SQLPassword $sqlPassword -FileName "00_master_setup" -Parameters $params
 }
 catch 
 {
@@ -127,7 +128,7 @@ catch
 
 try
 {
-    $result = Execute-SQLScriptFile -SQLScriptsPath $sqlScriptsPath -WorkspaceName $workspaceName -SQLPoolName $sqlPoolName -FileName "01_sqlpool01_mcw" -Parameters $params
+    $result = Execute-SQLScriptFile-SqlCmd -SQLScriptsPath $sqlScriptsPath -WorkspaceName $workspaceName -SQLPoolName $sqlPoolName -SQLUserName $sqlUserName -SQLPassword $sqlPassword -FileName "01_sqlpool01_mcw" -Parameters $params
 }
 catch 
 {
