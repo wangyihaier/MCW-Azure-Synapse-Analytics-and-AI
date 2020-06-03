@@ -999,12 +999,13 @@ function Execute-SQLScriptFile-SqlCmd {
     if ($Parameters) {
         foreach ($key in $Parameters.Keys) {
             $sqlQuery = $sqlQuery.Replace("#$($key)#", $Parameters[$key])
+            $sqlQuery = $sqlQuery.Replace('''','''''')
         }
     }
 
     $result = 0
-    ForEach ($line in $($sqlQuery -split "`r`n"))
-    {
+    ForEach ($line in $($sqlQuery -split "`r`n"))  
+    {        
         $result = Execute-SQLQuery-SqlCmd -WorkspaceName $WorkspaceName -SQLPoolName $SQLPoolName -SQLQuery $line -SQLUserName $SQLUserName -SQLPassword $SQLPassword $sqlQuery
     }
     return $result
