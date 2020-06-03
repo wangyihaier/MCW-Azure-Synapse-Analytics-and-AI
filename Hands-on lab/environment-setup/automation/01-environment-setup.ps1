@@ -76,6 +76,7 @@ Set-AzKeyVaultAccessPolicy -ResourceGroupName $resourceGroupName -VaultName $key
 
 Write-Information "Create SQL-USER-ASA Key Vault Secret"
 $secretValue = ConvertTo-SecureString $sqlPassword -AsPlainText -Force
+$secret = Set-AzKeyVaultSecret -VaultName $keyVaultName -Name $keyVaultSQLUserSecretName -SecretValue $secretValue
 
 Write-Information "Create KeyVault linked service $($keyVaultName)"
 
