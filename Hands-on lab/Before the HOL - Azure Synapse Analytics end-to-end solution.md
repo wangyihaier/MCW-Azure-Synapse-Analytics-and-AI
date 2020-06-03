@@ -31,7 +31,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
   - [Requirements](#requirements)
   - [Before the hands-on lab](#before-the-hands-on-lab)
     - [Task 1: Create a resource group in Azure](#task-1-create-a-resource-group-in-azure)
-    - [Task 2: Create Azure Synapse Analytics workspace](#task-2-create-azure-synapse-analytics-workspace)
+    - [Task 2: Create the Azure Synapse Analytics workspace](#task-2-create-the-azure-synapse-analytics-workspace)
     - [Task 3: Download lab artifacts](#task-3-download-lab-artifacts)
     - [Task 4: Run environment setup PowerShell scripts](#task-4-run-environment-setup-powershell-scripts)
 
@@ -65,7 +65,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 6. Select the **Create** button once validation has passed.
 
-### Task 2: Create Azure Synapse Analytics workspace
+### Task 2: Create the Azure Synapse Analytics workspace
 
 1. Deploy the workspace through the following Azure ARM template (press the button below):
 
@@ -90,7 +90,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 2. In the Cloud Shell window, enter the following command to clone the repository files.
 
     ```PowerShell
-    git clone https://github.com/codingbandit/MCW-Azure-Synapse-Analytics-end-to-end-solution.git Synapse-MCW
+    git clone https://github.com/microsoft/MCW-Azure-Synapse-Analytics-end-to-end-solution.git Synapse-MCW
     ```
 
 3. Keep the Cloud Shell open for the following task.
@@ -106,7 +106,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 2. Execute the **01-environment-setup.ps1** script by executing the following command:
 
     ```PowerShell
-    './01-environment-setup.ps1'
+    ./01-environment-setup.ps1
     ```
 
     You will be prompted for the following information for this script:
@@ -121,7 +121,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 3. Execute the **02-copy-lake-data.ps1** script by executing the following command:
 
     ```PowerShell
-    './02-copy-lake-data.ps1'
+    ./02-copy-lake-data.ps1
     ```
 
     You will be prompted for the following information for this script:
@@ -133,7 +133,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 4. Execute the **03-finalize-deployment.ps1** script by executing the following command:
 
     ```PowerShell
-    './03-finalize-deployment.ps1'
+    ./03-finalize-deployment.ps1
     ```
 
     You will be prompted for the following information for this script:

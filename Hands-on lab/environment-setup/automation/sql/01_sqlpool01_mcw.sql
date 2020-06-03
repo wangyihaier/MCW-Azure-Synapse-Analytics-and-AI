@@ -26,15 +26,14 @@ if not exists(select * from sys.database_principals where name = 'DataAnalystSan
 begin
     create user [DataAnalystSanDiego] without login;
 end
-go
 
 if not exists(select * from sys.schemas where name='wwi_mcw')
 begin
     EXEC('create schema [wwi_mcw] authorization [dbo]');
 END
-go
+
 create master key;
-go
+
 create table [wwi_mcw].[Product]
 (
     ProductId SMALLINT NOT NULL,
@@ -46,4 +45,3 @@ WITH
 (
     DISTRIBUTION = REPLICATE
 );
-go

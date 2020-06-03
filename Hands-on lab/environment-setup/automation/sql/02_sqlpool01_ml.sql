@@ -39,7 +39,6 @@ WITH
     REJECT_TYPE = VALUE ,
     REJECT_VALUE = 0
 );
-GO
 
 CREATE TABLE [wwi_mcw].[ASAMCWMLModel]
 (
@@ -52,4 +51,3 @@ WITH
     DISTRIBUTION = REPLICATE,
     HEAP
 );
-GO
