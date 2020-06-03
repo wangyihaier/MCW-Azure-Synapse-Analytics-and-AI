@@ -929,36 +929,6 @@ function Execute-SQLScriptFile {
     return Execute-SQLQuery -WorkspaceName $WorkspaceName -SQLPoolName $SQLPoolName -SQLQuery $sqlQuery -ForceReturn $ForceReturn
 }
 
-function Execute-SQLQuery-SqlCmd {
-
-    param(
-    [parameter(Mandatory=$true)]
-    [String]
-    $WorkspaceName,
-
-    [parameter(Mandatory=$true)]
-    [String]
-    $SQLPoolName,
-
-    [parameter(Mandatory=$true)]
-    [String]
-    $SQLUserName,
-
-    [parameter(Mandatory=$true)]
-    [String]
-    $SQLPassword,
-
-    [parameter(Mandatory=$true)]
-    [String]
-    $SQLQuery
-    )
-    
-    $sqlConnectionString = "Server=tcp:$($WorkspaceName).sql.azuresynapse.net,1433;Initial Catalog=$($SQLPoolName);Persist Security Info=False;User ID=$($SQLUserName);Password=$($SQLPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
-    $result = Invoke-SqlCmd -Query $SQLQuery -ConnectionString $sqlConnectionString
-    
-    return $result
-}
-
 function Execute-SQLScriptFile-SqlCmd {
 
     param(
@@ -999,7 +969,6 @@ function Execute-SQLScriptFile-SqlCmd {
     if ($Parameters) {
         foreach ($key in $Parameters.Keys) {
             $sqlQuery = $sqlQuery.Replace("#$($key)#", $Parameters[$key])
-            #$sqlQuery = $sqlQuery.Replace('''','''''')
         }
     }
 
@@ -1007,10 +976,7 @@ function Execute-SQLScriptFile-SqlCmd {
     $sqlConnectionString = "Server=tcp:$($WorkspaceName).sql.azuresynapse.net,1433;Initial Catalog=$($SQLPoolName);Persist Security Info=False;User ID=$($SQLUserName);Password=$($SQLPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
     ForEach ($line in $($sqlQuery -split "`r`n"))  
     {        
-
         $result = Invoke-SqlCmd -Query $SQLQuery -ConnectionString $sqlConnectionString
-
-        #$result = Execute-SQLQuery-SqlCmd -WorkspaceName $WorkspaceName -SQLPoolName $SQLPoolName -SQLQuery $line -SQLUserName $SQLUserName -SQLPassword $SQLPassword $sqlQuery
     }
     return $result
 }
@@ -1577,7 +1543,6 @@ Export-ModuleMember -Function Get-SQLPool
 Export-ModuleMember -Function Wait-ForSQLPool
 Export-ModuleMember -Function Execute-SQLQuery
 Export-ModuleMember -Function Execute-SQLScriptFile
-Export-ModuleMember -Function Execute-SQLQuery-SqlCmd
 Export-ModuleMember -Function Execute-SQLScriptFile-SqlCmd
 Export-ModuleMember -Function Wait-ForSQLQuery
 Export-ModuleMember -Function Create-SQLScript
