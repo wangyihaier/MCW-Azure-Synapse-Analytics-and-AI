@@ -999,14 +999,18 @@ function Execute-SQLScriptFile-SqlCmd {
     if ($Parameters) {
         foreach ($key in $Parameters.Keys) {
             $sqlQuery = $sqlQuery.Replace("#$($key)#", $Parameters[$key])
-            $sqlQuery = $sqlQuery.Replace('''','''''')
+            #$sqlQuery = $sqlQuery.Replace('''','''''')
         }
     }
 
     $result = 0
+    $sqlConnectionString = "Server=tcp:$($WorkspaceName).sql.azuresynapse.net,1433;Initial Catalog=$($SQLPoolName);Persist Security Info=False;User ID=$($SQLUserName);Password=$($SQLPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
     ForEach ($line in $($sqlQuery -split "`r`n"))  
     {        
-        $result = Execute-SQLQuery-SqlCmd -WorkspaceName $WorkspaceName -SQLPoolName $SQLPoolName -SQLQuery $line -SQLUserName $SQLUserName -SQLPassword $SQLPassword $sqlQuery
+
+        $result = Invoke-SqlCmd -Query $SQLQuery -ConnectionString $sqlConnectionString
+
+        #$result = Execute-SQLQuery-SqlCmd -WorkspaceName $WorkspaceName -SQLPoolName $SQLPoolName -SQLQuery $line -SQLUserName $SQLUserName -SQLPassword $SQLPassword $sqlQuery
     }
     return $result
 }
