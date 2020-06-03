@@ -97,6 +97,8 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 ### Task 4: Run environment setup PowerShell scripts
 
+When executing the scripts below, it is important to let the scripts run to completion. Some tasks may take longer than others to run. When a script completes execution, you will be returned to a command prompt.
+
 1. In the Cloud Shell, change the current directory to the **automation** folder of the cloned repository by executing the following:
 
     ```PowerShell
@@ -118,6 +120,8 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
     | Enter the SQL Administrator password you used in the deployment |
     | Enter the unique suffix you used in the deployment |
 
+    ![The Azure Cloud Shell window is displayed with a sample of the output from the preceding command.](media/bhol_sampleshelloutput.png)
+
 3. Execute the **02-copy-lake-data.ps1** script by executing the following command:
 
     ```PowerShell
@@ -129,6 +133,8 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
     | Prompt |
     |--------|
     | Enter the unique suffix you used in the deployment |
+
+    > **Note**: You may see messages indicating `INFO: Failed to create one or more destination container(s). Your transfers may still succeed if the container already exists.` or `INFO: Any empty folders will not be processed, because source and/or destination doesn't have full folder support` - these messages are safe to ignore.
 
 4. Execute the **03-finalize-deployment.ps1** script by executing the following command:
 
