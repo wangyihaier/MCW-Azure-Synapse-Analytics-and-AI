@@ -954,7 +954,8 @@ function Execute-SQLQuery-SqlCmd {
     )
     
     $sqlConnectionString = "Server=tcp:$($WorkspaceName).sql.azuresynapse.net,1433;Initial Catalog=$($SQLPoolName);Persist Security Info=False;User ID=$($SQLUserName);Password=$($SQLPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
-    $result = Invoke-Sqlcmd -Query $SQLQuery -ConnectionString $sqlConnectionString
+    $result = Invoke-SqlCmd -Query "$($SQLQuery)" -ConnectionString $sqlConnectionString
+    
     return $result
 }
 
@@ -1001,7 +1002,12 @@ function Execute-SQLScriptFile-SqlCmd {
         }
     }
 
-    return Execute-SQLQuery-SqlCmd -WorkspaceName $WorkspaceName -SQLPoolName $SQLPoolName -SQLQuery "$($sqlQuery)" -SQLUserName $SQLUserName -SQLPassword $SQLPassword $sqlQuery
+    $result = 0
+    ForEach ($line in $($sqlQuery -split "`r`n"))
+    {
+        $result = Execute-SQLQuery-SqlCmd -WorkspaceName $WorkspaceName -SQLPoolName $SQLPoolName -SQLQuery "$($line)" -SQLUserName $SQLUserName -SQLPassword $SQLPassword $sqlQuery
+    }
+    return $result
 }
 
 function Create-SQLScript {
