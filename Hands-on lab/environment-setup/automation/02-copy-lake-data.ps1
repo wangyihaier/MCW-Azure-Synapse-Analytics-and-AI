@@ -1,22 +1,7 @@
-Install-Module -Name Az -AllowClobber
-Install-Module -Name Azure.Storage -AllowClobber
-
 $InformationPreference = "Continue"
 
-# TODO: Keep all required configuration in C:\LabFiles\AzureCreds.ps1 file
-. C:\LabFiles\AzureCreds.ps1
-
-$userName = $AzureUserName                # READ FROM FILE
-$password = $AzurePassword                # READ FROM FILE
-$clientId = $TokenGeneratorClientId       # READ FROM FILE
-$sqlPassword = $AzureSQLPassword          # READ FROM FILE
-$resourceGroupName = $AzureResourceGroupName #READ FROM FILE
-$uniqueId = $UniqueSuffix                 #READ FROM FILE
-
-$securePassword = $password | ConvertTo-SecureString -AsPlainText -Force
-$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $userName, $SecurePassword
-
-Connect-AzAccount -Credential $cred | Out-Null
+$resourceGroupName = "Synapse-MCW"
+$uniqueId = Read-Host -Prompt "Enter the unique suffix you used in the deployment"
 
 $dataLakeAccountName = "asadatalake$($uniqueId)"
 
@@ -27,13 +12,6 @@ $dataLakeStorageBlobUrl = "https://"+ $dataLakeAccountName + ".blob.core.windows
 $dataLakeStorageAccountKey = (Get-AzStorageAccountKey -ResourceGroupName $resourceGroupName -AccountName $dataLakeAccountName)[0].Value
 $dataLakeContext = New-AzureStorageContext -StorageAccountName $dataLakeAccountName -StorageAccountKey $dataLakeStorageAccountKey
 $destinationSasKey = New-AzureStorageContainerSASToken -Container "wwi-02" -Context $dataLakeContext -Permission rwdl
-
-$azCopyLink = (curl https://aka.ms/downloadazcopy-v10-windows -MaximumRedirection 0 -ErrorAction silentlycontinue).headers.location
-Invoke-WebRequest $azCopyLink -OutFile "C:\LabFiles\azCopy.zip"
-Expand-Archive "C:\LabFiles\azCopy.zip" -DestinationPath "C:\LabFiles" -Force
-
-$azCopyCommand = (Get-ChildItem -Path C:\LabFiles -Recurse azcopy.exe).Directory.FullName
-$Env:Path += ";"+ $azCopyCommand
 
 $singleFiles = @{
         parquet_query_file = "wwi-02/sale-small/Year=2010/Quarter=Q4/Month=12/Day=20101231/sale-small-20101231-snappy.parquet"

@@ -929,6 +929,58 @@ function Execute-SQLScriptFile {
     return Execute-SQLQuery -WorkspaceName $WorkspaceName -SQLPoolName $SQLPoolName -SQLQuery $sqlQuery -ForceReturn $ForceReturn
 }
 
+function Execute-SQLScriptFile-SqlCmd {
+
+    param(
+    [parameter(Mandatory=$true)]
+    [String]
+    $SQLScriptsPath,
+
+    [parameter(Mandatory=$true)]
+    [String]
+    $WorkspaceName,
+
+    [parameter(Mandatory=$true)]
+    [String]
+    $SQLPoolName,
+
+    [parameter(Mandatory=$true)]
+    [String]
+    $SQLUserName,
+
+    [parameter(Mandatory=$true)]
+    [String]
+    $SQLPassword,
+
+    [parameter(Mandatory=$true)]
+    [String]
+    $FileName,
+
+    [parameter(Mandatory=$false)]
+    [Hashtable]
+    $Parameters
+    )
+
+    $vals = $filename.split("_");
+    $sqlpoolname = $vals[1];
+
+    $sqlQuery = Get-Content -Raw -Path "$($SQLScriptsPath)/$($FileName).sql"
+
+    if ($Parameters) {
+        foreach ($key in $Parameters.Keys) {
+            $sqlQuery = $sqlQuery.Replace("#$($key)#", $Parameters[$key])
+        }
+    }
+
+    $result = 0
+    $sqlConnectionString = "Server=tcp:$($WorkspaceName).sql.azuresynapse.net,1433;Initial Catalog=$($SQLPoolName);Persist Security Info=False;User ID=$($SQLUserName);Password=$($SQLPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+    ForEach ($line in $($sqlQuery -split "`r`n"))  
+    {        
+        $result = Invoke-SqlCmd -Query $SQLQuery -ConnectionString $sqlConnectionString
+    }
+    return $result
+}
+
 function Create-SQLScript {
     
     param(
@@ -1491,6 +1543,7 @@ Export-ModuleMember -Function Get-SQLPool
 Export-ModuleMember -Function Wait-ForSQLPool
 Export-ModuleMember -Function Execute-SQLQuery
 Export-ModuleMember -Function Execute-SQLScriptFile
+Export-ModuleMember -Function Execute-SQLScriptFile-SqlCmd
 Export-ModuleMember -Function Wait-ForSQLQuery
 Export-ModuleMember -Function Create-SQLScript
 Export-ModuleMember -Function Get-SparkPool

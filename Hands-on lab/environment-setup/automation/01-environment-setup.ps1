@@ -1,33 +1,15 @@
-Remove-Module "environment-automation"
 Import-Module ".\environment-automation"
-
-Uninstall-AzureRm
-
-Install-Module -Name Az -AllowClobber 
-Install-Module -Name Az.Storage -AllowClobber
-Install-Module -Name Az.Resources -AllowClobber
-Install-Module -Name Az.KeyVault -AllowClobber
-
-Import-Module Az.KeyVault;
-Import-Module Az.Resources;
 
 $InformationPreference = "Continue"
 
-#
-# TODO: Keep all required configuration in C:\LabFiles\AzureCreds.ps1 file
-. C:\LabFiles\AzureCreds.ps1
-
-$userName = $AzureUserName                # READ FROM FILE
-$password = $AzurePassword                # READ FROM FILE
-$clientId = $TokenGeneratorClientId       # READ FROM FILE
-$sqlPassword = $AzureSQLPassword          # READ FROM FILE
-$resourceGroupName = $AzureResourceGroupName #READ FROM FILE
-$uniqueId = $UniqueSuffix                 #READ FROM FILE
-
-$securePassword = $password | ConvertTo-SecureString -AsPlainText -Force
-$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $userName, $SecurePassword
-
-Connect-AzAccount -Credential $cred | Out-Null
+$userName = Read-Host -Prompt "Enter your Azure portal username"
+$password = Read-Host -Prompt "Enter your Azure portal password" -AsSecureString
+$password = [System.Runtime.InteropServices.Marshal]::PtrToStringUni([System.Runtime.InteropServices.Marshal]::SecureStringToCoTaskMemUnicode($password))
+$clientId = "1950a258-227b-4e31-a9cf-717495945fc2"       
+$sqlPassword = Read-Host -Prompt "Enter the SQL Administrator password you used in the deployment" -AsSecureString
+$sqlPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringUni([System.Runtime.InteropServices.Marshal]::SecureStringToCoTaskMemUnicode($sqlPassword))
+$resourceGroupName = "Synapse-MCW"
+$uniqueId = Read-Host -Prompt "Enter the unique suffix you used in the deployment"
 
 $subscriptionId = (Get-AzContext).Subscription.Id
 $global:logindomain = (Get-AzContext).Tenant.Id
@@ -42,6 +24,7 @@ $blobStorageAccountName = "asastore$($uniqueId)"
 $keyVaultName = "asakeyvault$($uniqueId)"
 $keyVaultSQLUserSecretName = "SQL-USER-ASA"
 $sqlPoolName = "SQLPool01"
+$sqlUserName = "asa.sql.admin"
 $integrationRuntimeName = "AzureIntegrationRuntime01"
 $sparkPoolName = "SparkPool01"
 $amlWorkspaceName = "amlworkspace$($uniqueId)"
@@ -56,9 +39,9 @@ $global:synapseSQLToken = ""
 $global:managementToken = ""
 
 $global:tokenTimes = [ordered]@{
-        Synapse = (Get-Date -Year 1)
-        SynapseSQL = (Get-Date -Year 1)
-        Management = (Get-Date -Year 1)
+        Synapse = (Get-Date ([datetime]::UtcNow) -Year 1)
+        SynapseSQL = (Get-Date ([datetime]::UtcNow) -Year 1)
+        Management = (Get-Date ([datetime]::UtcNow) -Year 1)
 }
 
 Write-Information "Assign Ownership on Synapse Workspace"
@@ -122,7 +105,7 @@ $params = @{
 
 try
 {
-    $result = Execute-SQLScriptFile -SQLScriptsPath $sqlScriptsPath -WorkspaceName $workspaceName -SQLPoolName "master" -FileName "00_master_setup" -Parameters $params
+   $result = Execute-SQLScriptFile-SqlCmd -SQLScriptsPath $sqlScriptsPath -WorkspaceName $workspaceName -SQLPoolName "master" -SQLUserName $sqlUserName -SQLPassword $sqlPassword -FileName "00_master_setup" -Parameters $params
 }
 catch 
 {
@@ -131,7 +114,7 @@ catch
 
 try
 {
-    $result = Execute-SQLScriptFile -SQLScriptsPath $sqlScriptsPath -WorkspaceName $workspaceName -SQLPoolName $sqlPoolName -FileName "01_sqlpool01_mcw" -Parameters $params
+    $result = Execute-SQLScriptFile-SqlCmd -SQLScriptsPath $sqlScriptsPath -WorkspaceName $workspaceName -SQLPoolName $sqlPoolName -SQLUserName $sqlUserName -SQLPassword $sqlPassword -FileName "01_sqlpool01_mcw" -Parameters $params
 }
 catch 
 {
@@ -185,7 +168,7 @@ $params = @{}
 $workloadPipelines = [ordered]@{
         copy_products_pipeline = "ASAMCW - Exercise 2 - Copy Product Information"
         execute_business_analyst_queries = "ASAMCW - Exercise 7 - ExecuteBusinessAnalystQueries"
-        execute_data_analyst_and_ceo_queries = "ASAMCW - Exercise 7 - ExecuteDataAnalystandCEOQueries"
+        execute_data_analyst_and_ceo_queries = "ASAMCW - Exercise 7 - ExecuteDataAnalystAndCEOQueries"
 }
 
 foreach ($pipeline in $workloadPipelines.Keys) 
