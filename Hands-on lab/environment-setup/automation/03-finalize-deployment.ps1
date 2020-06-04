@@ -2,7 +2,8 @@ Import-Module ".\environment-automation"
 
 $InformationPreference = "Continue"
      
-$sqlPassword = Read-Host -Prompt "Enter the SQL Administrator password you used in the deployment"
+$sqlPassword = Read-Host -Prompt "Enter the SQL Administrator password you used in the deployment" -AsSecureString
+$sqlPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringUni([System.Runtime.InteropServices.Marshal]::SecureStringToCoTaskMemUnicode($sqlPassword))
 $resourceGroupName = "Synapse-MCW"
 $uniqueId = Read-Host -Prompt "Enter the unique suffix you used in the deployment"
 
