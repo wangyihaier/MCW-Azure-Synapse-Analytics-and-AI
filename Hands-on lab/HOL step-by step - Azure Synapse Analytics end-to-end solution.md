@@ -1355,6 +1355,8 @@ In this task, you will explore the model registration process in Azure Synapse A
 
 In this task, you will author a T-SQL query that uses the previously trained model to make predictions.
 
+> **Note**: In order to make use of the `PREDICT` T-SQL function, your environment will need to be whitelisted. If your environment is not whitelisted, then you should read through the steps of this task as a reference as you will not be able to run the prediction queries.
+
 1. From the left menu, select **Data**.
 
 2. Expand the **Databases** section, right-click your SQL Pool and then select **New SQL Script**, and then **Empty script**.
