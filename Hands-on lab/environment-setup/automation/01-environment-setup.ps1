@@ -14,7 +14,7 @@ if($subs.length -gt 1){
         $selectedSubIdx = $host.ui.PromptForChoice('Select the desired Azure Subscription for this lab','If you have a long list, see expanded choice details by entering ?', $subOptions.ToArray(),0)
         $selectedSubName = $subs[$selectedSubIdx]
         Write-Information "Selecting the $selectedSubName subscription"
-        #Select-AzSubscription -SubscriptionName $selectedSubName
+        Select-AzSubscription -SubscriptionName $selectedSubName
 }
 
 $userName = ((az ad signed-in-user show) | ConvertFrom-JSON).UserPrincipalName
