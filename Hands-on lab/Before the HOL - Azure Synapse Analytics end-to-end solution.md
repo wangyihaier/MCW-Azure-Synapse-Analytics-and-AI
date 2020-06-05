@@ -139,31 +139,4 @@ When executing the script below, it is important to let the scripts run to compl
 
     ![The Azure Cloud Shell window is displayed with a sample of the output from the preceding command.](media/bhol_sampleshelloutput.png)
 
-3. Execute the **02-copy-lake-data.ps1** script by executing the following command:
-
-    ```PowerShell
-    ./02-copy-lake-data.ps1
-    ```
-
-    You will be prompted for the following information for this script:
-
-    | Prompt |
-    |--------|
-    | Enter the unique suffix you used in the deployment |
-
-    > **Note**: You may see messages indicating `INFO: Failed to create one or more destination container(s). Your transfers may still succeed if the container already exists.` or `INFO: Any empty folders will not be processed, because source and/or destination doesn't have full folder support` - these messages are safe to ignore.
-
-4. Execute the **03-finalize-deployment.ps1** script by executing the following command:
-
-    ```PowerShell
-    ./03-finalize-deployment.ps1
-    ```
-
-    You will be prompted for the following information for this script:
-
-    | Prompt |
-    |--------|
-    | Enter the SQL Administrator password you used in the deployment |
-    | Enter the unique suffix you used in the deployment |
-
 You should follow all steps provided *before* performing the Hands-on lab.
