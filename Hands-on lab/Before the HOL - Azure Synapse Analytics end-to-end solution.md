@@ -33,7 +33,8 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
     - [Task 1: Create a resource group in Azure](#task-1-create-a-resource-group-in-azure)
     - [Task 2: Create the Azure Synapse Analytics workspace](#task-2-create-the-azure-synapse-analytics-workspace)
     - [Task 3: Download lab artifacts](#task-3-download-lab-artifacts)
-    - [Task 4: Run environment setup PowerShell scripts](#task-4-run-environment-setup-powershell-scripts)
+    - [Task 4: Establish a user context](#task-4-establish-a-user-context)
+    - [Task 4: Run environment setup PowerShell script](#task-4-run-environment-setup-powershell-script)
 
 <!-- /TOC -->
 
@@ -59,7 +60,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 4. Select the **Create** button on the **Resource group** overview page.
 
-5. On the **Create a resource group** screen, select your desired Subscription and Region. For Resource group, enter **Synapse-MCW**, then select the **Review + Create** button.
+5. On the **Create a resource group** screen, select your desired Subscription and Region. For Resource group, enter **Synapse-MCW**, then select the **Review + Create** button. **You must use this resource group name for the scripts to run properly.**
 
     ![The Create a resource group form is displayed populated with Synapse-MCW as the resource group name.](media/bhol_resourcegroupform.png)
 
@@ -93,11 +94,27 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
     git clone https://github.com/microsoft/MCW-Azure-Synapse-Analytics-end-to-end-solution.git Synapse-MCW
     ```
 
-3. Keep the Cloud Shell open for the following task.
+3. Keep the Cloud Shell open.
 
-### Task 4: Run environment setup PowerShell scripts
+### Task 4: Establish a user context
 
-When executing the scripts below, it is important to let the scripts run to completion. Some tasks may take longer than others to run. When a script completes execution, you will be returned to a command prompt.
+1. In the Cloud Shell, execute the following command:
+
+    ```cli
+    az login
+    ```
+
+2. A message will be displayed asking you to open a new tab in your web browser, navigate to [https://microsoft.com/devicelogin](https://microsoft.com/devicelogin) and to enter a code for authentication.
+
+   ![A message is displayed indicating to enter an authentication code on the device login page.](media/bhol_devicelogin.png)
+
+   ![A dialog is shown requesting the entry of a code.](media/bhol_clicodescreen.png)
+
+3. Once complete, you may close the tab from the previous step and return to the Cloud Shell.
+
+### Task 4: Run environment setup PowerShell script
+
+When executing the script below, it is important to let the scripts run to completion. Some tasks may take longer than others to run. When a script completes execution, you will be returned to a command prompt.
 
 1. In the Cloud Shell, change the current directory to the **automation** folder of the cloned repository by executing the following:
 
@@ -111,42 +128,13 @@ When executing the scripts below, it is important to let the scripts run to comp
     ./01-environment-setup.ps1
     ```
 
-    You will be prompted for the following information for this script:
+    You will be prompted to enter the name of your desired Azure Subscription. You can copy and paste the value from the list to select one. You will also be prompted for the following information for this script:
 
     | Prompt |
     |--------|
-    | Enter your Azure portal username |
-    | Enter your Azure portal password |
     | Enter the SQL Administrator password you used in the deployment |
     | Enter the unique suffix you used in the deployment |
 
     ![The Azure Cloud Shell window is displayed with a sample of the output from the preceding command.](media/bhol_sampleshelloutput.png)
-
-3. Execute the **02-copy-lake-data.ps1** script by executing the following command:
-
-    ```PowerShell
-    ./02-copy-lake-data.ps1
-    ```
-
-    You will be prompted for the following information for this script:
-
-    | Prompt |
-    |--------|
-    | Enter the unique suffix you used in the deployment |
-
-    > **Note**: You may see messages indicating `INFO: Failed to create one or more destination container(s). Your transfers may still succeed if the container already exists.` or `INFO: Any empty folders will not be processed, because source and/or destination doesn't have full folder support` - these messages are safe to ignore.
-
-4. Execute the **03-finalize-deployment.ps1** script by executing the following command:
-
-    ```PowerShell
-    ./03-finalize-deployment.ps1
-    ```
-
-    You will be prompted for the following information for this script:
-
-    | Prompt |
-    |--------|
-    | Enter the SQL Administrator password you used in the deployment |
-    | Enter the unique suffix you used in the deployment |
 
 You should follow all steps provided *before* performing the Hands-on lab.

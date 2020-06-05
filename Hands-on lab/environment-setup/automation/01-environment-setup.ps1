@@ -2,10 +2,20 @@ Import-Module ".\environment-automation"
 
 $InformationPreference = "Continue"
 
-$userName = Read-Host -Prompt "Enter your Azure portal username"
-$password = Read-Host -Prompt "Enter your Azure portal password" -AsSecureString
-$password = [System.Runtime.InteropServices.Marshal]::PtrToStringUni([System.Runtime.InteropServices.Marshal]::SecureStringToCoTaskMemUnicode($password))
-$clientId = "1950a258-227b-4e31-a9cf-717495945fc2"       
+$subs = Get-AzSubscription | Select-Object -ExpandProperty Name
+if($subs.GetType().IsArray -and $subs.length -gt 1){
+        $subOptions = [System.Collections.ArrayList]::new()
+        for($subIdx=0; $subIdx -lt $subs.length; $subIdx++){
+                $opt = New-Object System.Management.Automation.Host.ChoiceDescription "$($subs[$subIdx])", "Selects the $($subs[$subIdx]) subscription."   
+                $subOptions.Add($opt)
+        }
+        $selectedSubIdx = $host.ui.PromptForChoice('Enter the desired Azure Subscription for this lab','Copy and paste the name of the subscription to make your choice.', $subOptions.ToArray(),0)
+        $selectedSubName = $subs[$selectedSubIdx]
+        Write-Information "Selecting the $selectedSubName subscription"
+        Select-AzSubscription -SubscriptionName $selectedSubName
+}
+
+$userName = ((az ad signed-in-user show) | ConvertFrom-JSON).UserPrincipalName
 $sqlPassword = Read-Host -Prompt "Enter the SQL Administrator password you used in the deployment" -AsSecureString
 $sqlPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringUni([System.Runtime.InteropServices.Marshal]::SecureStringToCoTaskMemUnicode($sqlPassword))
 $resourceGroupName = "Synapse-MCW"
@@ -29,19 +39,21 @@ $integrationRuntimeName = "AzureIntegrationRuntime01"
 $sparkPoolName = "SparkPool01"
 $amlWorkspaceName = "amlworkspace$($uniqueId)"
 
-$ropcBodyCore = "client_id=$($clientId)&username=$($userName)&password=$($password)&grant_type=password"
-$global:ropcBodySynapse = "$($ropcBodyCore)&scope=https://dev.azuresynapse.net/.default"
-$global:ropcBodyManagement = "$($ropcBodyCore)&scope=https://management.azure.com/.default"
-$global:ropcBodySynapseSQL = "$($ropcBodyCore)&scope=https://sql.azuresynapse.net/.default"
-
 $global:synapseToken = ""
 $global:synapseSQLToken = ""
 $global:managementToken = ""
 
 $global:tokenTimes = [ordered]@{
-        Synapse = (Get-Date ([datetime]::UtcNow) -Year 1)
-        SynapseSQL = (Get-Date ([datetime]::UtcNow) -Year 1)
-        Management = (Get-Date ([datetime]::UtcNow) -Year 1)
+        Synapse = (Get-Date -Year 1)
+        SynapseSQL = (Get-Date -Year 1)
+        Management = (Get-Date -Year 1)
+}
+
+Get-AzResourceGroup -Name $resourceGroupName -ErrorVariable rgNotPresent -ErrorAction SilentlyContinue
+
+if ($rgNotPresent)
+{
+    throw 'The Synapse-MCW resource group does not exist in this subscription.'
 }
 
 Write-Information "Assign Ownership on Synapse Workspace"
@@ -210,3 +222,69 @@ foreach ($notebookName in $notebooks.Keys)
         $result = Wait-ForOperation -WorkspaceName $workspaceName -OperationId $result.operationId
         $result
 }
+
+
+$publicDataUrl = "https://solliancepublicdata.blob.core.windows.net/"
+$dataLakeStorageUrl = "https://"+ $dataLakeAccountName + ".dfs.core.windows.net/"
+$dataLakeStorageBlobUrl = "https://"+ $dataLakeAccountName + ".blob.core.windows.net/"
+$dataLakeStorageAccountKey = (Get-AzStorageAccountKey -ResourceGroupName $resourceGroupName -AccountName $dataLakeAccountName)[0].Value
+$dataLakeContext = New-AzureStorageContext -StorageAccountName $dataLakeAccountName -StorageAccountKey $dataLakeStorageAccountKey
+$destinationSasKey = New-AzureStorageContainerSASToken -Container "wwi-02" -Context $dataLakeContext -Permission rwdl
+
+Write-Information "Copying single files from the public data account..."
+$singleFiles = @{
+        parquet_query_file = "wwi-02/sale-small/Year=2010/Quarter=Q4/Month=12/Day=20101231/sale-small-20101231-snappy.parquet"
+        customer_info = "wwi-02/customer-info/customerinfo.csv"
+        campaign_analytics = "wwi-02/campaign-analytics/campaignanalytics.csv"
+        products = "wwi-02/data-generators/generator-product/generator-product.csv"
+        model = "wwi-02/ml/onnx-hex/product_seasonality_classifier.onnx.hex"
+}
+
+foreach ($singleFile in $singleFiles.Keys) {
+        $source = $publicDataUrl + $singleFiles[$singleFile]
+        $destination = $dataLakeStorageBlobUrl + $singleFiles[$singleFile] + $destinationSasKey
+        Write-Information "Copying file $($source) to $($destination)"
+        azcopy copy $source $destination 
+}
+
+Write-Information "Copying sample sales raw data directories from the public data account..."
+$dataDirectories = @{
+        data2018 = "wwi-02/sale-small,wwi-02/sale-small/Year=2018/"
+        data2019 = "wwi-02/sale-small,wwi-02/sale-small/Year=2019/"
+}
+
+foreach ($dataDirectory in $dataDirectories.Keys) {
+
+        $vals = $dataDirectories[$dataDirectory].tostring().split(",");
+
+        $source = $publicDataUrl + $vals[1];
+
+        $path = $vals[0];
+
+        $destination = $dataLakeStorageBlobUrl + $path + $destinationSasKey
+        Write-Information "Copying directory $($source) to $($destination)"
+        azcopy copy $source $destination --recursive=true
+}
+
+Write-Information "Copying sample JSON data from the repository..."
+$rawData = "./rawdata/json-data"
+$destination = $dataLakeStorageUrl +"wwi-02/product-json" + $destinationSasKey
+azcopy copy $rawData $destination --recursive
+
+Write-Information "Setup machine learning tables in SQL Pool"
+$params = @{
+    "PASSWORD" = $sqlPassword
+    "DATALAKESTORAGEKEY" = $dataLakeStorageAccountKey
+    "DATALAKESTORAGEACCOUNTNAME" = $dataLakeAccountName
+}
+
+try
+{
+    Execute-SQLScriptFile-SqlCmd -SQLScriptsPath $sqlScriptsPath -WorkspaceName $workspaceName -SQLPoolName $sqlPoolName -SQLUserName $sqlUserName -SQLPassword $sqlPassword -FileName "02_sqlpool01_ml" -Parameters $params
+}
+catch 
+{
+    write-host $_.exception
+}
+
+Write-Information "Environment setup has completed."
