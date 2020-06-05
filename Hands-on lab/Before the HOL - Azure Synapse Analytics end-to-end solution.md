@@ -33,7 +33,8 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
     - [Task 1: Create a resource group in Azure](#task-1-create-a-resource-group-in-azure)
     - [Task 2: Create the Azure Synapse Analytics workspace](#task-2-create-the-azure-synapse-analytics-workspace)
     - [Task 3: Download lab artifacts](#task-3-download-lab-artifacts)
-    - [Task 4: Run environment setup PowerShell scripts](#task-4-run-environment-setup-powershell-scripts)
+    - [Task 4: Establish a user context](#task-4-establish-a-user-context)
+    - [Task 4: Run environment setup PowerShell script](#task-4-run-environment-setup-powershell-script)
 
 <!-- /TOC -->
 
@@ -93,11 +94,27 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
     git clone https://github.com/microsoft/MCW-Azure-Synapse-Analytics-end-to-end-solution.git Synapse-MCW
     ```
 
-3. Keep the Cloud Shell open for the following task.
+3. Keep the Cloud Shell open.
 
-### Task 4: Run environment setup PowerShell scripts
+### Task 4: Establish a user context
 
-When executing the scripts below, it is important to let the scripts run to completion. Some tasks may take longer than others to run. When a script completes execution, you will be returned to a command prompt.
+1. In the Cloud Shell, execute the following command:
+
+    ```cli
+    az login
+    ```
+
+2. A message will be displayed asking you to open a new tab in your web browser, navigate to [https://microsoft.com/devicelogin](https://microsoft.com/devicelogin) and to enter a code for authentication.
+
+   ![A message is displayed indicating to enter an authentication code on the device login page.](media/bhol_devicelogin.png)
+
+   ![A dialog is shown requesting the entry of a code.](media/bhol_clicodescreen.png)
+
+3. Once complete, you may close the tab from the previous step and return to the Cloud Shell.
+
+### Task 4: Run environment setup PowerShell script
+
+When executing the script below, it is important to let the scripts run to completion. Some tasks may take longer than others to run. When a script completes execution, you will be returned to a command prompt.
 
 1. In the Cloud Shell, change the current directory to the **automation** folder of the cloned repository by executing the following:
 
