@@ -60,7 +60,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 4. Select the **Create** button on the **Resource group** overview page.
 
-5. On the **Create a resource group** screen, select your desired Subscription and Region. For Resource group, enter **Synapse-MCW**, then select the **Review + Create** button.
+5. On the **Create a resource group** screen, select your desired Subscription and Region. For Resource group, enter **Synapse-MCW**, then select the **Review + Create** button. **You must use this resource group name for the scripts to run properly.**
 
     ![The Create a resource group form is displayed populated with Synapse-MCW as the resource group name.](media/bhol_resourcegroupform.png)
 
@@ -128,12 +128,10 @@ When executing the script below, it is important to let the scripts run to compl
     ./01-environment-setup.ps1
     ```
 
-    You will be prompted for the following information for this script:
+    You will be prompted to enter the name of your desired Azure Subscription. You can copy and paste the value from the list to select one. You will also be prompted for the following information for this script:
 
     | Prompt |
     |--------|
-    | Enter your Azure portal username |
-    | Enter your Azure portal password |
     | Enter the SQL Administrator password you used in the deployment |
     | Enter the unique suffix you used in the deployment |
 
