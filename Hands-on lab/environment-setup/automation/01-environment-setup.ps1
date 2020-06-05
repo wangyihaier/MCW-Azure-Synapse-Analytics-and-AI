@@ -4,13 +4,12 @@ $InformationPreference = "Continue"
 
 # select a subscription
 $subs = Get-AzSubscription | Select-Object -ExpandProperty Name
-if($subs.length -gt 1){
+if($subs.GetType().IsArray -and $subs.length -gt 1){
         $subOptions = [System.Collections.ArrayList]::new()
         for($subIdx=0; $subIdx -lt $subs.length; $subIdx++){
                 $opt = New-Object System.Management.Automation.Host.ChoiceDescription "&$([char](65 + $subIdx)) $($subs[$subIdx])", "Selects the $($subs[$subIdx]) subscription."   
                 $subOptions.Add($opt)
         }
-       
         $selectedSubIdx = $host.ui.PromptForChoice('Select the desired Azure Subscription for this lab','If you have a long list, see expanded choice details by entering ?', $subOptions.ToArray(),0)
         $selectedSubName = $subs[$selectedSubIdx]
         Write-Information "Selecting the $selectedSubName subscription"
