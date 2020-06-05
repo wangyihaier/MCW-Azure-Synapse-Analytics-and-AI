@@ -1456,17 +1456,17 @@ function Refresh-Token {
 
     switch($TokenType) {
         "Synapse" {
-            $tokenValue = ((az account get-access-token --resource https://dev.azuresynapse.net) | ConvertFrom-Json).AccessToken
+            $tokenValue = ((az account get-access-token --resource https://dev.azuresynapse.net) | ConvertFrom-Json).accessToken
             $global:synapseToken = $tokenValue; 
             break;
         }
         "SynapseSQL" {
-            $tokenValue = ((az account get-access-token --resource https://sql.azuresynapse.net) | ConvertFrom-Json).AccessToken
+            $tokenValue = ((az account get-access-token --resource https://sql.azuresynapse.net) | ConvertFrom-Json).accessToken
             $global:synapseSQLToken = $tokenValue; 
             break;
         }
         "Management" {
-            $tokenValue = ((az account get-access-token --resource https://management.azure.com) | ConvertFrom-Json).AccessToken
+            $tokenValue = ((az account get-access-token --resource https://management.azure.com) | ConvertFrom-Json).accessToken
             $global:managementToken = $tokenValue; 
             break;
         }
