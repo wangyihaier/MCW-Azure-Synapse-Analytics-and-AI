@@ -132,9 +132,12 @@ When executing the script below, it is important to let the scripts run to compl
 
     | Prompt |
     |--------|
+    | Enter the desired Azure Subscription for this lab [you will be able to copy and paste from a listing] |
     | Enter the SQL Administrator password you used in the deployment |
     | Enter the unique suffix you used in the deployment |
 
     ![The Azure Cloud Shell window is displayed with a sample of the output from the preceding command.](media/bhol_sampleshelloutput.png)
+
+3. At the end of the script, you should see a message indicating **Environment validation has succeeded**.
 
 You should follow all steps provided *before* performing the Hands-on lab.
