@@ -218,6 +218,8 @@ The data that we will be retrieving to populate the sale table is currently stor
 
 4. In the **New dataset** blade, with the **All** tab selected, choose the **Azure Data Lake Storage Gen2** item. Select **Continue**.
 
+    ![The New dataset blade is displayed with the All tab selected, the Azure Data Lake Storage Gen2 item is selected from the list.](media/new_dataset_type_selection.png)
+
 5. In the **Select format** screen, choose the **Parquet** item. Select **Continue**.
 
     ![In the Select format screen, the Parquet item is highlighted.](media/dataset_format_parquet.png)
@@ -257,16 +259,22 @@ The data that we will be retrieving to populate the sale table is currently stor
 
     ![From the left menu, the Develop item is selected. From the Develop blade the + button is expanded with the Data flow item highlighted.](media/develop_newdataflow_menu.png)
 
-12. In the side pane on the **General** tab, name the data flow by entering **ASAMCW - Exercise 2 - 2018 and 2019 Sales** in the **Name** field.
+12. In the side pane on the **General** tab, name the data flow by entering **ASAMCW_Exercise_2_2018_and_2019_Sales** in the **Name** field.
 
-    ![The General tab is displayed with ASAMCW - Exercise 2 - 2018 and 2019 Sales entered as the name of the data flow.](media/dataflow_generaltab_name.png)
+    ![The General tab is displayed with ASAMCW_Exercise_2_2018_and_2019_Sales entered as the name of the data flow.](media/dataflow_generaltab_name.png)
 
 13. In the data flow designer window, select the **Add Source** box.
 
     ![The Add source box is highlighted in the data flow designer window.](media/dataflow_addsourcebox.png)
 
-14. With the added source selected in the designer, in the lower pane with the **Source settings** tab selected, set the **Output stream name** to **salesdata** and for the **Dataset**, select **asamcw_sales_parquet**.
+14. With the added source selected in the designer, in the lower pane with the **Source settings** tab selected, set the following field values:
   
+    | Field | Value |
+    |-------|-------|
+    | Output stream name  | Enter **salesdata** |
+    | Source type | Select **Dataset**. |
+    | Dataset | Select **asamcw_sales_parquet**. |
+
     ![The Source settings tab is selected displaying the Output stream name set to salesdata and the selected dataset being asamcw_sales_parquet.](media/dataflow_source_sourcesettings.png)
 
 15. Select the **Source options** tab, and add the following as **Wildcard paths**, this will ensure that we only pull data from the parquet files for the sales years of 2018 and 2019:
@@ -289,18 +297,19 @@ The data that we will be retrieving to populate the sale table is currently stor
     |-------|-------|
     | Output stream name  | Enter **sale** |
     | Incoming stream | Select **salesdata**. |
+    | Sink type | Select **Dataset**. |
     | Dataset | Select **asamcw_sale_asa**. |
 
     ![The Sink tab is displayed with the form populated with the values from the preceding table.](media/dataflow_sink_sinktab.png)
 
-19. Select the **Mapping** tab and toggle the **Auto mapping** setting to the off position. You will need to add the following input to output column mappings. Add a mapping by selecting the **+ Add mapping** button.
+19. Select the **Mapping** tab and toggle the **Auto mapping** setting to the off position. You will need to select Input columns for the following:
   
     | Input column | Output column |
     |-------|-------|
+    | Quantity | Quantity |
     | TransactionDate  | TransactionDateId |
     | Hour | Hour |
     | Minute | Minute |
-    | Quantity | Quantity |
 
     ![The Mapping tab is selected with the Auto mapping toggle set to the off position. The + Add mapping button is highlighted along with the mapping entries specified in the preceding table.](media/dataflow_sink_mapping.png)
 
@@ -310,19 +319,21 @@ The data that we will be retrieving to populate the sale table is currently stor
 
 21. We can now use this data flow as an activity in a pipeline. Create a new pipeline by selecting **Orchestrate** from the left menu, and in the **Orchestrate** blade, expand the **+** button and select **Pipeline**.
 
-22. Select the **Properties** button from the right side of the designer toolbar. On the **Properties** blade, Enter **ASAMCW - Exercise 2 - Copy Sale Data** as the Name of the pipeline.
+22. On the **Properties** blade, Enter **ASAMCW - Exercise 2 - Copy Sale Data** as the Name of the pipeline.
 
 23. From the **Activities** menu, expand the **Move & transform** section and drag an instance of **Data flow** to the design surface of the pipeline.
   
     ![The Activities menu of the pipeline is displayed with the Move and transform section expanded. An arrow indicating a drag operation shows adding a Data flow activity to the design surface of the pipeline.](media/pipeline_sales_dataflowactivitymenu.png)
 
-24. With the newly added data flow activity selected in the designer, in the side pane with the **General** tab selected, Name the data flow **ASAMCW - Exercise 2 - 2018 and 2019 Sales**.
+24. In the **Adding data flow** blade, ensure **Use existing data flow** is selected, and choose **ASAMCW_Exercise_2_2018_and_2019_Sales** from the select list and select **Finish**.
+
+    ![The Adding data flow blade is displayed populated with the appropriate values.](media/pipeline_dataflowactivity_addingblade.png)
 
 25. Select the **Settings** tab and set the form fields to the following values:
 
     | Field | Value |
     |-------|-------|
-    | Data flow  | Select **ASAMCW - Exercise 2 - 2018 and 2019 Sales** |
+    | Data flow  | Select **ASAMCW_Exercise_2_2018_and_2019_Sales** |
     | Staging linked service | Select `asadatalake{SUFFIX}`. |
     | Staging storage folder - Container | Enter **staging** |
     | Staging storage folder - Folder | Enter **mcwsales** |
@@ -541,7 +552,7 @@ Similar to the customer information table, we will also be populating the campai
 
 2. On the **New dataset** blade, with the **All** tab selected, choose the **Azure Data Lake Storage Gen2** item. Select **Continue**.  
   
-    ![On the New dataset blade, the All tab is selected and the Azure Blob Storage item is highlighted.](media/newdataset_azureblobstorage.png)
+    ![The New dataset blade is displayed with the All tab selected, the Azure Data Lake Storage Gen2 item is selected from the list.](media/new_dataset_type_selection.png)
 
 3. On the **Select format** blade, select **CSV Delimited Text**. Select **Continue**.
 
@@ -586,9 +597,9 @@ Similar to the customer information table, we will also be populating the campai
 
     ![From the left menu, the Develop item is selected. From the Develop blade the + button is expanded with the Data flow item highlighted.](media/develop_newdataflow_menu.png)
 
-10. Select the Properties icon on the right side of the dataflow designer toolbar. In the **Properties** blade name the data flow by entering **ASAMCW - Exercise 2 - Campaign Analytics Data** in the **Name** field.
+10. Select the Properties icon on the right side of the dataflow designer toolbar. In the **Properties** blade name the data flow by entering **ASAMCW_Exercise_2_Campaign_Analytics_Data** in the **Name** field.
 
-    ![The Properties blade is displayed with ASAMCW - Exercise 2 - Campaign Analytics Data entered as the name of the data flow.](media/dataflow_campaignanalytics_propertiesblade.png)
+    ![The Properties blade is displayed with ASAMCW_Exercise_2_Campaign_Analytics_Data entered as the name of the data flow.](media/dataflow_campaignanalytics_propertiesblade.png)
 
 11. In the data flow designer window, select the **Add Source** box.
 
@@ -599,6 +610,7 @@ Similar to the customer information table, we will also be populating the campai
     | Field | Value |
     |-------|-------|
     | Output stream name  | Enter **campaignanlyticscsv** |
+    | Source type | Select **Dataset** |
     | Dataset | Select **asamcw_campaignanalytics_csv**. |
     | Skip line count | Enter **1** |  
 
@@ -642,7 +654,7 @@ Similar to the customer information table, we will also be populating the campai
 
     | Field | Value |
     |-------|-------|
-    | Output stream name  | Enter **mapcampaignanlytics** |
+    | Output stream name  | Enter **mapcampaignanalytics** |
 
     For **Input Columns**, under the **Name as** column, enter the following list values in order:
       - Region
@@ -720,7 +732,7 @@ Similar to the customer information table, we will also be populating the campai
   
     ![The Activities menu of the pipeline is displayed with the Move and transform section expanded. An arrow indicating a drag operation shows adding a Data flow activity to the design surface of the pipeline.](media/pipeline_sales_dataflowactivitymenu.png)
 
-30. In the **Adding data flow** blade, select the data flow **ASAMCW - Exercise 2 - Campaign Analytics Data**, then **Finish**. Select the Mapping Data Flow activity on the design surface.
+30. In the **Adding data flow** blade, select the data flow **ASAMCW_Exercise_2_Campaign_Analytics_Data**, then **Finish**. Select the Mapping Data Flow activity on the design surface.
 
 31. In the bottom pane, select the **Settings** tab and set the form fields to the following values:
 
@@ -1258,7 +1270,7 @@ Please note that each of these tasks will be addressed through several cells in 
 
 In this task, you will explore the model registration process in Azure Synapse Analytics that enables trained model for use from T-SQL. This task picks up where you left off, with the ONNX model being made available in Azure Storage.
 
-1. One step that is not shown by the notebook is an offline step that converts the ONNX model to hexadecimal. The resulting hex encoded model is also upload to Azure Storage. This conversion is currently performed with [this PowerShell script](https://github.com/solliancenet/azure-synapse-analytics-workshop-400/raw/master/artifacts/day-03/lab-06-machine-learning/convert-to-hex.ps1), but could be automated using any scripting platform.
+1. One step that is not shown by the notebook is an offline step that converts the ONNX model to hexadecimal. The resulting hex encoded model is also upload to Azure Storage. This conversion is currently performed with [this PowerShell script](https://github.com/microsoft/MCW-Azure-Synapse-Analytics-end-to-end-solution/raw/master/Hands-on lab/artifacts/convert-to-hex.ps1), but could be automated using any scripting platform.
 
 2. From the left menu, select **Data**.
 
@@ -1339,7 +1351,7 @@ In this task, you will explore the model registration process in Azure Synapse A
       GO
     ```
 
-6. Import the persisted ONNX model in hexadecimal format into the main models table (to be later used with the `PREDICT` function):
+6. Import the persisted ONNX model in hexadecimal format into the main models table (to be later used with the `PREDICT` function) by executing the following query on **SQLPool01**:
 
     ```sql
     -- Register the model by inserting it into the table.
@@ -1747,5 +1759,11 @@ All logins to your data warehouse are logged to `sys.dm_pdw_exec_sessions`. This
 ### Task 1: Delete the resource group
 
 1. In the Azure Portal, open the resource group for this lab. Select **Delete** from the top toolbar menu.
+
+2. Open the Cloud Shell and issue the following command to remove the lab files:
+
+   ```PowerShell
+   Remove-Item -Path .\Synapse-MCW -recurse -force
+   ```
 
 You should follow all steps provided *after* attending the Hands-on lab.

@@ -60,7 +60,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 4. Select the **Create** button on the **Resource group** overview page.
 
-5. On the **Create a resource group** screen, select your desired Subscription and Region. For Resource group, enter **Synapse-MCW**, then select the **Review + Create** button. **You must use this resource group name for the scripts to run properly.**
+5. On the **Create a resource group** screen, select your desired Subscription and Region. For Resource group, enter **Synapse-MCW**, then select the **Review + Create** button.
 
     ![The Create a resource group form is displayed populated with Synapse-MCW as the resource group name.](media/bhol_resourcegroupform.png)
 
@@ -133,6 +133,7 @@ When executing the script below, it is important to let the scripts run to compl
     | Prompt |
     |--------|
     | Enter the desired Azure Subscription for this lab [you will be able to copy and paste from a listing] |
+    | Enter the name of the resource group containing the Azure Synapse Analytics Workspace |
     | Enter the SQL Administrator password you used in the deployment |
     | Enter the unique suffix you used in the deployment |
 
