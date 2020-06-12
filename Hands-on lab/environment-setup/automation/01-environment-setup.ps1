@@ -53,7 +53,7 @@ Get-AzResourceGroup -Name $resourceGroupName -ErrorVariable rgNotPresent -ErrorA
 
 if ($rgNotPresent)
 {
-    throw 'The Synapse-MCW resource group does not exist in this subscription.'
+    throw "The $($resourceGroupName) resource group does not exist in this subscription."
 }
 
 Write-Information "Assign Ownership on Synapse Workspace"

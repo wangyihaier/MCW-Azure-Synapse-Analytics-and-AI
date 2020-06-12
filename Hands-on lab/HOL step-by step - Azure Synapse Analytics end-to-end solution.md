@@ -1748,4 +1748,10 @@ All logins to your data warehouse are logged to `sys.dm_pdw_exec_sessions`. This
 
 1. In the Azure Portal, open the resource group for this lab. Select **Delete** from the top toolbar menu.
 
+2. Open the Cloud Shell and issue the following command to remove the lab files:
+
+   ```PowerShell
+   Remove-Item -Path .\Synapse-MCW -recurse -force
+   ```
+
 You should follow all steps provided *after* attending the Hands-on lab.
