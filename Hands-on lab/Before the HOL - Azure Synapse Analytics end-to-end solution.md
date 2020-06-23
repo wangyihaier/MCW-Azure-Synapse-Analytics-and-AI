@@ -46,6 +46,8 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 ## Before the hands-on lab
 
+**Duration**: 20 minutes
+
 ### Task 1: Create a resource group in Azure
 
 1. Log into the [Azure Portal](https://portal.azure.com) using your Azure credentials.
