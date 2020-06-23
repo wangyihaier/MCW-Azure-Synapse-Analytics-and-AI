@@ -43,7 +43,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
     - [Task 5: Create the campaign analytics table](#task-5-create-the-campaign-analytics-table)
     - [Task 6: Populate the campaign analytics table](#task-6-populate-the-campaign-analytics-table)
     - [Task 7: Populate the product table](#task-7-populate-the-product-table)
-  - [Exercise 3: Exploring raw parquet data](#exercise-3-exploring-raw-parquet-data)
+  - [Exercise 3: Exploring raw parquet](#exercise-3-exploring-raw-parquet)
     - [Task 1: Query sales Parquet data with Synapse SQL Serverless](#task-1-query-sales-parquet-data-with-synapse-sql-serverless)
     - [Task 2: Query sales Parquet data with Azure Synapse Spark](#task-2-query-sales-parquet-data-with-azure-synapse-spark)
   - [Exercise 4: Exploring raw text based data with Azure Synapse SQL Serverless](#exercise-4-exploring-raw-text-based-data-with-azure-synapse-sql-serverless)
@@ -133,6 +133,8 @@ All exercises in this lab utilize the workspace Synapse Studio user interface. T
 
 ## Exercise 2: Create and populate the supporting tables in the SQL Pool
 
+**Duration**: 45 minutes
+
 The first step in querying meaningful data is to create tables to house the data. In this case, we will create four different tables: SaleSmall, CustomerInfo, CampaignAnalytics, and Sales. When designing tables in Azure Synapse Analytics, we need to take into account the expected amount of data in each table, as well as how each table will be used. Utilize the following guidance when designing your tables to ensure the best experience and performance.
 
 Table design performance considerations
@@ -198,7 +200,7 @@ Over the past 5 years, Wide World Importers has amassed over 3 billion rows of s
   
 ### Task 2: Populate the sale table
 
-The data that we will be retrieving to populate the sale table is currently stored as a series of parquet files in the **asadatalake{SUFFIX}** in the data lake (Azure Data Lake Storage Gen 2). This storage account has already been added as a linked service in Azure Synapse Analytics when the environment was provisioned. Linked Services are synonymous with connection strings in Azure Synapse Analytics. Azure Synapse Analytics linked services provides the ability to connect to nearly 100 different types of external services ranging from Azure Storage Accounts to Amazon S3 and more.
+The data that we will be retrieving to populate the sale table is currently stored as a series of parquet files in the **asadatalake{SUFFIX}** data lake (Azure Data Lake Storage Gen 2). This storage account has already been added as a linked service in Azure Synapse Analytics when the environment was provisioned. Linked Services are synonymous with connection strings in Azure Synapse Analytics. Azure Synapse Analytics linked services provides the ability to connect to nearly 100 different types of external services ranging from Azure Storage Accounts to Amazon S3 and more.
 
 1. Review the presence of the **asadatalake{SUFFIX}** linked service, by selecting **Manage** from the left menu, and selecting **Linked services** from the blade menu. Filter the linked services by the term **asadatalake** to find the **asadatalake{SUFFIX}** item. Further investigating this item will unveil that it makes a connection to the storage account using a storage account key.
   
@@ -609,7 +611,7 @@ Similar to the customer information table, we will also be populating the campai
 
     | Field | Value |
     |-------|-------|
-    | Output stream name  | Enter **campaignanlyticscsv** |
+    | Output stream name  | Enter **campaignanalyticscsv** |
     | Source type | Select **Dataset** |
     | Dataset | Select **asamcw_campaignanalytics_csv**. |
     | Skip line count | Enter **1** |  
@@ -738,7 +740,7 @@ Similar to the customer information table, we will also be populating the campai
 
     | Field | Value |
     |-------|-------|
-    | Data flow  | Select **ASAMCW - Exercise 2 - Campaign Analytics Data** |
+    | Data flow  | Select **ASAMCW_Exercise_2_Campaign_Analytics_Data** |
     | Staging linked service | Select `asadatalake{SUFFIX}`. |
     | Staging storage folder - Container | Enter **staging** |
     | Staging storage folder - Directory | Enter **mcwcampaignanalytics** |
@@ -781,9 +783,11 @@ When the lab environment was provisioned, the **wwi_mcw.Product** table and data
     select * from wwi_mcw.Product;
   ```
 
-## Exercise 3: Exploring raw parquet data
+## Exercise 3: Exploring raw parquet
 
-Understanding data through data exploration is one of the core challenges faced today by data engineers and data scientists as well. Depending on the underlying structure of the data as well as the specific requirements of the exploration process, different data processing engines will offer varying degrees of performance, complexity, and flexibility.
+**Duration**: 15 minutes
+
+Understanding data through data exploration is one of the core challenges faced today by data engineers and data scientists. Depending on the underlying structure of the data as well as the specific requirements of the exploration process, different data processing engines will offer varying degrees of performance, complexity, and flexibility.
 
 In Azure Synapse Analytics, you have the possibility of using either the Synapse SQL Serverless engine, the big-data Spark engine, or both.
 
@@ -852,7 +856,7 @@ When you query Parquet files using Synapse SQL Serverless, you can explore the d
 
 4. Select **Run all** on the notebook toolbar to execute the notebook.
 
-    > **Note:** The first time you run a notebook in a Spark pool, Synapse creates a new session. This can take approximately 3 minutes.
+    > **Note:** The first time you run a notebook in a Spark pool, Synapse creates a new session. This can take approximately 5 minutes.
     > **Note:** To run just the cell, either hover over the cell and select the _Run cell_ icon to the left of the cell, or select the cell then type **Ctrl+Enter** on your keyboard.
 
 5. Create a new cell underneath by selecting **{} Add code** when hovering over the blank space at the bottom of the notebook.
@@ -901,6 +905,8 @@ When you query Parquet files using Synapse SQL Serverless, you can explore the d
  > We import required Python libraries to use aggregation functions and types defined in the schema to successfully execute the query.
 
 ## Exercise 4: Exploring raw text based data with Azure Synapse SQL Serverless
+
+**Duration**: 10 minutes
 
 A common format for exporting and storing data is with text based files. These can delimited text files such as CSV as well as JSON structured data files. Azure Synapse Analytics also provides ways of querying into these types of raw files to gain valuable insights into the data without having to wait for them to be processed.
 
@@ -1001,13 +1007,15 @@ A common format for exporting and storing data is with text based files. These c
 
 ## Exercise 5: Security
 
+**Duration**: 15 minutes
+
 ### Task 1: Column level security
 
 It is important to identify data columns of that hold sensitive information. Types of sensitive information could be social security numbers, email addresses, credit card numbers, financial totals, and more. Azure Synapse Analytics allows you define permissions that prevent users or roles select privileges on specific columns.
 
 1. Create a new SQL Script by selecting **Develop** from the left menu, then in the **Develop** blade, expanding the **+** button and selecting **SQL Query**.
 
-2. Copy and paste the following query into the query window. Then, step through each statement by highlighting it in the query window, and selecting **Run** from the query window toolbar menu. The query is documented inline.
+2. Copy and paste the following query into the query window. Then, step through each statement by highlighting it in the query window, and selecting **Run** from the query window toolbar menu. The query is documented inline. Ensure you are connected to **SQLPool01** when running the queries.
 
     ```sql
         /*  Column-level security feature in Azure Synapse simplifies the design and coding of security in applications.
@@ -1228,6 +1236,8 @@ As an alternative to column level security, SQL Administrators also have the opt
 
 ## Exercise 6: Machine Learning
 
+**Duration**: 45 minutes
+
 Azure Synapse Analytics provides a unified environment for both data science and data engineering. What this means in practice, is that your data scientists can train and deploy models using Azure Synapse Analytics and your data engineers can write T-SQL queries that use those models to make predictions against tabular data stored in a SQL Pool database table.
 
 In this lab, you will create several machine learning models and use them to make predictions using the T-SQL `Predict` statement.
@@ -1270,7 +1280,17 @@ Please note that each of these tasks will be addressed through several cells in 
 
 In this task, you will explore the model registration process in Azure Synapse Analytics that enables trained model for use from T-SQL. This task picks up where you left off, with the ONNX model being made available in Azure Storage.
 
-1. One step that is not shown by the notebook is an offline step that converts the ONNX model to hexadecimal. The resulting hex encoded model is also upload to Azure Storage. This conversion is currently performed with [this PowerShell script](https://github.com/microsoft/MCW-Azure-Synapse-Analytics-end-to-end-solution/raw/master/Hands-on lab/artifacts/convert-to-hex.ps1), but could be automated using any scripting platform.
+1. The next step is to convert the ONNX model to hexadecimal. The resulting hex encoded model is also upload to Azure Storage. A sample script that performs this functionality is available in [this PowerShell script](https://github.com/microsoft/MCW-Azure-Synapse-Analytics-end-to-end-solution/raw/master/Hands-on%20lab/artifacts/convert-to-hex.ps1). We will execute the following Powershell script that leverages this functionality. Open the **Cloud Console** and execute the following:
+
+   ```PowerShell
+   './Synapse-MCW/Hands-on lab/artifacts/convert-automl-model-to-hex.ps1'
+   ```
+
+   You will be prompted for the following information:
+    | Prompt |
+    |--------|  
+    | Enter the name of the resource group containing the Azure Synapse Analytics Workspace |
+    | Enter the unique suffix you used in the deployment |
 
 2. From the left menu, select **Data**.
 
@@ -1291,7 +1311,7 @@ In this task, you will explore the model registration process in Azure Synapse A
 
     ![Persisted ONNX model in hexadecimal format](media/lab06-persisted-model.png)
 
-5. **ASAMCWMLModelExt** is an external table that maps to the data lake location where the trained model was persisted (and then converted to hexadecimal format). Take a moment to read through the code that was used to create the external table (you don't need to run this code as it was already run during the deployment of your environment):
+5. **ASAMCWMLModelExt** is an external table that maps to the data lake location where the trained model was persisted (and then converted to hexadecimal format). Take a moment to read through the code that was used to create the external table (**you don't need to run this code as it was already run during the deployment of your environment**):
 
     ``` sql
       -- Replace <data_lake_account_key> with the key of the primary data lake account
@@ -1408,6 +1428,8 @@ In this task, you will author a T-SQL query that uses the previously trained mod
    ![The query results pane is displayed with the prediction results.](media/lab06-view-prediction-results.png "View prediction results")
 
 ## Exercise 7: Monitoring
+
+**Duration**: 25 minutes
 
 Azure Synapse Analytics provides a rich monitoring experience within the Azure portal to surface insights regarding your data warehouse workload.
 
@@ -1756,6 +1778,8 @@ All logins to your data warehouse are logged to `sys.dm_pdw_exec_sessions`. This
   
 ## After the hands-on lab
 
+**Duration**: 5 minutes
+
 ### Task 1: Delete the resource group
 
 1. In the Azure Portal, open the resource group for this lab. Select **Delete** from the top toolbar menu.
@@ -1764,6 +1788,7 @@ All logins to your data warehouse are logged to `sys.dm_pdw_exec_sessions`. This
 
    ```PowerShell
    Remove-Item -Path .\Synapse-MCW -recurse -force
+   Remove-Item -Path .\modelconversion -recurse -force
    ```
 
 You should follow all steps provided *after* attending the Hands-on lab.
