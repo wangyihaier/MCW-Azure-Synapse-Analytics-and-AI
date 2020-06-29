@@ -49,15 +49,18 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
   - [Exercise 4: Exploring raw text based data with Azure Synapse SQL Serverless](#exercise-4-exploring-raw-text-based-data-with-azure-synapse-sql-serverless)
     - [Task 1: Query CSV data](#task-1-query-csv-data)
     - [Task 2: Query JSON data](#task-2-query-json-data)
-  - [Exercise 5: Security](#exercise-5-security)
+  - [Exercise 5: Synapse Pipelines & Cognitive Search](#exercise-5-synapse-pipelines--cognitive-search)
+    - [Task 1: Configure a skillset with Form Recognizer](#task-1-configure-a-skillset-with-form-recognizer)
+    - [Task 2: Create the Synapse Pipline](#task-2-create-the-synapse-pipline)
+  - [Exercise 6: Security](#exercise-6-security)
     - [Task 1: Column level security](#task-1-column-level-security)
     - [Task 2: Row level security](#task-2-row-level-security)
     - [Task 3: Dynamic data masking](#task-3-dynamic-data-masking)
-  - [Exercise 6: Machine Learning](#exercise-6-machine-learning)
+  - [Exercise 7: Machine Learning](#exercise-7-machine-learning)
     - [Task 1: Training models](#task-1-training-models)
     - [Task 2: Registering the models with Azure Synapse Analytics](#task-2-registering-the-models-with-azure-synapse-analytics)
     - [Task 3: Making predictions with the registered models](#task-3-making-predictions-with-the-registered-models)
-  - [Exercise 7: Monitoring](#exercise-7-monitoring)
+  - [Exercise 8: Monitoring](#exercise-8-monitoring)
     - [Task 1: Workload Importance](#task-1-workload-importance)
     - [Task 2: Workload Isolation](#task-2-workload-isolation)
     - [Task 3: Monitoring with Dynamic Management Views](#task-3-monitoring-with-dynamic-management-views)
@@ -1005,7 +1008,30 @@ A common format for exporting and storing data is with text based files. These c
 
    ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png)
 
-## Exercise 5: Security
+
+## Exercise 5: Synapse Pipelines & Cognitive Search
+
+**Duration**: 15 minutes
+
+In this exercise you will create a Synapse Pipeline that will orchestrate updating the part prices from a supplier invoice. You will accomplish this by a combination of a Synapse Pipeline with an Azure Cogntive Search Skillset that invokes the Form Recognizer service as a custom skill. The pipeline will work as follows:
+    - Invoice is uploaded to Azure Storage.
+    - This triggers a Synapse Pipeline.
+    - The Synapse Pipeline has a web activity that invokes an Azure Cognitive Search skillset.
+    - The first skill in the skillset invokes an Azure Function, passing it the URL to the PDF invoice. 
+    - The Azure Function invokes the Form Recognizer service, passing it the URL and SAS token to the PDF invoice. Forms recognizer returns the OCR results to the function.
+    - The Azure Function returns the results to skillset. The skillset then extracts only the product names and costs and sends that to a configure knowledge store that writes the extracted data to JSON files in Azure Storage.
+    - The Synapse pipline reads these JSON files from Azure Storage in a Data Flow activity and performs an upsert against the product catalog table in the Synapse SQL Pool. 
+
+### Task 1: Configure a skillset with Form Recognizer
+
+TBD
+
+### Task 2: Create the Synapse Pipline
+
+TBD
+
+
+## Exercise 6: Security
 
 **Duration**: 15 minutes
 
@@ -1234,7 +1260,7 @@ As an alternative to column level security, SQL Administrators also have the opt
 
    ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png)
 
-## Exercise 6: Machine Learning
+## Exercise 7: Machine Learning
 
 **Duration**: 45 minutes
 
@@ -1427,7 +1453,7 @@ In this task, you will author a T-SQL query that uses the previously trained mod
 
    ![The query results pane is displayed with the prediction results.](media/lab06-view-prediction-results.png "View prediction results")
 
-## Exercise 7: Monitoring
+## Exercise 8: Monitoring
 
 **Duration**: 25 minutes
 
