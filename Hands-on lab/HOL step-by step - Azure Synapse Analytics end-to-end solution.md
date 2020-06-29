@@ -1015,13 +1015,13 @@ A common format for exporting and storing data is with text based files. These c
 
 In this exercise you will create a Synapse Pipeline that will orchestrate updating the part prices from a supplier invoice. You will accomplish this by a combination of a Synapse Pipeline with an Azure Cogntive Search Skillset that invokes the Form Recognizer service as a custom skill. The pipeline will work as follows:
 
- - Invoice is uploaded to Azure Storage.
- - This triggers a Synapse Pipeline.
- - The Synapse Pipeline has a web activity that invokes an Azure Cognitive Search skillset.
- - The first skill in the skillset invokes an Azure Function, passing it the URL to the PDF invoice. 
- - The Azure Function invokes the Form Recognizer service, passing it the URL and SAS token to the PDF invoice. Forms recognizer returns the OCR results to the function.
- - The Azure Function returns the results to skillset. The skillset then extracts only the product names and costs and sends that to a configure knowledge store that writes the extracted data to JSON files in Azure Storage.
- - The Synapse pipline reads these JSON files from Azure Storage in a Data Flow activity and performs an upsert against the product catalog table in the Synapse SQL Pool. 
+- Invoice is uploaded to Azure Storage.
+- This triggers a Synapse Pipeline.
+- The Synapse Pipeline has a web activity that invokes an Azure Cognitive Search skillset.
+- The first skill in the skillset invokes an Azure Function, passing it the URL to the PDF invoice. 
+- The Azure Function invokes the Form Recognizer service, passing it the URL and SAS token to the PDF invoice. Forms recognizer returns the OCR results to the function.
+- The Azure Function returns the results to skillset. The skillset then extracts only the product names and costs and sends that to a configure knowledge store that writes the extracted data to JSON files in Azure Storage.
+- The Synapse pipline reads these JSON files from Azure Storage in a Data Flow activity and performs an upsert against the product catalog table in the Synapse SQL Pool. 
 
 ### Task 1: Configure a skillset with Form Recognizer
 
