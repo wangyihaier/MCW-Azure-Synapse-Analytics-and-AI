@@ -1014,6 +1014,7 @@ A common format for exporting and storing data is with text based files. These c
 **Duration**: 15 minutes
 
 In this exercise you will create a Synapse Pipeline that will orchestrate updating the part prices from a supplier invoice. You will accomplish this by a combination of a Synapse Pipeline with an Azure Cogntive Search Skillset that invokes the Form Recognizer service as a custom skill. The pipeline will work as follows:
+
     - Invoice is uploaded to Azure Storage.
     - This triggers a Synapse Pipeline.
     - The Synapse Pipeline has a web activity that invokes an Azure Cognitive Search skillset.

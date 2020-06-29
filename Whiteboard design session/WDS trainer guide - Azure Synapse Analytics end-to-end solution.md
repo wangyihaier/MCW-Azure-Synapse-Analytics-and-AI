@@ -558,6 +558,7 @@ The primary audience is the business decision makers and technology decision mak
 6. How does your solution address their need to keep their part costs table in the data warehouse updated by the supplier invoices? 
 
     WWI can accomplish this by a combination of a Synapse Pipeline with an Azure Cogntive Search Skillset that invokes the Form Recognizer service as a custom skill. The pipeline would work as follows:
+    
         - Invoice is uploaded to Azure Storage.
         - This triggers a Synapse Pipeline.
         - The Synapse Pipeline has a web activity that invokes an Azure Cognitive Search skillset.
