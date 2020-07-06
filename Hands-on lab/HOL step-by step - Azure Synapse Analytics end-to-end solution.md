@@ -1099,7 +1099,7 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
     ![display the endpoint and keys for Cognitive services](media/ex5-task2a-05.png)
 
 7. Browse to your Azure Portal a create a new resource and create a new instance of Azure Cognative Search
-    ![search for and select Azure Cognative Search](media/Ex5-Task1-006.png)
+    ![search for and select Azure Cognative Search](media/ex5-task1-006.png)
 1. Choose the subscription and resource group you've been using. Set the URL of the Cognative Search Service and switch the pricing tier to free
     ![displaying the basics tab of the new search service and the configuration settings](media/ex5-task1-007.png)
 2. Click "Review + create"
@@ -1130,9 +1130,9 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
 1. Open Visual Studio Code
 2. Make sure you hve the Azure Functions extension installed.
-   ![The header of the azure functions module is show](media/Ex5-Task1-000.png)
+   ![The header of the azure functions module is show](media/ex5-task1-000.png)
 3. In Visual Studio Code open the folder /environment-setup/functions
-   ![The functions folder to open is shown](media/Ex5-Task1-001.png)
+   ![The functions folder to open is shown](media/ex5-task1-001.png)
 4. In __init__.py update lines 66, 68, 70, and 73 to have the appropriate values for your environment
    ![The lines of code thta need to be updated are displayed](media/ex5-task1-step2.png)
 5. Use the Azure Functions extention to publish to a new Azure function in the same Resource Group as your Synapse workspace
