@@ -1090,7 +1090,7 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
     - Check the confirmation checkbox
     Then click Create
 
-    ![display the configuraiton settings for Cognitive Services](media/ex5-task2a-03.png) 
+    ![display the configuraiton settings for Cognitive Services](media/ex5-task2a-03.png)
 
 4. Wait for the service to provision then navigate to the resource
 5. Click on "Keys and Endpoint on the left side"
@@ -1098,9 +1098,8 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 6. Copy and Paste both KEY 1 and the ENDPOINT. Put these in the same location as the storage connection string you copied earlier
     ![display the endpoint and keys for Cognitive services](media/ex5-task2a-05.png)
 
-
-Browse to your Azure Portal a create a new resource and create a new instance of Azure Cognative Search
-    ![search for and select Azure Cognative Search](media/ex5-task1-006.png)
+7. Browse to your Azure Portal a create a new resource and create a new instance of Azure Cognative Search
+    ![search for and select Azure Cognative Search](media/Ex5-Task1-006.png)
 1. Choose the subscription and resource group you've been using. Set the URL of the Cognative Search Service and switch the pricing tier to free
     ![displaying the basics tab of the new search service and the configuration settings](media/ex5-task1-007.png)
 2. Click "Review + create"
