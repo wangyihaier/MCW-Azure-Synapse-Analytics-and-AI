@@ -1285,11 +1285,13 @@ Browse to your Azure Portal a create a new resource and create a new instance of
 ![dispaly the file path settings](media/ex5-task4-025.png)
 32. Click to select a file and use the file /environment-setup/synapse/sampleformrecognizer.json. Click OK
 ![dispaly the Data set properties](media/ex5-task4-026.png)
-33. Click + to add another step in your data flow
+33. With the jsonInvoice selected, switch to the "Source options tab" at the bottom. Add \*/\* to Wildcard paths
+![dispaly the Data set properties](media/ex5-task4-048.png)
+1. Click + to add another step in your data flow
 ![dispaly adding another step to the data flow](media/ex5-task4-028.png)
-34. This one will be a derived column. This will be used to do some processign of the incoming data.
+1. This one will be a derived column. This will be used to do some processign of the incoming data.
 ![dispaly adding another step to the data flow](media/ex5-task4-029.png)
-34. Give it a name and add 3 columns that are going to be configured in the following ways
+1. Give it a name and add 3 columns that are going to be configured in the following ways
     
     - productprice: toDecimal(replace(productprice,'$',''))
     - totalcharges: toDecimal(replace(replace(totalcharges,'$',''),',',''))
@@ -1330,6 +1332,10 @@ Browse to your Azure Portal a create a new resource and create a new instance of
 ![display publishing completed](media/ex5-task4-044.png)
 52. Within 5 minutes, you should see a processing pipeline
 ![display publishing completed](media/ex5-task4-045.png)
+53. After about 3 or 4 minutes it will complete.
+![show completed pipeline](media/ex5-task4-046.png)
+54. Then you can go query your database and you'll see the data from the two Test invoices
+![show the data in the databases](media/ex5-task4-047.png)
 
 ## Exercise 6: Security
 
