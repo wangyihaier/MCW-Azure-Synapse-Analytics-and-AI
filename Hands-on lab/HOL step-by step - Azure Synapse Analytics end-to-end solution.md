@@ -1803,7 +1803,7 @@ Please note that each of these tasks will be addressed through several cells in 
 
 In this task, you will explore the model registration process in Azure Synapse Analytics that enables trained model for use from T-SQL. This task picks up where you left off, with the ONNX model being made available in Azure Storage.
 
-1. The next step is to convert the ONNX model to hexadecimal. The resulting hex encoded model is also upload to Azure Storage. A sample script that performs this functionality is available in [this PowerShell script](https://github.com/microsoft/MCW-Azure-Synapse-Analytics-end-to-end-solution/raw/master/Hands-on%20lab/artifacts/convert-to-hex.ps1). We will execute the following Powershell script that leverages this functionality. Open the **Cloud Console** and execute the following:
+1. The next step is to convert the ONNX model to hexadecimal. The resulting hex encoded model is also upload to Azure Storage. A sample script that performs this functionality is available in [this PowerShell script](https://github.com/microsoft/MCW-Azure-Synapse-Analytics-end-to-end-solution/raw/master/Hands-on%20lab/artifacts/convert-to-hex.ps1). We will execute the following PowerShell script that leverages this functionality. Open the **Cloud Console** and execute the following:
 
    ```PowerShell
    './Synapse-MCW/Hands-on lab/artifacts/convert-automl-model-to-hex.ps1'
@@ -2247,7 +2247,7 @@ All logins to your data warehouse are logged to `sys.dm_pdw_exec_sessions`. This
 
     ```sql
     -- Find a query with the Label 'My Query'
-    -- Use brackets when querying the label column, as it it a key word
+    -- Use brackets when querying the label column, as it is a key word
     SELECT  *
     FROM sys.dm_pdw_exec_requests
     WHERE [label] = 'My Query';
