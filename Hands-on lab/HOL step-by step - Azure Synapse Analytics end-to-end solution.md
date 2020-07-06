@@ -1016,20 +1016,261 @@ A common format for exporting and storing data is with text based files. These c
 In this exercise you will create a Synapse Pipeline that will orchestrate updating the part prices from a supplier invoice. You will accomplish this by a combination of a Synapse Pipeline with an Azure Cogntive Search Skillset that invokes the Form Recognizer service as a custom skill. The pipeline will work as follows:
 
 - Invoice is uploaded to Azure Storage.
-- This triggers a Synapse Pipeline.
-- The Synapse Pipeline has a web activity that invokes an Azure Cognitive Search skillset.
+- An Azure Conitive Search index is started
+- The index of any new or updated invoices invokes an Azure Cognitive Search skillset.
 - The first skill in the skillset invokes an Azure Function, passing it the URL to the PDF invoice. 
 - The Azure Function invokes the Form Recognizer service, passing it the URL and SAS token to the PDF invoice. Forms recognizer returns the OCR results to the function.
-- The Azure Function returns the results to skillset. The skillset then extracts only the product names and costs and sends that to a configure knowledge store that writes the extracted data to JSON files in Azure Storage.
+- The Azure Function returns the results to skillset. The skillset then extracts only the product names and costs and sends that to a configure knowledge store that writes the extracted data to JSON files in Azure Blob Storage.
 - The Synapse pipline reads these JSON files from Azure Storage in a Data Flow activity and performs an upsert against the product catalog table in the Synapse SQL Pool. 
 
-### Task 1: Configure a skillset with Form Recognizer
+### Task 1: Create the nessesary strorage account
+1. Create a new storage account in your Resource group
+    ![displaying creating a new storage account](media/ex5-task1a-000.png)
+2. In the properties for the storage account set:
+    - Resource group to the group you're using for this workshop
+    - Storage account name to something related to invoices
+    - Location should be the same location you're Synapse workspace is in
+    - Performance: Standard
+    - Account kind: StorageV2
+    - Replication: Locally-redundant storage
+    - Access tier: Hot
 
-TBD
+        Click "Review + create"
+        ![display the configuration settings described above](media/ex5-task1a-001.png)
 
-### Task 2: Create the Synapse Pipline
+3. Click Create
+4. Once it's created, navigate to the resource
+    ![display the completed provisioning and clicking to go to the resource](media/ex5-task1a-002.png)
+5. Click Access keys
+    ![displaying the location of access keys link in the navigation on the left](media/ex5-task1a-003.png)
+6. Copy the Connection string under "key1". Save it to notepad, Visual Studio Code, or another text file. We'll use this several times
+    ![display the button to click in order to copy the connection string](media/ex5-task1a-004.png)
+6. Click on Shared access signature
+7. Make sure all the checkboxes are selected and click Generate SAS
+    ![display configuration for the shared access signature](media/ex5-task1a-012.png)
+8. Copy the generated Blob service SAS Url to the same text file as above
+    ![display the shared access signature blob service SAS Url that was generated](media/ex5-task1a-013.png)
+1. Under the "Blob service" header, click "Containers"
+    ![display the link on the left side navigation to go to Containers](media/ex5-task1a-005.png)
+1. Create the following three containers
+    
+    - invoices
+    - invoices-json
+    - invoices-staging
 
-TBD
+    1. Click on +Container
+    ![display the +container button](media/ex5-task1a-006.png)
+    2. Type in the name and click Create
+    ![display creating a new container](media/ex5-task1a-007.png)
+    3. Repeat this for the other two containers
+    ![displaying all the containers created](media/ex5-task1a-008.png)
+8. Use [Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/) to open up the invoices container and create two folders Test and Train
+    1. Create a Train folder
+    ![displaying Azure Storage explorer and the steps to create the Train](media/ex5-task1a-009.png)
+    2. Upload the 5 invoices to it from /artifacts/sample_invoices/Train
+    ![displaying uploading the Train files to Azure](media/ex5-task1a-010.png)
+    3. Repeate the same for the Test folder and use the files in /Test instead of Train
+    
+    When you're done you should have a Train folder with Invoices 1 - 5 in it and a Test folder with Invoices 6 and 7
+    ![showing the Train and Test folders](media/ex5-task1a-011.png)
+
+### Task2: Create and train Azure Forms recognizer model and Cognative Search
+
+1. Browse to your Azure Portal, Create a resource, and create a new instace of Cognative Services
+    ![display creating Cognitive Services](media/ex5-task2a-01.png)
+2. Click Create
+    ![display the create button](media/ex5-task2a-02.png)
+3. Set the following configuration settings:
+
+    - Name: choose a name for processing invoice forms that you want to use
+    - Subscription: the subscription that you're using for his exercise
+    - Location: the same location you've been using for all other resources
+    - Pricing: Free F0
+    - Resource group: the same resource group you've been usign for this exercise
+    - Check the confirmation checkbox
+    Then click Create
+
+    ![display the configuraiton settings for Cognitive Services](media/ex5-task2a-03.png) 
+
+4. Wait for the service to provision then navigate to the resource
+5. Click on "Keys and Endpoint on the left side"
+    ![display the keys and endpoint navigation link in the left side navigation](media/ex5-task2a-04.png)
+6. Copy and Paste both KEY 1 and the ENDPOINT. Put these in the same location as the storage connection string you copied earlier
+    ![display the endpoint and keys for Cognitive services](media/ex5-task2a-05.png)
+
+
+Browse to your Azure Portal a create a new resource and create a new instance of Azure Cognative Search
+    ![search for and select Azure Cognative Search](media/ex5-task1-006.png)
+1. Choose the subscription and resource group you've been using. Set the URL of the Cognative Search Service and switch the pricing tier to free
+    ![displaying the basics tab of the new search service and the configuration settings](media/ex5-task1-007.png)
+2. Click "Review + create"
+    ![displaying the review + create button](media/ex5-task1-008.png)
+3. Click "Create"
+4. Wait for the service to be provisioned
+
+
+9. Make sure python is installed on computer
+10. Open Visual Studio Code
+11. Open the file /artifacts/pocofrmreader.py
+12. Update Lines 7, 9, and 17 with the appropriate
+    
+    - Line 7: The endpoint of Azure Cognative Services
+    - Line 9: The Blob Service SAS URL storage account with your Train and Test invoice folders. Make sure to update the URL to include /invoices 
+    - Line 13: The key for your Azure Cognative Service endpoint
+    
+    ![display lines 7 - 13 of the python script to update](media/ex5-task2a-06.png)
+13. Save the file
+14. Click Run, Start Debugging
+    ![display clicking Run in the file menu, then start debugging](media/ex5-task2a-07.png)
+15. Choose Python File
+    ![display python file selection](media/ex5-task2a-08.png)
+16. When it completes, you should see an output similar to what is seen in the screenshot below. The output should also contain a modelID. Copy and paste this into your text file to use later
+    ![display the output of the python script, including the  modelID](media/ex5-task2a-09.png)
+
+### Task 3: Configure a skillset with Form Recognizer
+
+1. Open Visual Studio Code
+2. Make sure you hve the Azure Functions extension installed.
+   ![The header of the azure functions module is show](media/Ex5-Task1-000.png)
+3. In Visual Studio Code open the folder /environment-setup/functions
+   ![The functions folder to open is shown](media/Ex5-Task1-001.png)
+4. In __init__.py update lines 66, 68, 70, and 73 to have the appropriate values for your environment
+   ![The lines of code thta need to be updated are displayed](media/ex5-task1-step2.png)
+5. Use the Azure Functions extention to publish to a new Azure function in the same Resource Group as your Synapse workspace
+   ![the button to publish the function is displayed](media/ex5-task1-002.png)
+    1. Select the same subscription as your Synapse workspace
+    2. Choose to "Create new Function App in Azure..."
+    3. Give you function a name. This function is what will call the Azure Form Recognizer
+      ![setting the function name in visual studio](media/ex5-task1-003.png)
+    4. For the runtime select Python 3.7
+      ![setting the python runtime version](media/ex5-task1-004.png)
+    5. Deploy the function to the same region as your Synapse workspace
+        ![choosing the deployment region](media/ex5-task1-005.png)
+    6. Your function is now ready for user in the skillset
+6. Now that we have the function publish and all our resources created, we can create the skillset. This will be accomplished using postman. If you don't have it downloaded and installed, you can get it from [https://www.postman.com/downloads/](https://www.postman.com/downloads/)
+7. Open Postman
+8. Import the postman collection  from /environment-setup/skillset
+    ![view the import option in the menu](media/ex5-task3-004.png)
+    ![view the upload file button](media/ex5-task3-005.png)
+    ![view adding the file to postman](media/ex5-task3-006.png)
+
+9. Click Import
+10.  This will give you 4 items on the left side. Create Index, Create Datasource, Screat the skillset, and Create the Indexer.
+    ![display the four options on the left side of postman](media/ex5-task3-007.png)
+11. The first thing we need to do, is edit some properties that effect all of these. Hover over "Create a KnowledgeStore", click ..., and then click Edit
+    ![display the edit menu option](media/ex5-task3-008.png)
+12. Select the variables tab at the top
+    ![displyas the tabs across the top](media/ex5-task3-009.png)
+13. We are going to need to edit each one of these variables to match the following:
+    
+    -  admin-key: The key from the search service you created
+        ![displyas the search service key to copy](media/ex5-task3-010.png)
+    - search-service-name: The name of the search service that you just got the key from
+        ![displyas the search service name](media/ex5-task3-011.png)
+    - storage-account-name: The name of the storage account used for blob storage for your invoices
+        ![displyas the name of the storage account](media/ex5-task3-012.png)
+    - storage-connection-string: The connection string from the same storage account
+        ![displyas the connection string to the storage account](media/ex5-task3-013.png)
+    - datasourcename: invoices
+    - indexer-name: invoice-indexer
+    - index-name: invoice-index
+    - skillset-name: invoice-skillset
+    - storage-container-name: invoices
+    - skillset-function: the function url from the function you published
+        ![displays function url from the app service, functions, the function name, overview, and get function url](media/ex5-task3-021.png)
+    - cognitive-services-key: the key from the cognative service being used for forms processing
+        ![displays the key from the cognative service, keys and endpoint, key 1](media/ex5-task3-022.png)
+    - cognitive-service-path: this is the url to the cognative service from /subscription all the way through /accounts/[servicename]. An example is: /subscriptions/[SUBSCRIPTOIN ID]/resourceGroups/synapse-mcw-v2-zst/providers/Microsoft.CognitiveServices/accounts/wwiformsreader
+        ![displays the url for the service path](media/ex5-task3-023.png)
+14. Update the collection
+    ![displays all the updated variables and the update button](media/ex5-task3-014.png)
+15. Select "Create Index" and click the "Body" tab
+    ![displays create index and body](media/ex5-task3-015.png)
+16. Copy and paste all the text from /environment-setup/skillset/index.body.txt into the body of the request
+17. Click "Send"
+    ![displays the send button](media/ex5-task3-016.png)
+18. You should get a response that it was created
+    ![displays the responce that it was created](media/ex5-task3-017.png)
+19. Do the same for Create Datasource, Create the Skillset, and Create the indexer using the cooresponding text files in the same location
+20. After you Send the Indexer request, if you navigate to your search service you should see your indexer running. It will take a couple minutes to run.
+   ![displays the running indexer](media/ex5-task3-018.png) 
+21. Once the indexer has run, it will show two succesful documents. If you go to your Blob storage account and look at the invoices-json you will also have two folders with .json documents in them.
+    ![displays the sucessful index](media/ex5-task3-019.png) 
+    ![displays the json documents](media/ex5-task3-020.png)
+    
+
+
+### Task 4: Create the Synapse Pipline
+
+1.  Open your Synapse workspace
+
+2.  Expand the left menu and select the **Develop** item. From the **Develop** blade, expand the **+** button and select the **SQL script** item.
+
+    ![The left menu is expanded with the Develop item selected. The Develop blade has the + button expanded with the SQL script item highlighted.](media/develop_newsqlscript_menu.png)
+
+3. In the query tab toolbar menu, ensure you connect to your SQL Pool, `SQLPool01`.
+
+    ![The query tab toolbar menu is displayed with the Connect to set to the SQL Pool.](media/querytoolbar_connecttosqlpool.png)
+
+4. In the query window, copy and paste the following query to create the invoice information table. Then select the **Run** button in the query tab toolbar.
+
+    ```sql
+      CREATE TABLE [wwi_mcw].[SaleSmall]
+      (
+        [TransactionId] [uniqueidentifier]  NOT NULL,
+        [CustomerId] [int]  NOT NULL,
+        [ProductId] [smallint]  NOT NULL,
+        [Quantity] [tinyint]  NOT NULL,
+        [Price] [decimal](9,2)  NOT NULL,
+        [TotalAmount] [decimal](9,2)  NOT NULL
+      );
+    ```
+
+5. From the top toolbar, select the **Discard all** button as we will not be saving this query. When prompted, choose to **Discard all changes**.
+
+   ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png)
+
+6. Create a linked service to the SQL Server database
+7. Create master key in the database
+8. Create a new pipeline
+9.  Add a trigger
+10. Add an event trigger
+11. Set the values, click OK
+12. Click OK again
+13. Add a Data Flow to the pipline
+14. Create a new Data Flow and give it a name
+15. Add a Source
+16. Set Source type to Data Set
+17. Create a new dataset
+18. Shoow Azure Blob Storage
+19. Choose Json for the format
+20. Configure the properties, choose "From sample file"
+21. Use the sampe file, click OK
+22. Source settings shoudl looke like the configuration here
+23. Click + to add another step, choose Destination -> Sink
+24. Set Output stream name to SalesSmall, Incoming stream should already be set to the stream name from the previous step
+25. Leave Sink type set to Dataset, click to create a new Dataset
+26. Choose Azure Synapse Analytics
+27. Give it a name of SalesSmall and choose the linked service to your LinkedServer (don't use the default)
+28. Select from existing table, if there isn't a table listed, click Refresh
+29. Set the DBName to your existing database and click OK
+30. Now you can select your existing table. Make sure Import schema is set to From connection/store
+31. Click OK and then OK again
+32. Click over to the Settings tab and click on Allow upsert. If you get prompted to add an Alter Row Transformion, click "Add Alter Row"
+33. Need to add the condition configuration here. Probably based of the invoice number? Current was just checkign if ProductID is not null
+34. Go back to the SalesSmall Sink
+35. Click to Mapping
+36. Deselect Auto mapping
+37. Configure mapping as seen in this screen show. Need to add more fields...
+38. Back in your pipeline, select InvoiceData, Click on settings and expand out PolyBase, add your Staging storage folder
+39. In your pipeline, under parameters click to add a new parameter
+40. Give it the name DBName, leave the value blank
+41. In your pipeline, click on Trigger and new/edit
+42. Click 0 under parameters for Invoicesync
+43. Add the name of your SQL table in the Value, click OK
+44. Click to "Publish all" at the top
+    
+   
 
 
 ## Exercise 6: Security
