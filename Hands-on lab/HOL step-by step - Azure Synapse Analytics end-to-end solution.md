@@ -1203,6 +1203,7 @@ Browse to your Azure Portal a create a new resource and create a new instance of
 ### Task 4: Create the Synapse Pipline
 
 1.  Open your Synapse workspace
+![displays open synapse studio](media/ex5-task4-001.png)
 
 2.  Expand the left menu and select the **Develop** item. From the **Develop** blade, expand the **+** button and select the **SQL script** item.
 
@@ -1215,7 +1216,7 @@ Browse to your Azure Portal a create a new resource and create a new instance of
 4. In the query window, copy and paste the following query to create the invoice information table. Then select the **Run** button in the query tab toolbar.
 
     ```sql
-      CREATE TABLE [wwi_mcw].[SaleSmall]
+      CREATE TABLE [wwi_mcw].[Invoices]
       (
         [TransactionId] [uniqueidentifier]  NOT NULL,
         [CustomerId] [int]  NOT NULL,
@@ -1230,48 +1231,105 @@ Browse to your Azure Portal a create a new resource and create a new instance of
 
    ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png)
 
-6. Create a linked service to the SQL Server database
-7. Create master key in the database
-8. Create a new pipeline
-9.  Add a trigger
-10. Add an event trigger
-11. Set the values, click OK
-12. Click OK again
-13. Add a Data Flow to the pipline
-14. Create a new Data Flow and give it a name
-15. Add a Source
-16. Set Source type to Data Set
-17. Create a new dataset
-18. Shoow Azure Blob Storage
-19. Choose Json for the format
-20. Configure the properties, choose "From sample file"
-21. Use the sampe file, click OK
-22. Source settings shoudl looke like the configuration here
-23. Click + to add another step, choose Destination -> Sink
-24. Set Output stream name to SalesSmall, Incoming stream should already be set to the stream name from the previous step
-25. Leave Sink type set to Dataset, click to create a new Dataset
-26. Choose Azure Synapse Analytics
-27. Give it a name of SalesSmall and choose the linked service to your LinkedServer (don't use the default)
-28. Select from existing table, if there isn't a table listed, click Refresh
-29. Set the DBName to your existing database and click OK
-30. Now you can select your existing table. Make sure Import schema is set to From connection/store
-31. Click OK and then OK again
-32. Click over to the Settings tab and click on Allow upsert. If you get prompted to add an Alter Row Transformion, click "Add Alter Row"
-33. Need to add the condition configuration here. Probably based of the invoice number? Current was just checkign if ProductID is not null
-34. Go back to the SalesSmall Sink
-35. Click to Mapping
-36. Deselect Auto mapping
-37. Configure mapping as seen in this screen show. Need to add more fields...
-38. Back in your pipeline, select InvoiceData, Click on settings and expand out PolyBase, add your Staging storage folder
-39. In your pipeline, under parameters click to add a new parameter
-40. Give it the name DBName, leave the value blank
-41. In your pipeline, click on Trigger and new/edit
-42. Click 0 under parameters for Invoicesync
-43. Add the name of your SQL table in the Value, click OK
-44. Click to "Publish all" at the top
-    
-   
+6. Click on "Manage" on the left menu
+![display the manage link on the left side navigation](media/ex5-task4-002.png)
+7. Click on "Linked services"
+![display the Linked service link on the left side navigation](media/ex5-task4-003.png)
+8. Click "+ New" to create a new linked service to the blob storage
+![display the new button](media/ex5-task4-004.png)
+9. Select Azure Blob Storage, click "Continue"
+![display the Azure Blob Storage button when adding a new service](media/ex5-task4-005.png)
+10. Configure the linked service in the way shown here. Provide a name that makes sense. Select the Azure subscription and Storage account name. Leave everything else set to it's default. Click "Create"
+![display the Azure Blob Storage connected service configuration](media/ex5-task4-006.png)
+11. Click "+ New" to create a new linked service to the blob storage
+![display the new button](media/ex5-task4-004.png)
+12. Select Azure Synapse Analytics and click Continue
+![display the Azure Synapse Analytics button when adding a new service](media/ex5-task4-007.png)
+13. Configure the linked service in the way shown here. Provide a name that makes sense. Select the Azure subscription, server name, database name. Switch the Authentication type to managed identity. Leave everything else with their defaults. Click "Create"
+![display the Azure Synapse Analytics connected service configuration](media/ex5-task4-008.png)
+14. You should see the two new linked services now.
+![display the Azure Synapse Analytics connected service configuration](media/ex5-task4-010.png)
+15. Using the same steps and 3 and 4, run a new SQL query against the  master database to create a new master key.
+```CREATE MASTER KEY ENCRYPTION BY PASSWORD =’Pass@Word01’;```
+![display the SQL Query to create the master database](media/ex5-task4-011.png)
 
+16. Click Orchestrate in the left navigation
+![display the orchestrate link in the left navigation](media/ex5-task4-012.png)
+17. Click + and then Pipeline to create a new pipline
+![display + link to create a new pipeline](media/ex5-task4-013.png)
+18. Choose a name for your new pipeline
+![display the pipeline properties](media/ex5-task4-014.png)
+19. Click "Add trigger" then "New/Edit" to create an event to start the pipeline
+![display the add new trigger](media/ex5-task4-015.png)
+20. Select the dropdown and click +New
+![display the new trigger option](media/ex5-task4-016.png)
+21. For this exercise, we're going to do a schedule. However, in the future you'll also be able to use an event based trigger that would fire off new JSON files being added to blob storage
+22. Set the trigger to start every 5 minutes, then click OK
+![display the trigger properties for the trigger to start every 5 minutes](media/ex5-task4-017.png)
+23. Click OK on the Run Parameters, nothign needs to be done here
+24. Next we need to add a Data Flow to the pipline. Under Activities, expand "Move & transform" then click and drag Data flow onto the canvas
+![display selecting Data flow and dragging in onto the canvase](media/ex5-task4-018.png)
+25. Create a new Data Flow and give it a name, click finish
+![display the new data flow properties](media/ex5-task4-019.png)
+26. Now we need to add our blob storage as a source for our data flow. Click "Add Source"
+![display the add source button](media/ex5-task4-020.png)
+27. Name your output stream, leave the source type to Dataset, Leave all the options and sampling set to their defaults. Click + New next to Dataset to add a new dataset
+![dispaly the Source settings](media/ex5-task4-021.png)
+28. Choose Azure Blob Storage
+![dispaly the Azure Blob Storage option](media/ex5-task4-022.png)
+29. Choose Json and click Continue
+![dispaly the Json option](media/ex5-task4-023.png)
+30. Provide a name and then choose the Azure Storage linked service that you created earlier
+![dispaly the Data set properties](media/ex5-task4-024.png)
+31. For the file path chose invoices-json. Set import schema to "From sample file"
+![dispaly the file path settings](media/ex5-task4-025.png)
+32. Click to select a file and use the file /environment-setup/synapse/sampleformrecognizer.json. Click OK
+![dispaly the Data set properties](media/ex5-task4-026.png)
+33. Click + to add another step in your data flow
+![dispaly adding another step to the data flow](media/ex5-task4-028.png)
+34. This one will be a derived column. This will be used to do some processign of the incoming data.
+![dispaly adding another step to the data flow](media/ex5-task4-029.png)
+34. Give it a name and add 3 columns that are going to be configured in the following ways
+    
+    - productprice: toDecimal(replace(productprice,'$',''))
+    - totalcharges: toDecimal(replace(replace(totalcharges,'$',''),',',''))
+    - quantity: toInteger(replace(quantity,',',''))
+     ![dispaly the drives column settings](media/ex5-task4-030.png)
+35. Click + again to add another step in your data flow
+![dispaly adding another step to the data flow](media/ex5-task4-028.png)
+36. This time select "Alter Row"
+![dispaly adding alter row](media/ex5-task4-031.png)
+37. Name the Output stream, leave incomign stream set to the default. Change Altar row condtions to "Upsert If" and then set the expression to notEquals(transactionid,"")
+![dispaly adding alter row](media/ex5-task4-032.png)
+38. Click + again to add another step in your data flow
+![dispaly adding another step to the data flow](media/ex5-task4-028.png)
+39. This time add a Sink
+![dispaly adding a sink](media/ex5-task4-033.png)
+40. Give it a name, leave everythign else set to the defaults, and click "+New" to add a new Dataset
+![dispaly sink settings](media/ex5-task4-034.png)
+41. This time choose "Azure Synapse Analytics" and click "Continue"
+![dispaly azure synapse analytics button](media/ex5-task4-035.png)
+42. Provide a name, choose the linked Service we created earlier, then select the database we created in the begining of thise exercise. If you don't see it in the list of your table names, click the refresh button and it should show up. Click OK
+![display SQL Dataset properties](media/ex5-task4-036.png)
+43. Click the settings tabl and check the box to "Allow upsert", set the Key columns to transactionid
+![display the settings tab](media/ex5-task4-037.png)
+44. Click the Mapping tab, disable Auto mapping and configure the mappings between the json file and the database. Use "+ Add mapping" -> "Fixed mapping" to add a mapping
+![display the settings tab](media/ex5-task4-038.png)
+45. Click back to your pipeline using the tab at the top of your workspace
+![display the mapping tab](media/ex5-task4-039.png)
+46. Select your dataflow, and then go to the settings tab. We need to configure the staging settings
+![display the mapping tab](media/ex5-task4-040.png)
+47. Under the "PolyBase" settings, set the Staging linked service to the storage account we've been using and set the container to invoices-json
+![display the completed settings tab](media/ex5-task4-041.png)
+48. Click Publish All at the top to save your pipeline
+![display the tab to go back to your pipeline](media/ex5-task4-042.png)
+49. Click Publish
+50. Shotly, you shoudl see a notification that Publishing completed
+![display publishing completed](media/ex5-task4-043.png)
+51. Click on Monitor
+![display publishing completed](media/ex5-task4-044.png)
+52. Within 5 minutes, you should see a processing pipeline
+![display publishing completed](media/ex5-task4-045.png)
 
 ## Exercise 6: Security
 
