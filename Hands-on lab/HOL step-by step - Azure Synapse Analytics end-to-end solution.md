@@ -133,7 +133,7 @@ All exercises in this lab utilize the workspace Synapse Studio user interface. T
 
 ## Exercise 2: Create and populate the supporting tables in the SQL Pool
 
-**Duration**: 45 minutes
+**Duration**: 120 minutes
 
 The first step in querying meaningful data is to create tables to house the data. In this case, we will create four different tables: SaleSmall, CustomerInfo, CampaignAnalytics, and Sales. When designing tables in Azure Synapse Analytics, we need to take into account the expected amount of data in each table, as well as how each table will be used. Utilize the following guidance when designing your tables to ensure the best experience and performance.
 
@@ -771,7 +771,7 @@ When the lab environment was provisioned, the **wwi_mcw.Product** table and data
 
 ## Exercise 3: Exploring raw parquet
 
-**Duration**: 15 minutes
+**Duration**: 30 minutes
 
 Understanding data through data exploration is one of the core challenges faced today by data engineers and data scientists. Depending on the underlying structure of the data as well as the specific requirements of the exploration process, different data processing engines will offer varying degrees of performance, complexity, and flexibility.
 
@@ -894,7 +894,7 @@ When you query Parquet files using Synapse SQL Serverless, you can explore the d
 
 ## Exercise 4: Exploring raw text based data with Azure Synapse SQL Serverless
 
-**Duration**: 10 minutes
+**Duration**: 15 minutes
 
 A common format for exporting and storing data is with text based files. These can delimited text files such as CSV as well as JSON structured data files. Azure Synapse Analytics also provides ways of querying into these types of raw files to gain valuable insights into the data without having to wait for them to be processed.
 
@@ -995,7 +995,7 @@ A common format for exporting and storing data is with text based files. These c
 
 ## Exercise 5: Security
 
-**Duration**: 15 minutes
+**Duration**: 30 minutes
 
 ### Task 1: Column level security
 
@@ -1224,7 +1224,7 @@ As an alternative to column level security, SQL Administrators also have the opt
 
 ## Exercise 6: Machine Learning
 
-**Duration**: 45 minutes
+**Duration**: 60 minutes
 
 Azure Synapse Analytics provides a unified environment for both data science and data engineering. What this means in practice, is that your data scientists can train and deploy models using Azure Synapse Analytics and your data engineers can write T-SQL queries that use those models to make predictions against tabular data stored in a SQL Pool database table.
 
@@ -1417,7 +1417,7 @@ In this task, you will author a T-SQL query that uses the previously trained mod
 
 ## Exercise 7: Monitoring
 
-**Duration**: 25 minutes
+**Duration**: 45 minutes
 
 Azure Synapse Analytics provides a rich monitoring experience within the Azure portal to surface insights regarding your data warehouse workload.
 
