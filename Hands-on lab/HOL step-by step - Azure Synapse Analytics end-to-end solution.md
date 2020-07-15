@@ -1268,10 +1268,19 @@ Please note that each of these tasks will be addressed through several cells in 
 
 In this task, you will explore the model registration process in Azure Synapse Analytics that enables trained model for use from T-SQL. This task picks up where you left off, with the ONNX model being made available in Azure Storage.
 
-1. The next step is to convert the ONNX model to hexadecimal. The resulting hex encoded model is also upload to Azure Storage. A sample script that performs this functionality is available in [this PowerShell script](https://github.com/microsoft/MCW-Azure-Synapse-Analytics-end-to-end-solution/raw/master/Hands-on%20lab/artifacts/convert-to-hex.ps1). We will execute the following Powershell script that leverages this functionality. Open the **Cloud Console** and execute the following:
+The next step is to convert the ONNX model to hexadecimal. The resulting hex encoded model is also upload to Azure Storage. A sample script that performs this functionality is available in [this PowerShell script](https://github.com/microsoft/MCW-Azure-Synapse-Analytics-end-to-end-solution/raw/master/Hands-on%20lab/artifacts/convert-to-hex.ps1). We will execute the following Powershell script that leverages this functionality.
+
+1. In the Azure Portal, open the Azure Cloud Shell by selecting its icon from the right side of the top toolbar. The Azure Cloud Shell allows you to execute PowerShell and CLI commands directly in the Azure cloud environment.
+
+    ![A portion of the Azure Portal taskbar is displayed with the Cloud Shell icon highlighted.](media/bhol_azurecloudshellmenu.png)
+
+    > **Note**: If you are prompted to create a storage account for the Cloud Shell, agree to have it created.
+
+2. Execute the following PowerShell commands:
 
    ```PowerShell
-   './Synapse-MCW/Hands-on lab/artifacts/convert-automl-model-to-hex.ps1'
+   cd './Synapse-MCW/Hands-on lab/artifacts'
+   ./convert-automl-model-to-hex.ps1
    ```
 
    You will be prompted for the following information:
@@ -1280,13 +1289,13 @@ In this task, you will explore the model registration process in Azure Synapse A
     | Enter the name of the resource group containing the Azure Synapse Analytics Workspace |
     | Enter the unique suffix you used in the deployment |
 
-2. From the left menu, select **Data**.
+3. From the left menu, select **Data**.
 
-3. Expand the **Databases** section, right click your SQL Pool, `SQLPool01`, and then select **New SQL Script**, and then **Empty script**.
+4. Expand the **Databases** section, right click your SQL Pool, `SQLPool01`, and then select **New SQL Script**, and then **Empty script**.
 
    ![Showing the context menu, selecting New SQL Script, Empty Script](media/lab06-new-sql-script.png "Create new script")
 
-4. Replace the contents of this script with following:
+5. Replace the contents of this script with following:
 
     ```sql
     SELECT
@@ -1299,7 +1308,7 @@ In this task, you will explore the model registration process in Azure Synapse A
 
     ![Persisted ONNX model in hexadecimal format](media/lab06-persisted-model.png)
 
-5. **ASAMCWMLModelExt** is an external table that maps to the data lake location where the trained model was persisted (and then converted to hexadecimal format). Take a moment to read through the code that was used to create the external table (**you don't need to run this code as it was already run during the deployment of your environment**):
+6. **ASAMCWMLModelExt** is an external table that maps to the data lake location where the trained model was persisted (and then converted to hexadecimal format). Take a moment to read through the code that was used to create the external table (**you don't need to run this code as it was already run during the deployment of your environment**):
 
     ``` sql
       -- Replace <data_lake_account_key> with the key of the primary data lake account
@@ -1359,7 +1368,7 @@ In this task, you will explore the model registration process in Azure Synapse A
       GO
     ```
 
-6. Import the persisted ONNX model in hexadecimal format into the main models table (to be later used with the `PREDICT` function) by executing the following query on **SQLPool01**:
+7. Import the persisted ONNX model in hexadecimal format into the main models table (to be later used with the `PREDICT` function) by executing the following query on **SQLPool01**:
 
     ```sql
     -- Register the model by inserting it into the table.
