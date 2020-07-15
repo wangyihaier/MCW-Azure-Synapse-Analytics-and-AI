@@ -1289,7 +1289,7 @@ The next step is to convert the ONNX model to hexadecimal. The resulting hex enc
     | Enter the name of the resource group containing the Azure Synapse Analytics Workspace |
     | Enter the unique suffix you used in the deployment |
 
-3. From the left menu, select **Data**.
+3. Return to the Azure Synapse Workspace, and from the left menu, select **Data**.
 
 4. Expand the **Databases** section, right click your SQL Pool, `SQLPool01`, and then select **New SQL Script**, and then **Empty script**.
 
