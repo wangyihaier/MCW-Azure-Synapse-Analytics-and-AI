@@ -23,7 +23,7 @@ At the end of this whiteboard design session, you will be better able to design 
 
 ### Hands-on lab
 
-[HOL step-by-step - Azure Synapse Analytics end-to-end solution](Hands-on%20lab/HOL%20step-by%20step%20-%20Azure%20Synapse%20Analytics%20end-to-end%20solution.md)
+[HOL step-by-step - Azure Synapse Analytics and AI](Hands-on%20lab/HOL%20step-by%20step%20-%20Azure%20Synapse%20Analytics%20and%20AI.md)
 
 ## Azure services and related products
 -	Azure Synapse Analytics
