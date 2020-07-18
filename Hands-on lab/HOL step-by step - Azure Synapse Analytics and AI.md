@@ -9,7 +9,7 @@ Hands-on lab step-by-step
 </div>
 
 <div class="MCWHeader3">
-May 2020
+July 2020
 </div>
 
 
@@ -54,7 +54,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
     - [Task 2: Row level security](#task-2-row-level-security)
     - [Task 3: Dynamic data masking](#task-3-dynamic-data-masking)
   - [Exercise 6: Machine Learning](#exercise-6-machine-learning)
-    - [Task 1: Training models](#task-1-training-models)
+    - [Task 1: Training, consuming, and deploying models](#task-1-training-consuming-and-deploying-models)
   - [Exercise 7: Monitoring](#exercise-7-monitoring)
     - [Task 1: Workload Importance](#task-1-workload-importance)
     - [Task 2: Workload Isolation](#task-2-workload-isolation)
@@ -1224,35 +1224,14 @@ As an alternative to column level security, SQL Administrators also have the opt
 
 **Duration**: 60 minutes
 
-Azure Synapse Analytics provides a unified environment for both data science and data engineering. What this means in practice, is that your data scientists can train and deploy models using Azure Synapse Analytics and your data engineers can write T-SQL queries that use those models to make predictions against tabular data stored in a SQL Pool database table.
+Using Azure Synapse Analytics, Data Scientists are no longer required to use separate tooling to create and deploy machine learning models.
 
-In this lab, you will create several machine learning models and use them to make predictions using the T-SQL `Predict` statement.
+In this exercise, you will create multiple machine learning models. You will learn how to consume these models in your notebook. You will also deploy a model as a web service to Azure Container Instances and consume the service - without ever having to leave the Azure Synapse Analytics workspace.
 
-For context, the following are the high level steps taken to create a Spark ML based model and deploy it so it is ready for use from T-SQL.
-
-![The process for registering and using a model](media/lab06-machine-learning-process.png "Review model registration process")
-
-All of the steps are performed within your Azure Synapse Analytics Studio.
-
-- Within a notebook, a data scientist will:
-
-  a. Train a model using Spark ML, the machine learning library included with Apache Spark. Models can also be trained using other approaches, including by using Azure Machine Learning automated ML. The main requirement is that the model format must be supported by ONNX.
-
-  b. Convert the model to the ONNX format using the `onnxml` tools.
-
-  c. Save a hexadecimal encoded version of the ONNX model to a table in the SQL Pool database. This is an interim step while this feature is in preview.
-
-- To use the model for making predictions, in a SQL Script a data engineer will:
-
-  a. Read the model into a binary variable by querying it from the table in which it was stored.
-
-  b. Execute a query using the `FROM PREDICT` statement as you would a table. This statement defines both the model to use and the query to execute that will provide the data used for prediction. You can then take these predictions and insert them into a table for use by downstream analytics applications.
-
-> What is ONNX? [ONNX](https://onnx.ai/) is an acronym for the Open Neural Network eXchange and is an open format built to represent machine learning models, regardless of what frameworks were used to create the model. This enables model portability, as models in the ONNX format can be run using a wide variety of frameworks, tools, runtimes and platforms. Think of it like a universal file format for machine learning models.
-
-### Task 1: Training models
+### Task 1: Training, consuming, and deploying models
 
 1. Open the **ASAMCW - Exercise 6 - Machine Learning** notebook (select **Develop** from the left menu, from the **Develop** menu, expand the **Notebooks** section and select the notebook)
+
 2. Run the notebook step by step (DO NOT `RUN ALL`) to complete this exercise. Some of the most important tasks you will perform are:
 
 - Exploratory data analysis (basic stats)
