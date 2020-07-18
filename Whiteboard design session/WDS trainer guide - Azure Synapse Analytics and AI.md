@@ -1,7 +1,7 @@
 ![Microsoft Cloud Workshops](https://github.com/Microsoft/MCW-Template-Cloud-Workshop/raw/master/Media/ms-cloud-workshop.png "Microsoft Cloud Workshops")
 
 <div class="MCWHeader1">
-Azure Synapse Analytics end-to-end solution
+Azure Synapse Analytics and AI
 </div>
 
 <div class="MCWHeader2">
@@ -31,7 +31,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
   - [Whiteboard design session flow](#whiteboard-design-session-flow)
   - [Before the whiteboard design session: How to prepare](#before-the-whiteboard-design-session-how-to-prepare)
   - [During the whiteboard design session: Tips for an effective whiteboard design session](#during-the-whiteboard-design-session-tips-for-an-effective-whiteboard-design-session)
-- [Azure Synapse Analytics end-to-end solution whiteboard design session student guide](#azure-synapse-analytics-end-to-end-solution-whiteboard-design-session-student-guide)
+- [Azure Synapse Analytics and AI whiteboard design session student guide](#azure-synapse-analytics-and-ai-whiteboard-design-session-student-guide)
   - [Abstract and learning objectives](#abstract-and-learning-objectives)
   - [Step 1: Review the customer case study](#step-1-review-the-customer-case-study)
     - [Customer situation](#customer-situation)
@@ -42,7 +42,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
   - [Step 3: Present the solution](#step-3-present-the-solution)
   - [Wrap-up](#wrap-up)
   - [Additional references](#additional-references)
-- [Azure Synapse Analytics end-to-end solution whiteboard design session trainer guide](#azure-synapse-analytics-end-to-end-solution-whiteboard-design-session-trainer-guide)
+- [Azure Synapse Analytics and AI whiteboard design session trainer guide](#azure-synapse-analytics-and-ai-whiteboard-design-session-trainer-guide)
   - [Step 1: Review the customer case study](#step-1-review-the-customer-case-study-1)
   - [Step 2: Design a proof of concept solution](#step-2-design-a-proof-of-concept-solution-1)
   - [Step 3: Present the solution](#step-3-present-the-solution-1)
@@ -166,7 +166,7 @@ When participants are doing activities, you can **look ahead to refresh your mem
 
 **Wait for responses**. If you ask a question such as, "What's your experience with (fill in the blank)?" then wait. Do not be afraid of a little silence. If you leap into the silence, your participants will feel you are not serious about involving them and will become passive. Give participants a chance to think, and if no one answers, patiently ask again. You will usually get a response.
 
-# Azure Synapse Analytics end-to-end solution whiteboard design session student guide
+# Azure Synapse Analytics and AI whiteboard design session student guide
 
 ## Abstract and learning objectives
 
@@ -423,7 +423,7 @@ Directions: Tables reconvene with the larger group to hear the facilitator/SME s
 | Intro to Azure Data Lake Store Gen2 | https://docs.microsoft.com/en-us/azure/storage/blobs/data-lake-storage-introduction |
 | Azure Stream Analytics | https://docs.microsoft.com/en-us/azure/stream-analytics/stream-analytics-introduction |
 
-# Azure Synapse Analytics end-to-end solution whiteboard design session trainer guide
+# Azure Synapse Analytics and AI whiteboard design session trainer guide
 
 ## Step 1: Review the customer case study
 

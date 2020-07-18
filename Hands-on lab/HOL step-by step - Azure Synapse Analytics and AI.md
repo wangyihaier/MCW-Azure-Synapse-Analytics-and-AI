@@ -26,7 +26,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 **Contents** 
 
 <!-- TOC -->
-- [Azure Synapse Analytics end-to-end solution hands-on lab step-by-step](#azure-synapse-analytics-end-to-end-solution-hands-on-lab-step-by-step)
+- [Azure Synapse Analytics and AI hands-on lab step-by-step](#azure-synapse-analytics-and-ai-hands-on-lab-step-by-step)
   - [Abstract and learning objectives](#abstract-and-learning-objectives)
   - [Overview](#overview)
   - [Solution architecture](#solution-architecture)
@@ -65,7 +65,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
     - [Task 1: Delete the resource group](#task-1-delete-the-resource-group)
 <!-- /TOC -->
 
-# Azure Synapse Analytics end-to-end solution hands-on lab step-by-step
+# Azure Synapse Analytics and AI hands-on lab step-by-step
 
 ## Abstract and learning objectives
 
