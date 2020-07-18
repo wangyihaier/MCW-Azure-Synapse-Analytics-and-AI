@@ -1,7 +1,7 @@
 ![](https://github.com/Microsoft/MCW-Template-Cloud-Workshop/raw/master/Media/ms-cloud-workshop.png "Microsoft Cloud Workshops")
 
 <div class="MCWHeader1">
-Azure Synapse Analytics end-to-end solution
+Azure Synapse Analytics and AI
 </div>
 
 <div class="MCWHeader2">
