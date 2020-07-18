@@ -1318,12 +1318,18 @@ Setting importance in Synapse SQL for Azure Synapse allows you to influence the 
 6. You will flood the system with queries and see what happens for `asa.sql.workload01` and `asa.sql.workload02`. To do this, we'll run a Azure Synapse Pipeline which triggers queries.
 
 7. Select the `Orchestrate` Tab.
+
 8. **Run** the **Exercise 7 - Execute Data Analyst and CEO Queries** Pipeline, which will run / trigger the `asa.sql.workload01` and `asa.sql.workload02` queries. You can run the pipeline with the Debug option if you have an instance of the Integration Runtime running.
-9. Select **Add trigger**, then **Trigger now**. In the dialog that appears, select **OK**.
+
+9. Select **Add trigger**, then **Trigger now**. In the dialog that appears, select **OK**. **Let this pipeline run for 30 seconds to 1 minute, then proceed to the next step**.
 
     ![The add trigger and trigger now menu items are highlighted.](media/trigger-data-analyst-and-ceo-queries-pipeline.png "Add trigger")
 
-10. Let's see what happened to all the queries we just triggered as they flood the system. In the query window, replace the script with the following:
+10. From the left menu, select the **Monitor** hub. Hover over the link of the in-progress pipeline, and select the **Cancel recursive** icon that displays.
+
+    ![The Monitor Hub icon is selected from the left menu, and the Cancel recursive button is selected on the in progress pipeline.](media/cancel_running_pipeline_monitor_hub.png)
+
+11. From the left menu, select the **Develop** hub and return to your SQL script. Let's see what happened to all the queries we just triggered that flooded the system. In the query window, replace the script with the following:
 
     ```sql
     SELECT s.login_name, r.[Status], r.Importance, submit_time, start_time ,s.session_id FROM sys.dm_pdw_exec_sessions s
@@ -1333,11 +1339,13 @@ Setting importance in Synapse SQL for Azure Synapse allows you to influence the 
     ORDER BY submit_time ,status
     ```
 
-11. Select **Run** from the toolbar menu to execute the SQL command. You should see an output similar to the following:
+12. Select **Run** from the toolbar menu to execute the SQL command. You should see an output similar to the following:
 
     ![SQL query results.](media/sql-query-2-results.png "SQL script")
 
-12. We will give our `asa.sql.workload01` user queries priority by implementing the **Workload Importance** feature. In the query window, replace the script with the following:
+13. Intermittently perform the preceding query until all queries have been run and no results are returned.
+
+14. We will give our `asa.sql.workload01` user queries priority by implementing the **Workload Importance** feature. In the query window, replace the script with the following:
 
     ```sql
     IF EXISTS (SELECT * FROM sys.workload_management_workload_classifiers WHERE name = 'CEO')
@@ -1349,15 +1357,15 @@ Setting importance in Synapse SQL for Azure Synapse allows you to influence the 
       ,MEMBERNAME = 'asa.sql.workload01',IMPORTANCE = High);
     ```
 
-13. Select **Run** from the toolbar menu to execute the SQL command.
+15. Select **Run** from the toolbar menu to execute the SQL command.
 
-14. Let's flood the system again with queries and see what happens this time for `asa.sql.workload01` and `asa.sql.workload02` queries. To do this, we'll run an Azure Synapse Pipeline which triggers queries.
+16. Let's flood the system again with queries and see what happens this time for `asa.sql.workload01` and `asa.sql.workload02` queries. To do this, we'll run an Azure Synapse Pipeline which triggers queries. **Similar to before, run this pipeline for about 30 seconds to 1 minute**.
 
     - **Select** the `Orchestrate` Tab
 
     - **Run** the **Exercise 7 - Execute Data Analyst and CEO Queries** Pipeline, which will run / trigger the `asa.sql.workload01` and `asa.sql.workload02` queries.
 
-15. In the query window, replace the script with the following to see what happens to the `asa.sql.workload01` queries this time:
+17. In the query window, replace the script with the following to see what happens to the `asa.sql.workload01` queries this time:
 
     ```sql
     SELECT s.login_name, r.[Status], r.Importance, submit_time, start_time ,s.session_id FROM sys.dm_pdw_exec_sessions s
@@ -1367,13 +1375,9 @@ Setting importance in Synapse SQL for Azure Synapse allows you to influence the 
     ORDER BY submit_time ,status desc
     ```
 
-16. Select **Run** from the toolbar menu to execute the SQL command. You should see an output similar to the following that shows query executions for the `asa.sql.workload01` user having a **high** importance.
+18. Select **Run** from the toolbar menu to execute the SQL command. You should see an output similar to the following that shows query executions for the `asa.sql.workload01` user having a **high** importance Also note tha the 'asa.sql.workload02' queries being are in **Suspended** status while the high priorty queries are being run.
 
-    ![SQL query results.](media/sql-query-4-results.png "SQL script")
-
-17. Navigate to the **Monitor** hub, select **Pipeline runs**, and then select **Cancel recursive** for each running Exercise 7 pipelines. This will help speed up the remaining tasks.
-
-    ![The cancel recursive option is shown.](media/cancel-recursive.png "Pipeline runs - Cancel recursive")
+    ![SQL query results showing asa.sql.workload01 queries with a higher importance than those queries from asa.sql.workload02.](media/sql-query-4-results.png "SQL script")
 
 ### Task 2: Workload Isolation
 
@@ -1437,9 +1441,9 @@ Users should avoid a workload management solution that configures 100% workload 
     ORDER BY submit_time, status
     ```
 
-9. Let's flood the system with queries and see what happens for `asa.sql.workload02`. To do this, we will run a Azure Synapse Pipeline which triggers queries. Select the `Orchestrate` Tab. **Run** the **Exercise 7 - Execute Business Analyst Queries** Pipeline, which will run / trigger  `asa.sql.workload02` queries.
+9. Let's flood the system with queries and see what happens for `asa.sql.workload02`. To do this, we will run a Azure Synapse Pipeline which triggers queries. Select the `Orchestrate` Tab. **Run** the **Exercise 7 - Execute Business Analyst Queries** Pipeline, which will run / trigger  `asa.sql.workload02` queries. **Let this pipeline run for 30 seconds to 1 minute, then cancel the run recursively**.
 
-10. In the query window, replace the script with the following to see what happened to all the `asa.sql.workload02` queries we just triggered as they flood the system:
+10. In the query window, replace the script with the following to see what happened to all the `asa.sql.workload02` queries we just triggered as that were flooded into the system:
 
     ```sql
     SELECT s.login_name, r.[Status], r.Importance, submit_time,
@@ -1450,15 +1454,11 @@ Users should avoid a workload management solution that configures 100% workload 
     ORDER BY submit_time, status
     ```
 
-11. Select **Run** from the toolbar menu to execute the SQL command. You should see an output similar to the following that shows the importance for each session set to `below_normal`:
+11. Select **Run** from the toolbar menu to execute the SQL command. You should see an output similar to the following that shows the importance for each session set to `below_normal` and two queries being run in parallel:
 
-    ![The script results show that each session was executed with below normal importance.](media/sql-result-below-normal.png "SQL script")
+    ![The script results show that each session was executed with below normal importance with two queries being run in parallel.](media/sql-result-below-normal.png "SQL script")
 
-12. Navigate to the **Monitor** hub, select **Pipeline runs**, and then select **Cancel recursive** for each running Exercise 7 pipelines. This will help speed up the remaining tasks.
-
-    ![The cancel recursive option is shown.](media/cancel-recursive-ba.png "Pipeline runs - Cancel recursive")
-
-13. In the query window, replace the script with the following to set 3.25% minimum resources per request:
+12. In the query window, replace the script with the following to set 3.25% minimum resources per request:
 
     ```sql
     IF  EXISTS (SELECT * FROM sys.workload_management_workload_classifiers where group_name = 'CEODemo')
@@ -1481,9 +1481,9 @@ Users should avoid a workload management solution that configures 100% workload 
     > 
     > [Max Concurrency] = [CAP_PERCENTAGE_RESOURCE] / [REQUEST_MIN_RESOURCE_GRANT_PERCENT]
 
-14. Let's flood the system again and see what happens for `asa.sql.workload02`. To do this, we will run an Azure Synapse Pipeline which triggers queries. Select the `Orchestrate` Tab. **Run** the **Exercise 7 - Execute Business Analyst Queries** Pipeline, which will run / trigger  `asa.sql.workload02` queries.
+13. Let's flood the system again and see what happens for `asa.sql.workload02`. To do this, we will run an Azure Synapse Pipeline which triggers queries. Select the `Orchestrate` Tab. **Run** the **Exercise 7 - Execute Business Analyst Queries** Pipeline, which will run / trigger  `asa.sql.workload02` queries.
 
-15. In the query window, replace the script with the following to see what happened to all of the `asa.sql.workload02` queries we just triggered as they flood the system:
+14. In the query window, replace the script with the following to see what happened to all of the `asa.sql.workload02` queries we just triggered as they flooded the system, note that many more queries are now being performed in parallel for asa.sql.workload02:
 
     ```sql
     SELECT s.login_name, r.[Status], r.Importance, submit_time,
@@ -1494,7 +1494,9 @@ Users should avoid a workload management solution that configures 100% workload 
     ORDER BY submit_time, status
     ```
 
-16. Select **Run** from the toolbar menu to execute the SQL command.
+    ![The SQL results pane is shown with multiple queries being run in parallel.](media/multiple_parallel_queries_workload02.png)
+
+15. Select **Run** from the toolbar menu to execute the SQL command.
 
 ### Task 3: Monitoring with Dynamic Management Views
 
@@ -1524,7 +1526,7 @@ All logins to your data warehouse are logged to `sys.dm_pdw_exec_sessions`. This
 
 5. Select **Run** from the toolbar menu to execute the SQL command.
 
-6. Let's flood the system with queries to create operations to monitor. To do this, we will run a Azure Synapse Pipeline which triggers queries. Select the `Orchestrate` Tab. **Run** the **Exercise 7 - Execute Business Analyst Queries** Pipeline, which will run / trigger  `asa.sql.workload02` queries.
+6. Let's flood the system with queries to create operations to monitor. To do this, we will run a Azure Synapse Pipeline which triggers queries. Select the `Orchestrate` Tab. **Run** the **Exercise 7 - Execute Business Analyst Queries** Pipeline, which will run / trigger  `asa.sql.workload02` queries. **Let this pipeline run for 30 seconds to 1 minute, then cancel the run recursively**.
 
 7. In the query window, replace the script with the following:
 
@@ -1613,6 +1615,8 @@ All logins to your data warehouse are logged to `sys.dm_pdw_exec_sessions`. This
 4. Hover onto a SQL Request log and select `Request Content` to access the actual T-SQL command executed as part of the SQL Request.
 
     ![The request content link is displayed over a SQL request.](media/ex7-task5-03.png "SQL requests")
+
+5. You may now return to the **Monitor** hub and cancel the in-progress pipeline run.
   
 ## After the hands-on lab
 

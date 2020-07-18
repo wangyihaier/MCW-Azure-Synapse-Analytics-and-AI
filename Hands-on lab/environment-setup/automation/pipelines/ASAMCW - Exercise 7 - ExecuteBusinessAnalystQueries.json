@@ -32,7 +32,7 @@
                                     "queryTimeout": "02:00:00"
                                 },
                                 "dataset": {
-                                    "referenceName": "asamcw_wwi_salesmall_workload1_asa",
+                                    "referenceName": "asamcw_wwi_salesmall_workload2_asa",
                                     "type": "DatasetReference"
                                 }
                             }
