@@ -109,6 +109,8 @@ For the remainder of this lab, the following terms will be used for various ASA 
 
 ## Exercise 1: Accessing the Azure Synapse Analytics workspace
 
+**Duration**: 5 minutes
+
 All exercises in this lab utilize the workspace Synapse Studio user interface. This exercise will outline the steps to launch Synapse Studio. Unless otherwise specified, all instruction including menu navigation will occur in Synapse Studio.
 
 ### Task 1: Launching Synapse Studio
@@ -1161,7 +1163,7 @@ As an alternative to column level security, SQL Administrators also have the opt
     /* Scenario: WWI has identified sensitive information in the CustomerInfo table. They would like us to
         obfuscate the CreditCard and Email columns of the CustomerInfo table to DataAnalysts */
 
-    -- Step:1 Let us first get a view of CustomerInfo table.
+    -- Step:1 Let's first get a view of CustomerInfo table.
     SELECT TOP (100) * FROM wwi_mcw.CustomerInfo;
 
     -- Step:2 Let's confirm that there are no Dynamic Data Masking (DDM) applied on columns.
@@ -1173,7 +1175,7 @@ As an alternative to column level security, SQL Administrators also have the opt
         AND tbl.name = 'CustomerInfo';
     -- No results returned verify that no data masking has been done yet.
 
-    -- Step:3 Now lets mask 'CreditCard' and 'Email' Column of 'CustomerInfo' table.
+    -- Step:3 Now let's mask 'CreditCard' and 'Email' Column of 'CustomerInfo' table.
     ALTER TABLE wwi_mcw.CustomerInfo  
     ALTER COLUMN [CreditCard] ADD MASKED WITH (FUNCTION = 'partial(0,"XXXX-XXXX-XXXX-",4)');
     GO
@@ -1190,14 +1192,14 @@ As an alternative to column level security, SQL Administrators also have the opt
     WHERE is_masked = 1
         AND tbl.name ='CustomerInfo';
 
-    -- Step:5 Now, let us grant SELECT permission to 'DataAnalystMiami' on the 'CustomerInfo' table.
+    -- Step:5 Now, let's grant SELECT permission to 'DataAnalystMiami' on the 'CustomerInfo' table.
    GRANT SELECT ON wwi_mcw.CustomerInfo TO DataAnalystMiami;  
 
-    -- Step:6 Logged in as  'DataAnalystMiami' let us execute the select query and view the result.
+    -- Step:6 Logged in as  'DataAnalystMiami' let's execute the select query and view the result.
     EXECUTE AS USER = 'DataAnalystMiami';  
     SELECT * FROM wwi_mcw.CustomerInfo;
 
-    -- Step:7 Let us remove the data masking using UNMASK permission
+    -- Step:7 Let's remove the data masking using UNMASK permission
     GRANT UNMASK TO DataAnalystMiami;
     EXECUTE AS USER = 'DataAnalystMiami';  
     SELECT *
@@ -1543,7 +1545,7 @@ All logins to your data warehouse are logged to `sys.dm_pdw_exec_sessions`. This
 
     ```sql
     -- Find a query with the Label 'My Query'
-    -- Use brackets when querying the label column, as it it a key word
+    -- Use brackets when querying the label column, as it is a key word
     SELECT  *
     FROM sys.dm_pdw_exec_requests
     WHERE [label] = 'My Query';
