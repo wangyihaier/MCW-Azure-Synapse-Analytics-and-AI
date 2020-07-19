@@ -1,4 +1,4 @@
-![](https://github.com/Microsoft/MCW-Template-Cloud-Workshop/raw/master/Media/ms-cloud-workshop.png "Microsoft Cloud Workshops")
+![Microsoft Cloud Workshop](https://github.com/Microsoft/MCW-Template-Cloud-Workshop/raw/master/Media/ms-cloud-workshop.png "Microsoft Cloud Workshops")
 
 <div class="MCWHeader1">
 Azure Synapse Analytics and AI
@@ -34,7 +34,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
     - [Task 2: Create the Azure Synapse Analytics workspace](#task-2-create-the-azure-synapse-analytics-workspace)
     - [Task 3: Download lab artifacts](#task-3-download-lab-artifacts)
     - [Task 4: Establish a user context](#task-4-establish-a-user-context)
-    - [Task 4: Run environment setup PowerShell script](#task-4-run-environment-setup-powershell-script)
+    - [Task 5: Run environment setup PowerShell script](#task-5-run-environment-setup-powershell-script)
 
 <!-- /TOC -->
 
@@ -42,7 +42,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 ## Requirements
 
-1. An Azure Account with the ability to create an Azure Synapse Workspace
+1. An Azure Account with the ability to create an Azure Synapse Workspace.
 
 ## Before the hands-on lab
 
@@ -74,13 +74,13 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
     <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2FMCW-Azure-Synapse-Analytics-and-AI%2Fmaster%2FHands-on%2520lab%2Fenvironment-setup%2Fautomation%2F00-asa-workspace-core.json" target="_blank"><img src="http://azuredeploy.net/deploybutton.png" /></a>
 
-2. On the **Custom deployment** form, select your desired subscription and select **Synapse-MCW** for the **Resource group**. Also provide a **Unique Suffix** such as your initials followed by birth year. Finally, provide a strong **SQL Administrator Login Password**. Remember this password value, you'll be needing it!
+2. On the **Custom deployment** form, select your desired subscription and select **Synapse-MCW** for the **Resource group**. Also provide a **Unique Suffix** such as your initials followed by birth year. Finally, provide a strong **SQL Administrator Login Password**. Remember this password value, you'll need it later!
 
     ![The Custom deployment form is displayed with example data populated.](media/bhol_customdeploymentform.png)
   
 3. Check the **I agree to the terms and conditions stated above**, then select the **Purchase** button.
 
-    > **Note**: You may experience a deployment step failing in regards to Role Assignment. This error may safely be ignored.
+    > **Note**: You may experience a deployment step failing in regard to Role Assignment. This error may safely be ignored.
 
 ### Task 3: Download lab artifacts
 
@@ -114,7 +114,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 3. Once complete, you may close the tab from the previous step and return to the Cloud Shell.
 
-### Task 4: Run environment setup PowerShell script
+### Task 5: Run environment setup PowerShell script
 
 When executing the script below, it is important to let the scripts run to completion. Some tasks may take longer than others to run. When a script completes execution, you will be returned to a command prompt.
 
