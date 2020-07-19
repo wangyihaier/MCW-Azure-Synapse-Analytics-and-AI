@@ -4,10 +4,9 @@ Wide World Importers (WWI) has hundreds of brick and mortar stores and an online
 July 2020
 
 ## Target audience
-- Data Engineer
-- Data Scientist
-- Machine Learning Engineer
-
+- Data engineer
+- Data scientist
+- Machine Learning engineer
 
 ## Abstracts
 
@@ -21,13 +20,9 @@ In this whiteboard design session, you will work in a group to look at the proce
 
 At the end of this whiteboard design session, you will be better able to design and build a complete end-to-end advanced analytics solution using Azure Synapse Analytics.
 
-### Before the hands-on lab
-
-[Before the HOL - Azure Synapse Analytics and AI](Hands-on%20lab/Before%20the%20HOL%20-%20Azure%20Synapse%20Analytics%20and%20AI.md)
-
 ### Hands-on lab
 
-[HOL step-by-step - Azure Synapse Analytics and AI](Hands-on%20lab/HOL%20step-by%20step%20-%20Azure%20Synapse%20Analytics%20and%20AI.md)
+In this hands-on-lab, you will build an end-to-end data analytics with machine learning solution using Azure Synapse Analytics. The information will be presented in the context of a retail scenario. We will be heavily leveraging Azure Synapse Studio, a tool that conveniently unifies the most common data operations from ingestion, transformation, querying, and visualization.
 
 ## Azure services and related products
 -	Azure Synapse Analytics
@@ -38,7 +33,6 @@ At the end of this whiteboard design session, you will be better able to design 
 -	Event Hubs
 -	IoT Hub
 -	Power BI
-
 
 ## Related references
 - [MCW](https://github.com/Microsoft/MCW)
