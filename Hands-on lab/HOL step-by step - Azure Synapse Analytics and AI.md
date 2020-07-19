@@ -1,4 +1,4 @@
-![](https://github.com/Microsoft/MCW-Template-Cloud-Workshop/raw/master/Media/ms-cloud-workshop.png "Microsoft Cloud Workshops")
+![Microsoft Cloud Workshop](https://github.com/Microsoft/MCW-Template-Cloud-Workshop/raw/master/Media/ms-cloud-workshop.png "Microsoft Cloud Workshops")
 
 <div class="MCWHeader1">
 Azure Synapse Analytics and AI
@@ -139,16 +139,16 @@ Table design performance considerations
 
 | Table Indexing | Recommended use |
 |--------------|-------------|
-| Clustered Columnstore | recommended for tables with greater than 100 million rows, offers the highest data compression with best overall query performance |
-| Heap Tables | Smaller tables with less than 100 million rows, commonly used as a staging table prior to transformation |
-| Clustered Index | large lookup tables (> 100 million rows) where querying will only result in a single row returned |
-| Clustered Index + non-clustered secondary index | large tables (> 100 million rows) when single (or very few) records are being returned in queries |
+| Clustered Columnstore | Recommended for tables with greater than 100 million rows, offers the highest data compression with best overall query performance. |
+| Heap Tables | Smaller tables with less than 100 million rows, commonly used as a staging table prior to transformation. |
+| Clustered Index | Large lookup tables (> 100 million rows) where querying will only result in a single row returned. |
+| Clustered Index + non-clustered secondary index | Large tables (> 100 million rows) when single (or very few) records are being returned in queries. |
 
 | Table Distribution/Partition Type | Recommended use |
 |--------------------|-------------|
-| Hash distribution | tables that are larger than 2 GBs with infrequent insert/update/delete operations, works well for large fact tables in a star schema |
-| Round robin distribution | default distribution, when little is known about the data or how it will be used. Use this distribution for staging tables |
-| Replicated tables | smaller lookup tables less than 1.5 GB in size |
+| Hash distribution | Tables that are larger than 2 GBs with infrequent insert/update/delete operations, works well for large fact tables in a star schema. |
+| Round robin distribution | Default distribution, when little is known about the data or how it will be used. Use this distribution for staging tables. |
+| Replicated tables | Smaller lookup tables, less than 1.5 GB in size. |
 
 ### Task 1: Create the sale table
 
@@ -206,11 +206,12 @@ The data that we will be retrieving to populate the sale table is currently stor
 
 2. The sale data for each day is stored in a separate parquet file which is placed in storage following a known convention. In this lab, we are interested in populating the Sale table with only 2018 and 2019 data. Investigate the structure of the data by selecting the **Data** tab, and in the **Data** pane, select the **Linked** tab, and expanding the `asadatalake{SUFFIX}` Storage account.
 
-    > **Note**: The current folder structure for daily sales data is as follows: /wwi-02/sale-small/Year=`YYYY`/Quarter=`Q#`/Month=`M`/Day=`YYYYMMDD` - where `YYYY` is the 4 digit year (eg. 2019), `Q#` represents the quarter (eg. Q1), `M` represents the numerical month (eg. 1 for January) and finally `YYYYMMDD` represents a numeric date format representation (eg. `20190516` for May 16, 2019).
+    > **Note**: The current folder structure for daily sales data is as follows: 
+    /wwi-02/sale-small/Year=`YYYY`/Quarter=`Q#`/Month=`M`/Day=`YYYYMMDD`, where `YYYY` is the 4 digit year (eg. 2019), `Q#` represents the quarter (eg. Q1), `M` represents the numerical month (eg. 1 for January) and finally `YYYYMMDD` represents a numeric date format representation (eg. `20190516` for May 16, 2019).
     > A single parquet file is stored each day folder with the name **sale-small-YYYYMMDD-snappy.parquet** (replacing `YYYYMMDD` with the numeric date representation).
 
     ```text
-    Sample path to the parquet folder for January 1st, 2019:
+    Sample path to the parquet folder for January 1, 2019:
     /wwi-02/sale-small/Year=2019/Quarter=Q1/Month=1/Day=20190101/sale-small-20190101-snappy.parquet
     ```
 
@@ -228,11 +229,11 @@ The data that we will be retrieving to populate the sale table is currently stor
   
    | Field | Value |
    |-------|-------|
-   | Name  | Enter **asamcw_sales_parquet** |
-   | Linked service | Select **asadatalake{SUFFIX}** |
-   | File path - Container | Enter **wwi-02** |  
-   | File path - Folder | Enter **sale-small** |
-   | Import schema | Select **From connection/store** |
+   | Name  | Enter **asamcw_sales_parquet**. |
+   | Linked service | **asadatalake{SUFFIX}** |
+   | File path - Container | Enter **wwi-02**. |  
+   | File path - Folder | Enter **sale-small**. |
+   | Import schema | **From connection/store** |
 
     ![The Set properties blade is displayed with fields populated with the values from the preceding table.](media/dataset_salesparquet_propertiesform.png)
 
@@ -244,10 +245,10 @@ The data that we will be retrieving to populate the sale table is currently stor
 
    | Field | Value |
    |-------|-------|
-   | Name  | Enter **asamcw_sale_asa** |
-   | Linked service | Select `SQLPool01`. |
-   | Table name | Select **wwi_mcw.SaleSmall**. |  
-   | Import schema | Select **From connection/store** |
+   | Name  | Enter **asamcw_sale_asa**. |
+   | Linked service | **SQLPool01** |
+   | Table name | **wwi_mcw.SaleSmall** |  
+   | Import schema | **From connection/store** |
 
     ![The Set properties blade is populated with the values specified in the preceding table.](media/dataset_saleasaform.png)
   
@@ -271,9 +272,9 @@ The data that we will be retrieving to populate the sale table is currently stor
   
     | Field | Value |
     |-------|-------|
-    | Output stream name  | Enter **salesdata** |
-    | Source type | Select **Dataset**. |
-    | Dataset | Select **asamcw_sales_parquet**. |
+    | Output stream name  | Enter **salesdata**. |
+    | Source type | **Dataset** |
+    | Dataset | **asamcw_sales_parquet** |
 
     ![The Source settings tab is selected displaying the Output stream name set to salesdata and the selected dataset being asamcw_sales_parquet.](media/dataflow_source_sourcesettings.png)
 
@@ -293,10 +294,10 @@ The data that we will be retrieving to populate the sale table is currently stor
 
     | Field | Value |
     |-------|-------|
-    | Output stream name  | Enter **sale** |
-    | Incoming stream | Select **salesdata**. |
-    | Sink type | Select **Dataset**. |
-    | Dataset | Select **asamcw_sale_asa**. |
+    | Output stream name  | Enter **sale**. |
+    | Incoming stream | **salesdata** |
+    | Sink type | **Dataset** |
+    | Dataset | **asamcw_sale_asa** |
 
     ![The Sink tab is displayed with the form populated with the values from the preceding table.](media/dataflow_sink_sinktab.png)
 
@@ -331,10 +332,10 @@ The data that we will be retrieving to populate the sale table is currently stor
 
     | Field | Value |
     |-------|-------|
-    | Data flow  | Select **ASAMCW_Exercise_2_2018_and_2019_Sales** |
-    | Staging linked service | Select `asadatalake{SUFFIX}`. |
-    | Staging storage folder - Container | Enter **staging** |
-    | Staging storage folder - Folder | Enter **mcwsales** |
+    | Data flow  | **ASAMCW_Exercise_2_2018_and_2019_Sales** |
+    | Staging linked service | `asadatalake{SUFFIX}` |
+    | Staging storage folder - Container | Enter **staging**. |
+    | Staging storage folder - Folder | Enter **mcwsales**. |
 
     ![The data flow activity Settings tab is displayed with the fields specified in the preceding table highlighted.](media/pipeline_sales_dataflowsettings.png)
 
@@ -417,13 +418,13 @@ Over the past 5 years, Wide World Importers has amassed over 3 billion rows of s
 
    | Field | Value |
    |-------|-------|
-   | Name  | Enter **asamcw_customerinfo_csv** |
-   | Linked service | Select **asadatalake{SUFFIX}**.|
-   | File Path - Container | Enter **wwi-02** |
-   | File Path - Directory | Enter **customer-info** |
-   | File Path - File | Enter **customerinfo.csv** |
+   | Name  | Enter **asamcw_customerinfo_csv**. |
+   | Linked service | **asadatalake{SUFFIX}**|
+   | File Path - Container | Enter **wwi-02**. |
+   | File Path - Directory | Enter **customer-info**. |
+   | File Path - File | Enter **customerinfo.csv**. |
    | First row as header | Checked |
-   | Import schema | Select **From connection/store** |
+   | Import schema | Select **From connection/store**. |
 
     ![The Set properties form is displayed with the values specified in the previous table.](media/customerinfodatasetpropertiesform.png)
 
@@ -437,10 +438,10 @@ Over the past 5 years, Wide World Importers has amassed over 3 billion rows of s
 
    | Field | Value |
    |-------|-------|
-   | Name  | Enter **asamcw_customerinfo_asa** |
-   | Linked service | Select `SQLPool01`. |
-   | Table name | Select **wwi_mcw.CustomerInfo**. |  
-   | Import schema | Select **From connection/store** |
+   | Name  | Enter **asamcw_customerinfo_asa**. |
+   | Linked service | **SQLPool01** |
+   | Table name | **wwi_mcw.CustomerInfo** |  
+   | Import schema | **From connection/store** |
 
     ![The Set properties blade is populated with the values specified in the preceding table.](media/dataset_customerinfoasaform.png)
   
@@ -556,7 +557,7 @@ Similar to the customer information table, we will also be populating the campai
 
     ![On the Select format blade the CSV Delimited Text item is highlighted.](media/newdataset_selectfileformat_csv.png)
 
-4. On the **Properties** blade, set the name of the dataset to **asamcw_campaignanalytics_csv**
+4. On the **Properties** blade, set the name of the dataset to **asamcw_campaignanalytics_csv**.
 
 5. Now we will need to define the destination dataset for our data. In this case we will be storing campaign analytics data in our SQL Pool. On the **Data** blade, expand the **+** button and select **Dataset**.
 
@@ -568,10 +569,10 @@ Similar to the customer information table, we will also be populating the campai
 
    | Field | Value |
    |-------|-------|
-   | Name  | Enter **asamcw_campaignanalytics_asa** |
-   | Linked service | Select `SQLPool01`. |
-   | Table name | Select **wwi_mcw.CampaignAnalytics**. |  
-   | Import schema | Select **From connection/store** |
+   | Name  | Enter **asamcw_campaignanalytics_asa**. |
+   | Linked service | **SQLPool01** |
+   | Table name | **wwi_mcw.CampaignAnalytics** |  
+   | Import schema | Select **From connection/store**. |
 
     ![The Set properties blade is populated with the values specified in the preceding table.](media/dataset_campaignanalyticsasaform.png)
   
@@ -595,10 +596,10 @@ Similar to the customer information table, we will also be populating the campai
 
     | Field | Value |
     |-------|-------|
-    | Output stream name  | Enter **campaignanalyticscsv** |
-    | Source type | Select **Dataset** |
-    | Dataset | Select **asamcw_campaignanalytics_csv**. |
-    | Skip line count | Enter **1** |  
+    | Output stream name  | Enter **campaignanalyticscsv**. |
+    | Source type | **Dataset** |
+    | Dataset | **asamcw_campaignanalytics_csv** |
+    | Skip line count | Enter **1**. |  
 
     ![The Source settings tab is displayed with a form populated with the values defined in the preceding table.](media/dataflow_campaignanalytics_sourcesettings.png)
 
@@ -626,7 +627,7 @@ Similar to the customer information table, we will also be populating the campai
         skipLines: 1) ~> campaignanalyticscsv
     ```
 
-    > NOTE: We are changing the mappings as the source file was corrupted with the wrong headers.
+    > **Note**: We are changing the mappings as the source file was corrupted with the wrong headers.
 
 15. Select the **campaignanalyticscsv** data source, then select **Projection**. The projection should display the following schema:
 
@@ -640,7 +641,7 @@ Similar to the customer information table, we will also be populating the campai
 
     | Field | Value |
     |-------|-------|
-    | Output stream name  | Enter **mapcampaignanalytics** |
+    | Output stream name  | Enter **mapcampaignanalytics**. |
 
     For **Input Columns**, under the **Name as** column, enter the following list values in order:
       - Region
@@ -662,7 +663,7 @@ Similar to the customer information table, we will also be populating the campai
 
     | Field | Value |
     |-------|-------|
-    | Output stream name  | Enter **convertandaddcolums** |
+    | Output stream name  | Enter **convertandaddcolums**. |
 
     For **Columns**, add the following (Note you will need to type in the **Analyst** column):
 
@@ -680,8 +681,8 @@ Similar to the customer information table, we will also be populating the campai
 
     | Field | Value |
     |-------|-------|
-    | Output stream name  | Enter **selectcampaignanalyticscolumns** |
-    | Input columns | Delete the **RevenuePart1** and **RevenueTargetPart1** columns |
+    | Output stream name  | Enter **selectcampaignanalyticscolumns**. |
+    | Input columns | Delete the **RevenuePart1** and **RevenueTargetPart1** columns. |
 
     ![The Select settings are displayed showing the updated column mappings.](media/dataflow_campaignanalytics_select2.png)
 
@@ -691,8 +692,8 @@ Similar to the customer information table, we will also be populating the campai
 
     | Field | Value |
     |-------|-------|
-    | Output stream name  | Enter **campaignanlyticsasa** |
-    | Dataset | Select **asamcw_campaignanalytics_asa**. |
+    | Output stream name  | Enter **campaignanlyticsasa**. |
+    | Dataset | **asamcw_campaignanalytics_asa** |
 
     ![The Sink settings form is displayed populated with the values defined in the previous table.](media/dataflow_campaignanalytics_sink.png)
 
@@ -724,10 +725,10 @@ Similar to the customer information table, we will also be populating the campai
 
     | Field | Value |
     |-------|-------|
-    | Data flow  | Select **ASAMCW_Exercise_2_Campaign_Analytics_Data** |
-    | Staging linked service | Select `asadatalake{SUFFIX}`. |
-    | Staging storage folder - Container | Enter **staging** |
-    | Staging storage folder - Directory | Enter **mcwcampaignanalytics** |
+    | Data flow  | **ASAMCW_Exercise_2_Campaign_Analytics_Data** |
+    | Staging linked service | **asadatalake{SUFFIX}** |
+    | Staging storage folder - Container | Enter **staging**. |
+    | Staging storage folder - Directory | Enter **mcwcampaignanalytics**. |
 
     ![The data flow activity Settings tab is displayed with the fields specified in the preceding table highlighted.](media/pipeline_campaigndata_dataflowsettings.png)
 
@@ -843,6 +844,7 @@ When you query Parquet files using Synapse SQL Serverless, you can explore the d
 4. Select **Run all** on the notebook toolbar to execute the notebook.
 
     > **Note:** The first time you run a notebook in a Spark pool, Synapse creates a new session. This can take approximately 5 minutes.
+    
     > **Note:** To run just the cell, either hover over the cell and select the _Run cell_ icon to the left of the cell, or select the cell then type **Ctrl+Enter** on your keyboard.
 
 5. Create a new cell underneath by selecting **{} Add code** when hovering over the blank space at the bottom of the notebook.
@@ -1224,7 +1226,7 @@ As an alternative to column level security, SQL Administrators also have the opt
 
 **Duration**: 60 minutes
 
-Using Azure Synapse Analytics, Data Scientists are no longer required to use separate tooling to create and deploy machine learning models.
+Using Azure Synapse Analytics, data scientists are no longer required to use separate tooling to create and deploy machine learning models.
 
 In this exercise, you will create multiple machine learning models. You will learn how to consume these models in your notebook. You will also deploy a model as a web service to Azure Container Instances and consume the service - without ever having to leave the Azure Synapse Analytics workspace.
 
@@ -1256,7 +1258,7 @@ Pipeline runs can be monitored using the Monitor Hub and selecting Pipeline runs
 
 ### Task 1: Workload Importance
 
-Running mixed workloads can pose resource challenges on busy systems. Solution Architects seek ways to separate classic data warehousing activities (such as loading, transforming, and querying data) to ensure that enough resources exist to hit SLAs.
+Running mixed workloads can pose resource challenges on busy systems. Solution architects seek ways to separate classic data warehousing activities (such as loading, transforming, and querying data) to ensure that enough resources exist to hit SLAs.
 
 Synapse SQL pool workload management in Azure Synapse consists of three high-level concepts: Workload Classification, Workload Importance and Workload Isolation. These capabilities give you more control over how your workload utilizes system resources.
 
@@ -1340,7 +1342,7 @@ Setting importance in Synapse SQL for Azure Synapse allows you to influence the 
 
 16. Let's flood the system again with queries and see what happens this time for `asa.sql.workload01` and `asa.sql.workload02` queries. To do this, we'll run an Azure Synapse Pipeline which triggers queries. **Similar to before, run this pipeline for about 30 seconds to 1 minute**.
 
-    - **Select** the `Orchestrate` Tab
+    - **Select** the `Orchestrate` Tab.
 
     - **Run** the **Exercise 7 - Execute Data Analyst and CEO Queries** Pipeline, which will run / trigger the `asa.sql.workload01` and `asa.sql.workload02` queries.
 
@@ -1354,7 +1356,7 @@ Setting importance in Synapse SQL for Azure Synapse allows you to influence the 
     ORDER BY submit_time ,status desc
     ```
 
-18. Select **Run** from the toolbar menu to execute the SQL command. You should see an output similar to the following that shows query executions for the `asa.sql.workload01` user having a **high** importance Also note tha the 'asa.sql.workload02' queries being are in **Suspended** status while the high priorty queries are being run.
+18. Select **Run** from the toolbar menu to execute the SQL command. You should see an output similar to the following that shows query executions for the `asa.sql.workload01` user having a **high** importance Also note that the 'asa.sql.workload02' queries being are in **Suspended** status while the high priority queries are being run.
 
     ![SQL query results showing asa.sql.workload01 queries with a higher importance than those queries from asa.sql.workload02.](media/sql-query-4-results.png "SQL script")
 
@@ -1420,7 +1422,7 @@ Users should avoid a workload management solution that configures 100% workload 
     ORDER BY submit_time, status
     ```
 
-9. Let's flood the system with queries and see what happens for `asa.sql.workload02`. To do this, we will run a Azure Synapse Pipeline which triggers queries. Select the `Orchestrate` Tab. **Run** the **Exercise 7 - Execute Business Analyst Queries** Pipeline, which will run / trigger  `asa.sql.workload02` queries. **Let this pipeline run for 30 seconds to 1 minute, then cancel the run recursively**.
+9. Let's flood the system with queries and see what happens for `asa.sql.workload02`. To do this, we will run an Azure Synapse Pipeline which triggers queries. Select the `Orchestrate` Tab. **Run** the **Exercise 7 - Execute Business Analyst Queries** Pipeline, which will run / trigger  `asa.sql.workload02` queries. **Let this pipeline run for 30 seconds to 1 minute, then cancel the run recursively**.
 
 10. In the query window, replace the script with the following to see what happened to all the `asa.sql.workload02` queries we just triggered as that were flooded into the system:
 
