@@ -51,18 +51,15 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
     - [Task 2: Query JSON data](#task-2-query-json-data)
   - [Exercise 5: Synapse Pipelines & Cognitive Search](#exercise-5-synapse-pipelines--cognitive-search)
     - [Task 1: Create the necessary storage account](#task-1-create-the-necessary-storage-account)
-    - [Task 2: Create and train Azure Forms Recognizer model and Cognitive search](#task-2-create-and-train-azure-forms-recognizer-model-and-cognitive-search)
-    - [Task 3: Configure a skillset with form recognizer](#task-3-configure-a-skillset-with-form-recognizer)
-    - [Task 4: Create the Synapse pipeline](#task-4-create-the-synapse-pipeline)
+    - [Task 2: Create and train Azure Forms recognizer model and Cognitive Search](#task-2-create-and-train-azure-forms-recognizer-model-and-cognitive-search)
+    - [Task 3: Configure a skillset with Form Recognizer](#task-3-configure-a-skillset-with-form-recognizer)
+    - [Task 4: Create the Synapse Pipeline](#task-4-create-the-synapse-pipeline)
   - [Exercise 6: Security](#exercise-6-security)
     - [Task 1: Column level security](#task-1-column-level-security)
     - [Task 2: Row level security](#task-2-row-level-security)
     - [Task 3: Dynamic data masking](#task-3-dynamic-data-masking)
-  - [Exercise 6: Machine Learning](#exercise-6-machine-learning)
-    - [Task 1: Training, consuming, and deploying models](#task-1-training-consuming-and-deploying-models)
-  - [Exercise 7: Monitoring](#exercise-7-monitoring)
   - [Exercise 7: Machine Learning](#exercise-7-machine-learning)
-    - [Task 1: Training models](#task-1-training-models)
+    - [Task 1: Training, consuming, and deploying models](#task-1-training-consuming-and-deploying-models)
     - [Task 2: Registering the models with Azure Synapse Analytics](#task-2-registering-the-models-with-azure-synapse-analytics)
     - [Task 3: Making predictions with the registered models](#task-3-making-predictions-with-the-registered-models)
   - [Exercise 8: Monitoring](#exercise-8-monitoring)
@@ -1770,13 +1767,11 @@ In this exercise, you will create multiple machine learning models. You will lea
 - Use PCA for dimensionality reduction
 - Train ensemble of trees classifier (using XGBoost)
 - Train classifier using Auto ML
-<<<<<<< HEAD:Hands-on lab/HOL step-by step - Azure Synapse Analytics and AI.md
 - Register the best run model
 - Deploy the model as a web service to Azure Container Instances
 - Consume the web service to make predictions on sample data
   
 > **Note**: Please note that each of these tasks will be addressed through several cells in the notebook.
-=======
 
 Please note that each of these tasks will be addressed through several cells in the notebook.
 
@@ -1930,7 +1925,6 @@ In this task, you will author a T-SQL query that uses the previously trained mod
 6. Run the script and view the results, notice that the `Prediction` column is the model's prediction of the `Seasonality` property of each product.
 
    ![The query results pane is displayed with the prediction results.](media/lab06-view-prediction-results.png "View prediction results")
->>>>>>> 438fa950054f04c69a377d0fa61ebd8e69a4266e:Hands-on lab/HOL step-by step - Azure Synapse Analytics end-to-end solution.md
 
 ## Exercise 8: Monitoring
 
