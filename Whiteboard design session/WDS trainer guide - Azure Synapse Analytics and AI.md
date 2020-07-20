@@ -1,7 +1,7 @@
 ![Microsoft Cloud Workshops](https://github.com/Microsoft/MCW-Template-Cloud-Workshop/raw/master/Media/ms-cloud-workshop.png "Microsoft Cloud Workshops")
 
 <div class="MCWHeader1">
-Azure Synapse Analytics end-to-end solution
+Azure Synapse Analytics and AI
 </div>
 
 <div class="MCWHeader2">
@@ -9,7 +9,7 @@ Whiteboard design session trainer guide
 </div>
 
 <div class="MCWHeader3">
-April 2020
+July 2020
 </div>
 
 Information in this document, including URL and other Internet Web site references, is subject to change without notice. Unless otherwise noted, the example companies, organizations, products, domain names, e-mail addresses, logos, people, places, and events depicted herein are fictitious, and no association with any real company, organization, product, domain name, e-mail address, logo, person, place or event is intended or should be inferred. Complying with all applicable copyright laws is the responsibility of the user. Without limiting the rights under copyright, no part of this document may be reproduced, stored in or introduced into a retrieval system, or transmitted in any form or by any means (electronic, mechanical, photocopying, recording, or otherwise), or for any purpose, without the express written permission of Microsoft Corporation.
@@ -31,7 +31,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
   - [Whiteboard design session flow](#whiteboard-design-session-flow)
   - [Before the whiteboard design session: How to prepare](#before-the-whiteboard-design-session-how-to-prepare)
   - [During the whiteboard design session: Tips for an effective whiteboard design session](#during-the-whiteboard-design-session-tips-for-an-effective-whiteboard-design-session)
-- [Azure Synapse Analytics end-to-end solution whiteboard design session student guide](#azure-synapse-analytics-end-to-end-solution-whiteboard-design-session-student-guide)
+- [Azure Synapse Analytics and AI whiteboard design session student guide](#azure-synapse-analytics-and-ai-whiteboard-design-session-student-guide)
   - [Abstract and learning objectives](#abstract-and-learning-objectives)
   - [Step 1: Review the customer case study](#step-1-review-the-customer-case-study)
     - [Customer situation](#customer-situation)
@@ -42,7 +42,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
   - [Step 3: Present the solution](#step-3-present-the-solution)
   - [Wrap-up](#wrap-up)
   - [Additional references](#additional-references)
-- [Azure Synapse Analytics end-to-end solution whiteboard design session trainer guide](#azure-synapse-analytics-end-to-end-solution-whiteboard-design-session-trainer-guide)
+- [Azure Synapse Analytics and AI whiteboard design session trainer guide](#azure-synapse-analytics-and-ai-whiteboard-design-session-trainer-guide)
   - [Step 1: Review the customer case study](#step-1-review-the-customer-case-study-1)
   - [Step 2: Design a proof of concept solution](#step-2-design-a-proof-of-concept-solution-1)
   - [Step 3: Present the solution](#step-3-present-the-solution-1)
@@ -166,7 +166,7 @@ When participants are doing activities, you can **look ahead to refresh your mem
 
 **Wait for responses**. If you ask a question such as, "What's your experience with (fill in the blank)?" then wait. Do not be afraid of a little silence. If you leap into the silence, your participants will feel you are not serious about involving them and will become passive. Give participants a chance to think, and if no one answers, patiently ask again. You will usually get a response.
 
-# Azure Synapse Analytics end-to-end solution whiteboard design session student guide
+# Azure Synapse Analytics and AI whiteboard design session student guide
 
 ## Abstract and learning objectives
 
@@ -423,7 +423,7 @@ Directions: Tables reconvene with the larger group to hear the facilitator/SME s
 | Intro to Azure Data Lake Store Gen2 | https://docs.microsoft.com/en-us/azure/storage/blobs/data-lake-storage-introduction |
 | Azure Stream Analytics | https://docs.microsoft.com/en-us/azure/stream-analytics/stream-analytics-introduction |
 
-# Azure Synapse Analytics end-to-end solution whiteboard design session trainer guide
+# Azure Synapse Analytics and AI whiteboard design session trainer guide
 
 ## Step 1: Review the customer case study
 
@@ -477,11 +477,11 @@ The primary audience is the business decision makers and technology decision mak
 
 1. Diagram your initial vision for handling the top-level requirements for data loading, data transformation, storage, machine learning modeling, and reporting.
 
-    The following diagram illustrates the high level process for the "cold path" of the data pipeline architecture. It begins with ingesting the data from the Oracle, SAP Hana and Teradata sources. This can be done within Azure Synapse Analytics using Azure Synapse Pipelines containing the Copy Data activity, which lands the data in Azure Data Lake Gen2. When performing initial exploration of the data in the data lake, the data can be readily explored using Azure Synapse SQL to explore it with T-SQL or using Azure Synapse Spark to explore it within notebooks. 
+    The following diagram illustrates the high level process for the "cold path" of the data pipeline architecture. It begins with ingesting the data from the Oracle, SAP Hana and Teradata sources. This can be done within Azure Synapse Analytics using Azure Synapse Pipelines containing the Copy Data activity, which lands the data in Azure Data Lake Gen2. When performing initial exploration of the data in the data lake, the data can be readily explored using Azure Synapse SQL to explore it with T-SQL or using Azure Synapse Spark to explore it within notebooks.
 
-    At this stage Mapping Data Flows, which are Synapse Pipeline activities just like the Copy Data activity, can be created using the graphical designer to perform some data preparation tasks. 
+    At the Preparation stage, Mapping Data Flows, which are Synapse Pipeline activities just like the Copy Data activity, can be created using the graphical designer to perform some data preparation tasks. This preparation step is used to ensure the data being stored in a useful format, like parquet. Initial data cleansing to remove duplicates, filter out erroneous data, as well as impute missing values.
 
-    Next, the data can be transformed and enriched in several ways. 
+    Next, the data can be transformed and enriched in several ways.
 
     Azure Synapse SQL offers both serverless and provisioned resource models, offering consumption and billing options to fit the customer's needs. For predictable performance and cost, provision pools to reserve processing power for data stored in SQL tables. For ad hoc or bursty workloads, use the serverless, always-available SQL endpoint. 
 

@@ -1,4 +1,4 @@
-![](https://github.com/Microsoft/MCW-Template-Cloud-Workshop/raw/master/Media/ms-cloud-workshop.png "Microsoft Cloud Workshops")
+![Microsoft Cloud Workshop](https://github.com/Microsoft/MCW-Template-Cloud-Workshop/raw/master/Media/ms-cloud-workshop.png "Microsoft Cloud Workshops")
 
 <div class="MCWHeader1">
 Azure Synapse Analytics and AI
@@ -9,7 +9,7 @@ Hands-on lab step-by-step
 </div>
 
 <div class="MCWHeader3">
-May 2020
+July 2020
 </div>
 
 
@@ -26,7 +26,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 **Contents** 
 
 <!-- TOC -->
-- [Azure Synapse Analytics end-to-end solution hands-on lab step-by-step](#azure-synapse-analytics-end-to-end-solution-hands-on-lab-step-by-step)
+- [Azure Synapse Analytics and AI hands-on lab step-by-step](#azure-synapse-analytics-and-ai-hands-on-lab-step-by-step)
   - [Abstract and learning objectives](#abstract-and-learning-objectives)
   - [Overview](#overview)
   - [Solution architecture](#solution-architecture)
@@ -54,9 +54,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
     - [Task 2: Row level security](#task-2-row-level-security)
     - [Task 3: Dynamic data masking](#task-3-dynamic-data-masking)
   - [Exercise 6: Machine Learning](#exercise-6-machine-learning)
-    - [Task 1: Training models](#task-1-training-models)
-    - [Task 2: Registering the models with Azure Synapse Analytics](#task-2-registering-the-models-with-azure-synapse-analytics)
-    - [Task 3: Making predictions with the registered models](#task-3-making-predictions-with-the-registered-models)
+    - [Task 1: Training, consuming, and deploying models](#task-1-training-consuming-and-deploying-models)
   - [Exercise 7: Monitoring](#exercise-7-monitoring)
     - [Task 1: Workload Importance](#task-1-workload-importance)
     - [Task 2: Workload Isolation](#task-2-workload-isolation)
@@ -67,7 +65,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
     - [Task 1: Delete the resource group](#task-1-delete-the-resource-group)
 <!-- /TOC -->
 
-# Azure Synapse Analytics end-to-end solution hands-on lab step-by-step
+# Azure Synapse Analytics and AI hands-on lab step-by-step
 
 ## Abstract and learning objectives
 
@@ -79,7 +77,7 @@ In this lab various features of Azure Synapse Analytics will be explored. Azure 
 
 ## Solution architecture
 
-![Architecture diagram explained in the next paragraph.](media/archdiagram.png)
+![Architecture diagram explained in the next paragraph.](media/archdiagram.png "Architecture Diagram")
 
 This lab explores the cold data scenario of ingesting various types of raw data files. These files can exist anywhere. The file types used in this lab are CSV, parquet, and JSON. This data will be ingested into Synapse Analytics via Pipelines. From there, the data can be transformed and enriched using various tools such as data flows, Synapse Spark, and Synapse SQL (both provisioned and serverless). Once processed, data can be queried using Synapse SQL tooling. Azure Synapse Studio also provides the ability to author notebooks to further process data, create datasets, train, and create machine learning models. These models can then be stored in a storage account or even in a SQL table. These models can then be consumed via various methods, including T-SQL. The foundational component supporting all aspects of Azure Synapse Analytics is the ADLS Gen 2 Data Lake.
 
@@ -111,6 +109,8 @@ For the remainder of this lab, the following terms will be used for various ASA 
 
 ## Exercise 1: Accessing the Azure Synapse Analytics workspace
 
+**Duration**: 5 minutes
+
 All exercises in this lab utilize the workspace Synapse Studio user interface. This exercise will outline the steps to launch Synapse Studio. Unless otherwise specified, all instruction including menu navigation will occur in Synapse Studio.
 
 ### Task 1: Launching Synapse Studio
@@ -119,21 +119,21 @@ All exercises in this lab utilize the workspace Synapse Studio user interface. T
 
 2. Expand the left menu, and select the **Resource groups** item.
   
-    ![The Azure Portal left menu is expanded with the Resource groups item highlighted.](media/azureportal_leftmenu_resourcegroups.png)
+    ![The Azure Portal left menu is expanded with the Resource groups item highlighted.](media/azureportal_leftmenu_resourcegroups.png "Azure Portal Resource Groups menu item")
 
 3. From the list of resource groups, select `WorkspaceResourceGroup`.
   
 4. From the list of resources, select the **Synapse Workspace** resource, `asaworkspace{suffix}`.
   
-    ![In the resource list, the Synapse Workspace item is selected.](media/resourcelist_synapseworkspace.png)
+    ![In the resource list, the Synapse Workspace item is selected.](media/resourcelist_synapseworkspace.png "The resource group listing")
 
 5. On the **Overview** tab of the Synapse Workspace page, select the **Launch Synapse Studio** item from the top toolbar. Alternatively you can select the Workspace web URL link.
 
-    ![On the Synapse workspace resource screen, the Overview pane is shown with the Launch Synapse Studio button highlighted in the top toolbar. The Workspace web URL value is also highlighted.](media/workspaceresource_launchsynapsestudio.png)
+    ![On the Synapse workspace resource screen, the Overview pane is shown with the Launch Synapse Studio button highlighted in the top toolbar. The Workspace web URL value is also highlighted.](media/workspaceresource_launchsynapsestudio.png "Launching Synapse Studio")
 
 ## Exercise 2: Create and populate the supporting tables in the SQL Pool
 
-**Duration**: 45 minutes
+**Duration**: 120 minutes
 
 The first step in querying meaningful data is to create tables to house the data. In this case, we will create four different tables: SaleSmall, CustomerInfo, CampaignAnalytics, and Sales. When designing tables in Azure Synapse Analytics, we need to take into account the expected amount of data in each table, as well as how each table will be used. Utilize the following guidance when designing your tables to ensure the best experience and performance.
 
@@ -141,16 +141,16 @@ Table design performance considerations
 
 | Table Indexing | Recommended use |
 |--------------|-------------|
-| Clustered Columnstore | recommended for tables with greater than 100 million rows, offers the highest data compression with best overall query performance |
-| Heap Tables | Smaller tables with less than 100 million rows, commonly used as a staging table prior to transformation |
-| Clustered Index | large lookup tables (> 100 million rows) where querying will only result in a single row returned |
-| Clustered Index + non-clustered secondary index | large tables (> 100 million rows) when single (or very few) records are being returned in queries |
+| Clustered Columnstore | Recommended for tables with greater than 100 million rows, offers the highest data compression with best overall query performance. |
+| Heap Tables | Smaller tables with less than 100 million rows, commonly used as a staging table prior to transformation. |
+| Clustered Index | Large lookup tables (> 100 million rows) where querying will only result in a single row returned. |
+| Clustered Index + non-clustered secondary index | Large tables (> 100 million rows) when single (or very few) records are being returned in queries. |
 
 | Table Distribution/Partition Type | Recommended use |
 |--------------------|-------------|
-| Hash distribution | tables that are larger than 2 GBs with infrequent insert/update/delete operations, works well for large fact tables in a star schema |
-| Round robin distribution | default distribution, when little is known about the data or how it will be used. Use this distribution for staging tables |
-| Replicated tables | smaller lookup tables less than 1.5 GB in size |
+| Hash distribution | Tables that are larger than 2 GBs with infrequent insert/update/delete operations, works well for large fact tables in a star schema. |
+| Round robin distribution | Default distribution, when little is known about the data or how it will be used. Use this distribution for staging tables. |
+| Replicated tables | Smaller lookup tables, less than 1.5 GB in size. |
 
 ### Task 1: Create the sale table
 
@@ -158,11 +158,11 @@ Over the past 5 years, Wide World Importers has amassed over 3 billion rows of s
 
 1. Expand the left menu and select the **Develop** item. From the **Develop** blade, expand the **+** button and select the **SQL script** item.
 
-    ![The left menu is expanded with the Develop item selected. The Develop blade has the + button expanded with the SQL script item highlighted.](media/develop_newsqlscript_menu.png)
+    ![The left menu is expanded with the Develop item selected. The Develop blade has the + button expanded with the SQL script item highlighted.](media/develop_newsqlscript_menu.png "The Develop Hub")
 
 2. In the query tab toolbar menu, ensure you connect to your SQL Pool, `SQLPool01`.
 
-    ![The query tab toolbar menu is displayed with the Connect to set to the SQL Pool.](media/querytoolbar_connecttosqlpool.png)
+    ![The query tab toolbar menu is displayed with the Connect to set to the SQL Pool.](media/querytoolbar_connecttosqlpool.png "Connecting to the SQL Pool")
 
 3. In the query window, copy and paste the following query to create the customer information table. Then select the **Run** button in the query tab toolbar.
 
@@ -194,9 +194,9 @@ Over the past 5 years, Wide World Importers has amassed over 3 billion rows of s
       );
     ```
 
-4. From the top toolbar, select the **Discard all** button as we will not be saving this query. When prompted, choose to **Discard all changes**.
+4. From the top toolbar, select the **Discard all** button as we will not be saving this query. When prompted, choose to **Discard changes**.
 
-   ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png)
+   ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png "Discarding all changes")
   
 ### Task 2: Populate the sale table
 
@@ -204,15 +204,16 @@ The data that we will be retrieving to populate the sale table is currently stor
 
 1. Review the presence of the **asadatalake{SUFFIX}** linked service, by selecting **Manage** from the left menu, and selecting **Linked services** from the blade menu. Filter the linked services by the term **asadatalake** to find the **asadatalake{SUFFIX}** item. Further investigating this item will unveil that it makes a connection to the storage account using a storage account key.
   
-   ![The Manage item is selected from the left menu. The Linked services menu item is selected on the blade. On the Linked services screen the term asadatalake{SUFFIX} is entered in the search box and the asadatalake{SUFFIX} Azure Blob Storage item is selected from the filtered results list.](media/manage_linkedservices_solliancepublicdata.png)
+   ![The Manage item is selected from the left menu. The Linked services menu item is selected on the blade. On the Linked services screen the term asadatalake{SUFFIX} is entered in the search box and the asadatalake{SUFFIX} Azure Blob Storage item is selected from the filtered results list.](media/manage_linkedservices_solliancepublicdata.png "Searching for a linked service")
 
 2. The sale data for each day is stored in a separate parquet file which is placed in storage following a known convention. In this lab, we are interested in populating the Sale table with only 2018 and 2019 data. Investigate the structure of the data by selecting the **Data** tab, and in the **Data** pane, select the **Linked** tab, and expanding the `asadatalake{SUFFIX}` Storage account.
 
-    > **Note**: The current folder structure for daily sales data is as follows: /wwi-02/sale-small/Year=`YYYY`/Quarter=`Q#`/Month=`M`/Day=`YYYYMMDD` - where `YYYY` is the 4 digit year (eg. 2019), `Q#` represents the quarter (eg. Q1), `M` represents the numerical month (eg. 1 for January) and finally `YYYYMMDD` represents a numeric date format representation (eg. `20190516` for May 16, 2019).
+    > **Note**: The current folder structure for daily sales data is as follows: 
+    /wwi-02/sale-small/Year=`YYYY`/Quarter=`Q#`/Month=`M`/Day=`YYYYMMDD`, where `YYYY` is the 4 digit year (eg. 2019), `Q#` represents the quarter (eg. Q1), `M` represents the numerical month (eg. 1 for January) and finally `YYYYMMDD` represents a numeric date format representation (eg. `20190516` for May 16, 2019).
     > A single parquet file is stored each day folder with the name **sale-small-YYYYMMDD-snappy.parquet** (replacing `YYYYMMDD` with the numeric date representation).
 
     ```text
-    Sample path to the parquet folder for January 1st, 2019:
+    Sample path to the parquet folder for January 1, 2019:
     /wwi-02/sale-small/Year=2019/Quarter=Q1/Month=1/Day=20190101/sale-small-20190101-snappy.parquet
     ```
 
@@ -220,23 +221,23 @@ The data that we will be retrieving to populate the sale table is currently stor
 
 4. In the **New dataset** blade, with the **All** tab selected, choose the **Azure Data Lake Storage Gen2** item. Select **Continue**.
 
-    ![The New dataset blade is displayed with the All tab selected, the Azure Data Lake Storage Gen2 item is selected from the list.](media/new_dataset_type_selection.png)
+    ![The New dataset blade is displayed with the All tab selected, the Azure Data Lake Storage Gen2 item is selected from the list.](media/new_dataset_type_selection.png "Defining a new Dataset")
 
 5. In the **Select format** screen, choose the **Parquet** item. Select **Continue**.
 
-    ![In the Select format screen, the Parquet item is highlighted.](media/dataset_format_parquet.png)
+    ![In the Select format screen, the Parquet item is highlighted.](media/dataset_format_parquet.png "Selecting Parquet")
 
 6. In the **Set properties** blade, populate the form as follows then select **OK**.
   
    | Field | Value |
    |-------|-------|
-   | Name  | Enter **asamcw_sales_parquet** |
-   | Linked service | Select **asadatalake{SUFFIX}** |
-   | File path - Container | Enter **wwi-02** |  
-   | File path - Folder | Enter **sale-small** |
-   | Import schema | Select **From connection/store** |
+   | Name  | Enter **asamcw_sales_parquet**. |
+   | Linked service | **asadatalake{SUFFIX}** |
+   | File path - Container | Enter **wwi-02**. |  
+   | File path - Folder | Enter **sale-small**. |
+   | Import schema | **From connection/store** |
 
-    ![The Set properties blade is displayed with fields populated with the values from the preceding table.](media/dataset_salesparquet_propertiesform.png)
+    ![The Set properties blade is displayed with fields populated with the values from the preceding table.](media/dataset_salesparquet_propertiesform.png "Dataset form")
 
 7. Now we will need to define the destination dataset for our data. In this case we will be storing sale data in our SQL Pool. Create a new dataset by expanding the **+** button on the **Data** blade and selecting **Dataset**.
 
@@ -246,38 +247,38 @@ The data that we will be retrieving to populate the sale table is currently stor
 
    | Field | Value |
    |-------|-------|
-   | Name  | Enter **asamcw_sale_asa** |
-   | Linked service | Select `SQLPool01`. |
-   | Table name | Select **wwi_mcw.SaleSmall**. |  
-   | Import schema | Select **From connection/store** |
+   | Name  | Enter **asamcw_sale_asa**. |
+   | Linked service | **SQLPool01** |
+   | Table name | **wwi_mcw.SaleSmall** |  
+   | Import schema | **From connection/store** |
 
-    ![The Set properties blade is populated with the values specified in the preceding table.](media/dataset_saleasaform.png)
+    ![The Set properties blade is populated with the values specified in the preceding table.](media/dataset_saleasaform.png "Dataset form")
   
 10. In the top toolbar, select **Publish all** to publish the new dataset definitions. When prompted, select the **Publish** button to deploy the changes to the workspace.
 
-    ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png)
+    ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png "Publish changes")
 
 11. Since we want to filter on multiple sale year folders (Year=2018 and Year=2019) and copy only the 2018 and 2019 sales data, we will need to create a data flow to define the specific data that we wish to retrieve from our source dataset. To create a new data flow, start by selecting **Develop** from the left menu, and in the **Develop** blade, expand the **+** button and select **Data flow**.
 
-    ![From the left menu, the Develop item is selected. From the Develop blade the + button is expanded with the Data flow item highlighted.](media/develop_newdataflow_menu.png)
+    ![From the left menu, the Develop item is selected. From the Develop blade the + button is expanded with the Data flow item highlighted.](media/develop_newdataflow_menu.png "Creating a data flow")
 
 12. In the side pane on the **General** tab, name the data flow by entering **ASAMCW_Exercise_2_2018_and_2019_Sales** in the **Name** field.
 
-    ![The General tab is displayed with ASAMCW_Exercise_2_2018_and_2019_Sales entered as the name of the data flow.](media/dataflow_generaltab_name.png)
+    ![The General tab is displayed with ASAMCW_Exercise_2_2018_and_2019_Sales entered as the name of the data flow.](media/dataflow_generaltab_name.png "Naming the data flow")
 
 13. In the data flow designer window, select the **Add Source** box.
 
-    ![The Add source box is highlighted in the data flow designer window.](media/dataflow_addsourcebox.png)
+    ![The Add source box is highlighted in the data flow designer window.](media/dataflow_addsourcebox.png "Adding a data flow source")
 
 14. With the added source selected in the designer, in the lower pane with the **Source settings** tab selected, set the following field values:
   
     | Field | Value |
     |-------|-------|
-    | Output stream name  | Enter **salesdata** |
-    | Source type | Select **Dataset**. |
-    | Dataset | Select **asamcw_sales_parquet**. |
+    | Output stream name  | Enter **salesdata**. |
+    | Source type | **Dataset** |
+    | Dataset | **asamcw_sales_parquet** |
 
-    ![The Source settings tab is selected displaying the Output stream name set to salesdata and the selected dataset being asamcw_sales_parquet.](media/dataflow_source_sourcesettings.png)
+    ![The Source settings tab is selected displaying the Output stream name set to salesdata and the selected dataset being asamcw_sales_parquet.](media/dataflow_source_sourcesettings.png "Defining the source")
 
 15. Select the **Source options** tab, and add the following as **Wildcard paths**, this will ensure that we only pull data from the parquet files for the sales years of 2018 and 2019:
 
@@ -285,26 +286,24 @@ The data that we will be retrieving to populate the sale table is currently stor
 
     2. sale-small/Year=2019/\*/\*/\*/\*
 
-      ![The Source options tab is selected with the above wildcard paths highlighted.](media/dataflow_source_sourceoptions.png)
+      ![The Source options tab is selected with the above wildcard paths highlighted.](media/dataflow_source_sourceoptions.png "Setting wildcard paths on the source")
 
-16. Select the **Project** tab, then select **Import projection**
+16. At the bottom right of the **salesdata** source, expand the **+** button and select the **Sink** item located in the **Destination** section of the menu.
 
-17. At the bottom right of the **salesdata** source, expand the **+** button and select the **Sink** item located in the **Destination** section of the menu.
+      ![The + button is highlighted toward the bottom right of the source element on the data flow designer.](media/dataflow_source_additem.png "Adding another data flow activity")
 
-      ![The + button is highlighted toward the bottom right of the source element on the data flow designer.](media/dataflow_source_additem.png)
-
-18. In the designer, select the newly added **Sink** element and in the bottom pane with the **Sink** tab selected, fill the form as follows:
+17. In the designer, select the newly added **Sink** element and in the bottom pane with the **Sink** tab selected, fill the form as follows:
 
     | Field | Value |
     |-------|-------|
-    | Output stream name  | Enter **sale** |
-    | Incoming stream | Select **salesdata**. |
-    | Sink type | Select **Dataset**. |
-    | Dataset | Select **asamcw_sale_asa**. |
+    | Output stream name  | Enter **sale**. |
+    | Incoming stream | **salesdata** |
+    | Sink type | **Dataset** |
+    | Dataset | **asamcw_sale_asa** |
 
-    ![The Sink tab is displayed with the form populated with the values from the preceding table.](media/dataflow_sink_sinktab.png)
+    ![The Sink tab is displayed with the form populated with the values from the preceding table.](media/dataflow_sink_sinktab.png "Defining the data flow sink")
 
-19. Select the **Mapping** tab and toggle the **Auto mapping** setting to the off position. You will need to select Input columns for the following:
+18. Select the **Mapping** tab and toggle the **Auto mapping** setting to the off position. You will need to select Input columns for the following:
   
     | Input column | Output column |
     |-------|-------|
@@ -313,50 +312,50 @@ The data that we will be retrieving to populate the sale table is currently stor
     | Hour | Hour |
     | Minute | Minute |
 
-    ![The Mapping tab is selected with the Auto mapping toggle set to the off position. The + Add mapping button is highlighted along with the mapping entries specified in the preceding table.](media/dataflow_sink_mapping.png)
+    ![The Mapping tab is selected with the Auto mapping toggle set to the off position. The + Add mapping button is highlighted along with the mapping entries specified in the preceding table.](media/dataflow_sink_mapping.png "Mapping columns")
 
-20. In the top toolbar, select **Publish all** to publish the new dataset definitions. When prompted, select the **Publish** button to deploy the new data flow to the workspace.
+19. In the top toolbar, select **Publish all** to publish the new dataset definitions. When prompted, select the **Publish** button to deploy the new data flow to the workspace.
 
-    ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png)
+    ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png "Publishing changes")
 
-21. We can now use this data flow as an activity in a pipeline. Create a new pipeline by selecting **Orchestrate** from the left menu, and in the **Orchestrate** blade, expand the **+** button and select **Pipeline**.
+20. We can now use this data flow as an activity in a pipeline. Create a new pipeline by selecting **Orchestrate** from the left menu, and in the **Orchestrate** blade, expand the **+** button and select **Pipeline**.
 
-22. On the **Properties** blade, Enter **ASAMCW - Exercise 2 - Copy Sale Data** as the Name of the pipeline.
+21. On the **Properties** blade, Enter **ASAMCW - Exercise 2 - Copy Sale Data** as the Name of the pipeline.
 
-23. From the **Activities** menu, expand the **Move & transform** section and drag an instance of **Data flow** to the design surface of the pipeline.
+22. From the **Activities** menu, expand the **Move & transform** section and drag an instance of **Data flow** to the design surface of the pipeline.
   
-    ![The Activities menu of the pipeline is displayed with the Move and transform section expanded. An arrow indicating a drag operation shows adding a Data flow activity to the design surface of the pipeline.](media/pipeline_sales_dataflowactivitymenu.png)
+    ![The Activities menu of the pipeline is displayed with the Move and transform section expanded. An arrow indicating a drag operation shows adding a Data flow activity to the design surface of the pipeline.](media/pipeline_sales_dataflowactivitymenu.png "Drag and drop of the data flow activity")
 
-24. In the **Adding data flow** blade, ensure **Use existing data flow** is selected, and choose **ASAMCW_Exercise_2_2018_and_2019_Sales** from the select list and select **Finish**.
+23. In the **Adding data flow** blade, ensure **Use existing data flow** is selected, and choose **ASAMCW_Exercise_2_2018_and_2019_Sales** from the select list and select **Finish**.
 
-    ![The Adding data flow blade is displayed populated with the appropriate values.](media/pipeline_dataflowactivity_addingblade.png)
+    ![The Adding data flow blade is displayed populated with the appropriate values.](media/pipeline_dataflowactivity_addingblade.png "Configuring the data flow activity")
 
-25. Select the **Settings** tab and set the form fields to the following values:
+24. Select the **Settings** tab and set the form fields to the following values:
 
     | Field | Value |
     |-------|-------|
-    | Data flow  | Select **ASAMCW_Exercise_2_2018_and_2019_Sales** |
-    | Staging linked service | Select `asadatalake{SUFFIX}`. |
-    | Staging storage folder - Container | Enter **staging** |
-    | Staging storage folder - Folder | Enter **mcwsales** |
+    | Data flow  | **ASAMCW_Exercise_2_2018_and_2019_Sales** |
+    | Staging linked service | `asadatalake{SUFFIX}` |
+    | Staging storage folder - Container | Enter **staging**. |
+    | Staging storage folder - Folder | Enter **mcwsales**. |
 
-    ![The data flow activity Settings tab is displayed with the fields specified in the preceding table highlighted.](media/pipeline_sales_dataflowsettings.png)
+    ![The data flow activity Settings tab is displayed with the fields specified in the preceding table highlighted.](media/pipeline_sales_dataflowsettings.png "Data flow activity settings")
 
-26. In the top toolbar, select **Publish all** to publish the new dataset definitions. When prompted, select the **Publish** button to commit the changes.
+25. In the top toolbar, select **Publish all** to publish the new dataset definitions. When prompted, select the **Publish** button to commit the changes.
 
-    ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png)
+    ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png "Publishing changes")
 
-27. Once published, expand the **Add trigger** item on the pipeline designer toolbar, and select **Trigger now**. In the **Pipeline run** blade, select **OK** to proceed with the latest published configuration. You will see notification toast windows indicating the pipeline is running and when it has completed.
+26. Once published, expand the **Add trigger** item on the pipeline designer toolbar, and select **Trigger now**. In the **Pipeline run** blade, select **OK** to proceed with the latest published configuration. You will see notification toast windows indicating the pipeline is running and when it has completed.
 
-28. View the status of the pipeline run by locating the **ASAMCW - Exercise 2 - Copy Sale Data** pipeline in the Orchestrate blade. Expand the actions menu, and select the **Monitor** item.
+27. View the status of the pipeline run by locating the **ASAMCW - Exercise 2 - Copy Sale Data** pipeline in the Orchestrate blade. Expand the actions menu, and select the **Monitor** item.
 
-    ![In the Orchestrate blade, the Action menu is displayed with the Monitor item selected on the ASAMCW - Exercise 2 - Copy Sale Data pipeline.](media/orchestrate_pipeline_monitor_copysaledata.png)
+    ![In the Orchestrate blade, the Action menu is displayed with the Monitor item selected on the ASAMCW - Exercise 2 - Copy Sale Data pipeline.](media/orchestrate_pipeline_monitor_copysaledata.png "Monitoring a pipeline")
   
-29. You should see a run of the pipeline we created in the **Pipeline runs** table showing as in progress. It will take approximately 45 minutes for this pipeline operation to complete. You will need to refresh this table from time to time to see updated progress. Once it has completed. You should see the pipeline run displayed with a Status of **Succeeded**. _Feel free to proceed to the following tasks in this exercise while this pipeline runs_.
+28. You should see a run of the pipeline we created in the **Pipeline runs** table showing as in progress. It will take approximately 45 minutes for this pipeline operation to complete. You will need to refresh this table from time to time to see updated progress. Once it has completed. You should see the pipeline run displayed with a Status of **Succeeded**. _Feel free to proceed to the following tasks in this exercise while this pipeline runs_.
   
-    ![On the pipeline runs screen, a successful pipeline run is highlighted in the table.](media/pipeline_run_sales_successful.png)
+    ![On the pipeline runs screen, a successful pipeline run is highlighted in the table.](media/pipeline_run_sales_successful.png "Successful pipeline indicator")
 
-30. Verify the table has populated by creating a new query. Select the **Develop** item from the left menu, and in the **Develop** blade, expand the **+** button, and select **SQL script**. In the query window, be sure to connect to the SQL Pool database (`SQLPool01`), then paste and run the following query. When complete, select the **Discard all** button from the top toolbar.
+29. Verify the table has populated by creating a new query. Select the **Develop** item from the left menu, and in the **Develop** blade, expand the **+** button, and select **SQL script**. In the query window, be sure to connect to the SQL Pool database (`SQLPool01`), then paste and run the following query. When complete, select the **Discard all** button from the top toolbar.
 
   ```sql
     select count(TransactionId) from wwi_mcw.SaleSmall;
@@ -368,11 +367,11 @@ Over the past 5 years, Wide World Importers has amassed over 3 billion rows of s
 
 1. Expand the left menu and select the **Develop** item. From the **Develop** blade, expand the **+** button and select the **SQL script** item.
 
-    ![The left menu is expanded with the Develop item selected. The Develop blade has the + button expanded with the SQL script item highlighted.](media/develop_newsqlscript_menu.png)
+    ![The left menu is expanded with the Develop item selected. The Develop blade has the + button expanded with the SQL script item highlighted.](media/develop_newsqlscript_menu.png "Adding a SQL script")
 
 2. In the query tab toolbar menu, ensure you connect to your SQL Pool, `SQLPool01`.
 
-    ![The query tab toolbar menu is displayed with the Connect to set to the SQL Pool.](media/querytoolbar_connecttosqlpool.png)
+    ![The query tab toolbar menu is displayed with the Connect to set to the SQL Pool.](media/querytoolbar_connecttosqlpool.png "Connecting to the SQL Pool")
 
 3. In the query window, copy and paste the following query to create the customer information table. Then select the **Run** button in the query tab toolbar.
   
@@ -393,11 +392,11 @@ Over the past 5 years, Wide World Importers has amassed over 3 billion rows of s
     GO
    ```
 
-   ![The query tab toolbar is displayed with the Run button selected.](media/querytoolbar_run.png)
+   ![The query tab toolbar is displayed with the Run button selected.](media/querytoolbar_run.png "Running the query")
 
-4. From the top toolbar, select the **Discard all** button as we will not be saving this query. When prompted, choose to **Discard all changes**.
+4. From the top toolbar, select the **Discard all** button as we will not be saving this query. When prompted, choose to **Discard changes**.
 
-   ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png)
+   ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png "Discard all changes")
 
 ### Task 4: Populate the customer information table
 
@@ -407,70 +406,70 @@ Over the past 5 years, Wide World Importers has amassed over 3 billion rows of s
 
 3. The next thing that we will need to do is define a source dataset that will represent the information that we are copying over. This dataset will reference the CSV file containing customer information. From the left menu, select **Data**. From the **Data** blade, expand the **+** button and select **Dataset**.
 
-    ![The Data item is selected from the left menu. On the Data blade, the + button is expanded with the Dataset item highlighted.](media/data_newdatasetmenu.png)
+    ![The Data item is selected from the left menu. On the Data blade, the + button is expanded with the Dataset item highlighted.](media/data_newdatasetmenu.png "Creating a new Dataset")
 
-4. On the **New dataset** blade, with the **All** tab selected, choose the **Azure Data Lake Gen2** item. Select **Continue**.  
+4. On the **New dataset** blade, with the **Azure** tab selected, choose the **Azure Data Lake Gen2** item. Select **Continue**.  
   
-    ![On the New dataset blade, the All tab is selected and the Azure Blob Storage item is highlighted.](media/newdataset_azuredatalakegen2.png)
+    ![On the New dataset blade, the All tab is selected and the Azure Data Lake Gen2 item is highlighted.](media/newdataset_azuredatalakegen2.png "Selecting Azure Data Lake Gen2 as the dataset type")
 
 5. On the **Select format** blade, select **CSV Delimited Text**. Select **Continue**.
 
-    ![On the Select format blade the CSV Delimited Text item is highlighted.](media/newdataset_selectfileformat_csv.png)
+    ![On the Select format blade the CSV Delimited Text item is highlighted.](media/newdataset_selectfileformat_csv.png "Defining the dataset format to be CSV")
 
 6. On the **Set properties** blade, set the fields to the following values, then select **OK**.
 
    | Field | Value |
    |-------|-------|
-   | Name  | Enter **asamcw_customerinfo_csv** |
-   | Linked service | Select **asadatalake{SUFFIX}**.|
-   | File Path - Container | Enter **wwi-02** |
-   | File Path - Directory | Enter **customer-info** |
-   | File Path - File | Enter **customerinfo.csv** |
+   | Name  | Enter **asamcw_customerinfo_csv**. |
+   | Linked service | **asadatalake{SUFFIX}**|
+   | File Path - Container | Enter **wwi-02**. |
+   | File Path - Directory | Enter **customer-info**. |
+   | File Path - File | Enter **customerinfo.csv**. |
    | First row as header | Checked |
-   | Import schema | Select **From connection/store** |
+   | Import schema | Select **From connection/store**. |
 
-    ![The Set properties form is displayed with the values specified in the previous table.](media/customerinfodatasetpropertiesform.png)
+    ![The Set properties form is displayed with the values specified in the previous table.](media/customerinfodatasetpropertiesform.png "Configuring the dataset")
 
 7. Now we will need to define the destination dataset for our data. In this case we will be storing customer information data in our SQL Pool. On the **Data** blade, expand the **+** button just as you did in **Step 3**.
 
 8. On the **New dataset** blade, with the **Azure** tab selected, enter **synapse** as a search term and select the **Azure Synapse Analytics (formerly SQL DW)** item. Select **Continue**.
 
-    ![On the New dataset blade, synapse is entered as the search term and Azure Synapse Analytics (formerly SQL DW) is selected from the filtered results.](media/newdataset_synapseitem.png)
+    ![On the New dataset blade, synapse is entered as the search term and Azure Synapse Analytics (formerly SQL DW) is selected from the filtered results.](media/newdataset_synapseitem.png "Selecting Azure Synapse Analytics as the dataset type")
   
 9. On the **Set properties** blade, set the field values to the following, then select **OK**.
 
    | Field | Value |
    |-------|-------|
-   | Name  | Enter **asamcw_customerinfo_asa** |
-   | Linked service | Select `SQLPool01`. |
-   | Table name | Select **wwi_mcw.CustomerInfo**. |  
-   | Import schema | Select **From connection/store** |
+   | Name  | Enter **asamcw_customerinfo_asa**. |
+   | Linked service | **SQLPool01** |
+   | Table name | **wwi_mcw.CustomerInfo** |  
+   | Import schema | **From connection/store** |
 
-    ![The Set properties blade is populated with the values specified in the preceding table.](media/dataset_customerinfoasaform.png)
-  
+    ![The Set properties blade is populated with the values specified in the preceding table.](media/dataset_customerinfoasaform.png "Configuration form for the dataset")
+
 10. In the top toolbar, select **Publish all** to publish the new dataset definitions. When prompted, select the **Publish** button to commit the changes.
 
-    ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png)
+    ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png "Publishing changes")
 
 11. Next, we will define a pipeline to populate data into the CustomerInfo table. From the left menu, select **Orchestrate**. From the Orchestrate blade, select the **+** button and select the **Pipeline** item.
 
-    ![The Orchestrate menu item is selected from the left menu. On the Orchestrate blade, the + button is expanded with the Pipeline item highlighted.](media/orchestrate_newpipelinemenu.png)
+    ![The Orchestrate menu item is selected from the left menu. On the Orchestrate blade, the + button is expanded with the Pipeline item highlighted.](media/orchestrate_newpipelinemenu.png "The Orchestrate Hub")
 
-12. In the bottom pane, on the **General** tab, enter **ASAMCW - Exercise 2 - Copy Customer Information** in the **Name** field.
+12. In the **Properties** blade, enter **ASAMCW - Exercise 2 - Copy Customer Information** in the **Name** field.
 
-    ![The General tab is shown with the name field populated as described above.](media/pipeline_customerinfo_generaltab.png)
+    ![The General tab is shown with the name field populated as described above.](media/pipeline_customerinfo_generaltab.png "Naming the pipeline")
 
 13. In the **Activities** menu, expand the **Move & transform** item. Drag an instance of the **Copy data** activity to the design surface of the pipeline.
 
-    ![In the Activities menu, the Move and transform section is expanded. An arrow denotes an instance of the Copy data activity being dragged over to the design surface of the pipeline.](media/pipeline_addcopydataactivity.png)
+    ![In the Activities menu, the Move and transform section is expanded. An arrow denotes an instance of the Copy data activity being dragged over to the design surface of the pipeline.](media/pipeline_addcopydataactivity.png "Adding a copy activity to the pipeline")
 
 14. Select the **Copy data** activity on the pipeline design surface. In the bottom pane, on the **General** tab, enter **Copy Customer Information Data** in the **Name** field.
 
-    ![The General tab is selected with the Name field set to Copy Customer Information Data.](media/pipeline_copycustomerinformation_general.png)
+    ![The General tab is selected with the Name field set to Copy Customer Information Data.](media/pipeline_copycustomerinformation_general.png "Naming the Copy data activity")
 
 15. Select the **Source** tab in the bottom pane. In the **Source dataset** field, select **asamcw_customerinfo_csv**.
 
-    ![The Source tab is selected with the Source dataset field set to asamcw_customerinfo_csv.](media/pipeline_copycustomerinformation_source.png)
+    ![The Source tab is selected with the Source dataset field set to asamcw_customerinfo_csv.](media/pipeline_copycustomerinformation_source.png "Selecting a source dataset")
   
 16. Select the **Sink** tab in the bottom pane. In the **Sink dataset** field, select **asamcw_customerinfo_asa**, for the **Copy method** field, select **Bulk insert**, and for **Pre-copy script** enter:
 
@@ -478,25 +477,25 @@ Over the past 5 years, Wide World Importers has amassed over 3 billion rows of s
       truncate table wwi_mcw.CustomerInfo
     ```
 
-    ![The Sink tab is selected with the Sink dataset field set to asamcw_customerinfo_asa, the Copy method set to Bulk insert, and the Pre-copy script field set to the previous query.](media/pipeline_copycustomerinformation_sink.png)
+    ![The Sink tab is selected with the Sink dataset field set to asamcw_customerinfo_asa, the Copy method set to Bulk insert, and the Pre-copy script field set to the previous query.](media/pipeline_copycustomerinformation_sink.png "Selecting the sink dataset")
   
 17. Select the **Mapping** tab in the bottom pane. Select the **Import schemas** button. You will notice that Azure Synapse Analytics automated the mapping for us since the field names and types match.
 
-    ![The Mapping tab is selected in the bottom pane. The source to destination field mapping is shown.](media/pipeline_copycustomerinformation_mapping.png)
+    ![The Mapping tab is selected in the bottom pane. The source to destination field mapping is shown.](media/pipeline_copycustomerinformation_mapping.png "Source to destination field mapping")
 
 18. In the top toolbar, select **Publish all** to publish the new dataset definitions. When prompted, select the **Publish** button to commit the changes.
 
-    ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png)
+    ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png "Publishing changes")
 
 19. Once published, expand the **Add trigger** item on the pipeline designer toolbar, and select **Trigger now**. In the **Pipeline run** blade, select **OK** to proceed with the latest published configuration. You will see notification toast windows indicating the pipeline is running and when it has completed.
 
 20. View the status of the completed run by locating the **ASAMCW - Exercise 2 - Copy Customer Information** pipeline in the Orchestrate blade. Expand the actions menu, and select the **Monitor** item.
 
-    ![In the Orchestrate blade, the Action menu is displayed with the Monitor item selected on the ASAMCW - Exercise 2 - Copy Customer Information pipeline.](media/pipeline_copycustomerinformation_monitormenu.png)
+    ![In the Orchestrate blade, the Action menu is displayed with the Monitor item selected on the ASAMCW - Exercise 2 - Copy Customer Information pipeline.](media/pipeline_copycustomerinformation_monitormenu.png "Monitoring the pipeline")
   
 21. You should see a successful run of the pipeline we created in the **Pipeline runs** table.
   
-    ![On the pipeline runs screen, a successful pipeline run is highlighted in the table.](media/pipeline_run_customerinfo_successful.png)
+    ![On the pipeline runs screen, a successful pipeline run is highlighted in the table.](media/pipeline_run_customerinfo_successful.png "Successful pipeline run indicator")
 
 22. Verify the table has populated by creating a new query. Remember from **Task 1**, select the **Develop** item from the left menu, and in the **Develop** blade, expand the **+** button, and select **SQL script**. In the query window, be sure to connect to the SQL Pool database (`SQLPool01`), then paste and run the following query. When complete, select the **Discard all** button from the top toolbar.
 
@@ -510,13 +509,13 @@ The campaign analytics table will be queried primarily for dashboard and KPI pur
 
 1. Expand the left menu and select the **Develop** item. From the **Develop** blade, expand the **+** button and select the **SQL script** item.
 
-    ![The left menu is expanded with the Develop item selected. The Develop blade has the + button expanded with the SQL script item highlighted.](media/develop_newsqlscript_menu.png)
+    ![The left menu is expanded with the Develop item selected. The Develop blade has the + button expanded with the SQL script item highlighted.](media/develop_newsqlscript_menu.png "Creating a new SQL script")
 
 2. In the query tab toolbar menu, ensure you connect to your SQL Pool, `SQLPool01`.
 
-    ![The query tab toolbar menu is displayed with the Connect to set to the SQL Pool.](media/querytoolbar_connecttosqlpool.png)
+    ![The query tab toolbar menu is displayed with the Connect to set to the SQL Pool.](media/querytoolbar_connecttosqlpool.png "Connecting to the SQL Pool")
 
-3. In the query window, copy and paste the following query to create the customer information table. Then select the **Run** button in the query tab toolbar.
+3. In the query window, copy and paste the following query to create the campaign analytics table. Then select the **Run** button in the query tab toolbar.
 
     ```sql
     CREATE TABLE [wwi_mcw].[CampaignAnalytics]
@@ -538,11 +537,11 @@ The campaign analytics table will be queried primarily for dashboard and KPI pur
     );  
     ```
 
-    ![The query tab toolbar is displayed with the Run button selected.](media/querytoolbar_run.png)
+    ![The query tab toolbar is displayed with the Run button selected.](media/querytoolbar_run.png "Running the query")
 
-4. From the top toolbar, select the **Discard all** button as we will not be saving this query. When prompted, choose to **Discard all changes**.
+4. From the top toolbar, select the **Discard all** button as we will not be saving this query. When prompted, choose to **Discard changes**.
 
-   ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png)
+   ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png "Discard all changes")
 
 ### Task 6: Populate the campaign analytics table
 
@@ -550,77 +549,65 @@ Similar to the customer information table, we will also be populating the campai
 
 1. The source dataset will reference the CSV file containing campaign analytics information. From the left menu, select **Data**. From the **Data** blade, expand the **+** button and select **Dataset**.
 
-    ![The Data item is selected from the left menu. On the Data blade, the + button is expanded with the Dataset item highlighted.](media/data_newdatasetmenu.png)
+    ![The Data item is selected from the left menu. On the Data blade, the + button is expanded with the Dataset item highlighted.](media/data_newdatasetmenu.png "Creating a new dataset")
 
 2. On the **New dataset** blade, with the **All** tab selected, choose the **Azure Data Lake Storage Gen2** item. Select **Continue**.  
   
-    ![The New dataset blade is displayed with the All tab selected, the Azure Data Lake Storage Gen2 item is selected from the list.](media/new_dataset_type_selection.png)
+    ![The New dataset blade is displayed with the All tab selected, the Azure Data Lake Storage Gen2 item is selected from the list.](media/new_dataset_type_selection.png "Selecting the dataset type")
 
 3. On the **Select format** blade, select **CSV Delimited Text**. Select **Continue**.
 
-    ![On the Select format blade the CSV Delimited Text item is highlighted.](media/newdataset_selectfileformat_csv.png)
+    ![On the Select format blade the CSV Delimited Text item is highlighted.](media/newdataset_selectfileformat_csv.png "Selecting the dataset format")
 
-4. On the **Set properties** blade, set the fields to the following values, then select **OK**. You may choose to preview the data which will show a sample of the CSV file. Notice that since we are not setting the first row as the header, the header columns appear as the first row. Also, notice that the city and state values do not appear. This is because of the mismatch in the number of columns in the header row compared to the rest of the file. Soon, we will exclude the first row as we transform the data.
-
-   | Field | Value |
-   |-------|-------|
-   | Name  | Enter **asamcw_campaignanalytics_csv** |
-   | Linked service | Select **asadatalake{SUFFIX}**.|
-   | File Path - Container | Enter **wwi-02** |
-   | File Path - Directory | Enter **campaign-analytics** |
-   | File Path - File | Enter **campaignanalytics.csv** |
-   | First row as header | Unchecked |
-   | Import schema | Select **From connection/store** |
-
-    ![The Set properties form is displayed with the values specified in the previous table.](media/campaignanalyticsdatasetpropertiesform.png)
+4. On the **Properties** blade, set the name of the dataset to **asamcw_campaignanalytics_csv**.
 
 5. Now we will need to define the destination dataset for our data. In this case we will be storing campaign analytics data in our SQL Pool. On the **Data** blade, expand the **+** button and select **Dataset**.
 
 6. On the **New dataset** blade, with the **Azure** tab selected, enter **synapse** as a search term and select the **Azure Synapse Analytics (formerly SQL DW)** item. Select **Continue**.
 
-    ![On the New dataset blade, synapse is entered as the search term and Azure Synapse Analytics (formerly SQL DW) is selected from the filtered results.](media/newdataset_synapseitem.png)
+    ![On the New dataset blade, synapse is entered as the search term and Azure Synapse Analytics (formerly SQL DW) is selected from the filtered results.](media/newdataset_synapseitem.png "Selecting the dataset type")
   
 7. On the **Set properties** blade, set the field values to the following, then select **OK**.
 
    | Field | Value |
    |-------|-------|
-   | Name  | Enter **asamcw_campaignanalytics_asa** |
-   | Linked service | Select `SQLPool01`. |
-   | Table name | Select **wwi_mcw.CampaignAnalytics**. |  
-   | Import schema | Select **From connection/store** |
+   | Name  | Enter **asamcw_campaignanalytics_asa**. |
+   | Linked service | **SQLPool01** |
+   | Table name | **wwi_mcw.CampaignAnalytics** |  
+   | Import schema | Select **From connection/store**. |
 
-    ![The Set properties blade is populated with the values specified in the preceding table.](media/dataset_campaignanalyticsasaform.png)
+    ![The Set properties blade is populated with the values specified in the preceding table.](media/dataset_campaignanalyticsasaform.png "The dataset configuration form")
   
 8. In the top toolbar, select **Publish all** to publish the new dataset definitions. When prompted, select the **Publish** button to commit the changes.
 
-    ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png)
+    ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png "Publish changes")
 
 9. Since our source data is malformed and does not contain an Analyst column, we will need to create a data flow to transform the source data. A data flow allows you to graphically define dataset filters and transformations without writing code. These data flows can be leveraged as an activity in an orchestration pipeline. Create a new data flow, start by selecting **Develop** from the left menu, and in the **Develop** blade, expand the **+** button and select **Data flow**.
 
-    ![From the left menu, the Develop item is selected. From the Develop blade the + button is expanded with the Data flow item highlighted.](media/develop_newdataflow_menu.png)
+    ![From the left menu, the Develop item is selected. From the Develop blade the + button is expanded with the Data flow item highlighted.](media/develop_newdataflow_menu.png "Create a new data flow")
 
-10. Select the Properties icon on the right side of the dataflow designer toolbar. In the **Properties** blade name the data flow by entering **ASAMCW_Exercise_2_Campaign_Analytics_Data** in the **Name** field.
+10. In the **Properties** blade name the data flow by entering **ASAMCW_Exercise_2_Campaign_Analytics_Data** in the **Name** field.
 
-    ![The Properties blade is displayed with ASAMCW_Exercise_2_Campaign_Analytics_Data entered as the name of the data flow.](media/dataflow_campaignanalytics_propertiesblade.png)
+    ![The Properties blade is displayed with ASAMCW_Exercise_2_Campaign_Analytics_Data entered as the name of the data flow.](media/dataflow_campaignanalytics_propertiesblade.png "Naming the data flow")
 
 11. In the data flow designer window, select the **Add Source** box.
 
-    ![The Add source box is highlighted in the data flow designer window.](media/dataflow_addsourcebox.png)
+    ![The Add source box is highlighted in the data flow designer window.](media/dataflow_addsourcebox.png "Adding a data flow source")
 
 12. Under **Source settings**, configure the following:
 
     | Field | Value |
     |-------|-------|
-    | Output stream name  | Enter **campaignanalyticscsv** |
-    | Source type | Select **Dataset** |
-    | Dataset | Select **asamcw_campaignanalytics_csv**. |
-    | Skip line count | Enter **1** |  
+    | Output stream name  | Enter **campaignanalyticscsv**. |
+    | Source type | **Dataset** |
+    | Dataset | **asamcw_campaignanalytics_csv** |
+    | Skip line count | Enter **1**. |  
 
-    ![The Source settings tab is displayed with a form populated with the values defined in the preceding table.](media/dataflow_campaignanalytics_sourcesettings.png)
+    ![The Source settings tab is displayed with a form populated with the values defined in the preceding table.](media/dataflow_campaignanalytics_sourcesettings.png "The data flow configuration form")
 
 13. When you create data flows, certain features are enabled by turning on debug, such as previewing data and importing a schema (projection). Due to the amount of time it takes to enable this option, as well as environmental constraints of the lab environment, we will bypass these features. The data source has a schema we need to set. To do this, select **Script** from the right side of the dataflow designer toolbar menu.
 
-    ![A portion of the dataflow designer toolbar is shown with the Script icon highlighted.](media/dataflow_toolbarscriptmenu.png)
+    ![A portion of the dataflow designer toolbar is shown with the Script icon highlighted.](media/dataflow_toolbarscriptmenu.png "The data flow script icon")
 
 14. Replace the script with the following to provide the column mappings (`output`), then select **OK**:
 
@@ -642,21 +629,21 @@ Similar to the customer information table, we will also be populating the campai
         skipLines: 1) ~> campaignanalyticscsv
     ```
 
-    > NOTE: We are changing the mappings as the source file was corrupted with the wrong headers.
+    > **Note**: We are changing the mappings as the source file was corrupted with the wrong headers.
 
 15. Select the **campaignanalyticscsv** data source, then select **Projection**. The projection should display the following schema:
 
-    ![The Projection tab is displayed with columns defined as described in the column mapping script.](media/dataflow_campaignanalytics_projectiontab.png)
+    ![The Projection tab is displayed with columns defined as described in the column mapping script.](media/dataflow_campaignanalytics_projectiontab.png "The column mappings of the source")
 
 16. Select the **+** to the bottom right of the **campaignanalyticscsv** source, then select the **Select** schema modifier from the context menu.
 
-    ![The + button on the bottom right of the campaignanalyticscsv source is highlighted.](media/dataflow_campaignanalytics_addstep.png)
+    ![The + button on the bottom right of the campaignanalyticscsv source is highlighted.](media/dataflow_campaignanalytics_addstep.png "Adding a Select schema modifier")
 
 17. In the bottom pane, under **Select settings**, configure the following:
 
     | Field | Value |
     |-------|-------|
-    | Output stream name  | Enter **mapcampaignanalytics** |
+    | Output stream name  | Enter **mapcampaignanalytics**. |
 
     For **Input Columns**, under the **Name as** column, enter the following list values in order:
       - Region
@@ -670,7 +657,7 @@ Similar to the customer information table, we will also be populating the campai
       - City
       - State
 
-    ![The Select settings tab is displayed with the form filled as described in the preceding table.](media/dataflow_mapcampaignanalytics_selectsettings.png)
+    ![The Select settings tab is displayed with the form filled as described in the preceding table.](media/dataflow_mapcampaignanalytics_selectsettings.png "Configuring the Select schema modifier")
 
 18. Select the **+** to the right of the **mapCampaignAnalytics** source, then select the **Derived Column** schema modifier from the context menu.
 
@@ -678,7 +665,7 @@ Similar to the customer information table, we will also be populating the campai
 
     | Field | Value |
     |-------|-------|
-    | Output stream name  | Enter **convertandaddcolums** |
+    | Output stream name  | Enter **convertandaddcolums**. |
 
     For **Columns**, add the following (Note you will need to type in the **Analyst** column):
 
@@ -688,7 +675,7 @@ Similar to the customer information table, we will also be populating the campai
     | RevenueTarget | **toDecimal(replace(concat(toString(RevenueTargetPart1), toString(RevenueTarget)), '\\\\', ''), 10, 2, '$###,###.##')** | Concatenate the **RevenueTargetPart1** and **RevenueTarget** fields, replace the invalid `\` character, then convert and format the data to a decimal type. |
     | Analyst | **iif(isNull(City), '',  replace('DataAnalyst'+ City,' ',''))** | If the city field is null, assign an empty string to the Analyst field, otherwise concatenate DataAnalyst to the City value, removing all spaces. |
 
-    ![The derived column's settings are displayed as described.](media/dataflow_campaignanalytics_derivedcolumns.png)
+    ![The derived column's settings are displayed as described.](media/dataflow_campaignanalytics_derivedcolumns.png "Deriving columns based on expressions")
 
 20. Select the **+** to the right of the **convertandaddcolumns** step, then select the **Select** schema modifier from the context menu.
 
@@ -696,10 +683,10 @@ Similar to the customer information table, we will also be populating the campai
 
     | Field | Value |
     |-------|-------|
-    | Output stream name  | Enter **selectcampaignanalyticscolumns** |
-    | Input columns | Delete the **RevenuePart1** and **RevenueTargetPart1** columns |
+    | Output stream name  | Enter **selectcampaignanalyticscolumns**. |
+    | Input columns | Delete the **RevenuePart1** and **RevenueTargetPart1** columns. |
 
-    ![The Select settings are displayed showing the updated column mappings.](media/dataflow_campaignanalytics_select2.png)
+    ![The Select settings are displayed showing the updated column mappings.](media/dataflow_campaignanalytics_select2.png "Configuring the Select schema modifier")
 
 22. Select the **+** to the right of the **selectcampaignanalyticscolumns** step, then select the **Sink** destination from the context menu.
 
@@ -707,18 +694,18 @@ Similar to the customer information table, we will also be populating the campai
 
     | Field | Value |
     |-------|-------|
-    | Output stream name  | Enter **campaignanlyticsasa** |
-    | Dataset | Select **asamcw_campaignanalytics_asa**. |
+    | Output stream name  | Enter **campaignanlyticsasa**. |
+    | Dataset | **asamcw_campaignanalytics_asa** |
 
-    ![The Sink settings form is displayed populated with the values defined in the previous table.](media/dataflow_campaignanalytics_sink.png)
+    ![The Sink settings form is displayed populated with the values defined in the previous table.](media/dataflow_campaignanalytics_sink.png "Configuring the data flow sink")
 
 24. Select **Settings** tab, and for **Table action** select **Truncate table**.
 
-    ![The sink Settings tab is displayed with the Table action set to Truncate table.](media/dataflow_campaignanalytics_sinksettings.png)
+    ![The sink Settings tab is displayed with the Table action set to Truncate table.](media/dataflow_campaignanalytics_sinksettings.png "Truncate table action")
 
 25. Your completed data flow should look similar to the following:
 
-    ![The completed data flow is displayed.](media/dataflow_campaignanalytics_complete.png)
+    ![The completed data flow is displayed.](media/dataflow_campaignanalytics_complete.png "The completed data flow")
   
 26. Select **Publish all** to save your new data flow.
 
@@ -726,13 +713,13 @@ Similar to the customer information table, we will also be populating the campai
 
 27. Now that the data flow is published, we can use it in a pipeline. Create a new pipeline by selecting **Orchestrate** from the left menu, then in the **Orchestrate** blade, expand the **+** button and select **Pipeline**.
 
-28. Expand the **Properties** pane on the right side of the pipeline designer. Enter **ASAMCW - Exercise 2 - Copy Campaign Analytics Data** in the **Name** field.
+28. In the **Properties** pane on the right side of the pipeline designer. Enter **ASAMCW - Exercise 2 - Copy Campaign Analytics Data** in the **Name** field.
 
-    ![The pipeline properties blade is displayed with the Name field populated with ASAMCW - Exercise 2 - Copy Campaign Analytics Data.](media/pipeline_properties_blade.png)
+    ![The pipeline properties blade is displayed with the Name field populated with ASAMCW - Exercise 2 - Copy Campaign Analytics Data.](media/pipeline_properties_blade.png "Naming the pipeline")
 
 29. From the **Activities** menu, expand the **Move & transform** section and drag an instance of **Data flow** to the design surface of the pipeline.
   
-    ![The Activities menu of the pipeline is displayed with the Move and transform section expanded. An arrow indicating a drag operation shows adding a Data flow activity to the design surface of the pipeline.](media/pipeline_sales_dataflowactivitymenu.png)
+    ![The Activities menu of the pipeline is displayed with the Move and transform section expanded. An arrow indicating a drag operation shows adding a Data flow activity to the design surface of the pipeline.](media/pipeline_sales_dataflowactivitymenu.png "Adding a data flow activity to the pipeline")
 
 30. In the **Adding data flow** blade, select the data flow **ASAMCW_Exercise_2_Campaign_Analytics_Data**, then **Finish**. Select the Mapping Data Flow activity on the design surface.
 
@@ -740,22 +727,22 @@ Similar to the customer information table, we will also be populating the campai
 
     | Field | Value |
     |-------|-------|
-    | Data flow  | Select **ASAMCW_Exercise_2_Campaign_Analytics_Data** |
-    | Staging linked service | Select `asadatalake{SUFFIX}`. |
-    | Staging storage folder - Container | Enter **staging** |
-    | Staging storage folder - Directory | Enter **mcwcampaignanalytics** |
+    | Data flow  | **ASAMCW_Exercise_2_Campaign_Analytics_Data** |
+    | Staging linked service | **asadatalake{SUFFIX}** |
+    | Staging storage folder - Container | Enter **staging**. |
+    | Staging storage folder - Directory | Enter **mcwcampaignanalytics**. |
 
-    ![The data flow activity Settings tab is displayed with the fields specified in the preceding table highlighted.](media/pipeline_campaigndata_dataflowsettings.png)
+    ![The data flow activity Settings tab is displayed with the fields specified in the preceding table highlighted.](media/pipeline_campaigndata_dataflowsettings.png "Configuring the data flow activity")
 
 32. In the top toolbar, select **Publish all** to publish the new pipeline. When prompted, select the **Publish** button to commit the changes.
 
-    ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png)
+    ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png "Publish changes")
 
 33. Once published, expand the **Add trigger** item on the pipeline designer toolbar, and select **Trigger now**. In the **Pipeline run** blade, select **OK** to proceed with the latest published configuration. You will see notification toast window indicating the pipeline is running and when it has completed.
 
 34. View the status of the pipeline run by locating the **ASAMCW - Exercise 2 - Copy Campaign Analytics Data** pipeline in the Orchestrate blade. Expand the actions menu, and select the **Monitor** item.
 
-    ![In the Orchestrate blade, the Action menu is displayed with the Monitor item selected on the ASAMCW - Exercise 2 - Copy Sale Data pipeline.](media/orchestrate_pipeline_monitor_copysaledata.png)
+    ![In the Orchestrate blade, the Action menu is displayed with the Monitor item selected on the ASAMCW - Exercise 2 - Copy Sale Data pipeline.](media/orchestrate_pipeline_monitor_copysaledata.png "Monitoring the pipeline run")
   
 35. You should see a run of the pipeline we created in the **Pipeline runs** table showing as in progress. You will need to refresh this table from time to time to see updated progress. Once it has completed. You should see the pipeline run displayed with a Status of **Succeeded**.
 
@@ -785,7 +772,7 @@ When the lab environment was provisioned, the **wwi_mcw.Product** table and data
 
 ## Exercise 3: Exploring raw parquet
 
-**Duration**: 15 minutes
+**Duration**: 30 minutes
 
 Understanding data through data exploration is one of the core challenges faced today by data engineers and data scientists. Depending on the underlying structure of the data as well as the specific requirements of the exploration process, different data processing engines will offer varying degrees of performance, complexity, and flexibility.
 
@@ -799,17 +786,19 @@ When you query Parquet files using Synapse SQL Serverless, you can explore the d
 
 1. From the left menu, select **Data**.
 
-2. Expand **Storage accounts**. Expand the `asadatalake{SUFFIX}` ADLS Gen2 account and select **wwi-02**.
+2. From the **Data** blade, select the **Linked** tab.
 
-3. Navigate to the **sale-small/Year=2010/Quarter=Q4/Month=12/Day=20101231** folder. Right-click on the **sale-small-20101231-snappy.parquet** file, select **New SQL script**, then **Select TOP 100 rows**.
+3. Expand **Storage accounts**. Expand the `asadatalake{SUFFIX}` ADLS Gen2 account and select **wwi-02**.
 
-    ![The Storage accounts section is expanded with the context menu visible on the asadatalake{SUFFIX} account with the Select TOP 100 rows option highlighted.](media/data-hub-parquet-select-rows.png)
+4. Navigate to the **sale-small/Year=2010/Quarter=Q4/Month=12/Day=20101231** folder. Right-click on the **sale-small-20101231-snappy.parquet** file, select **New SQL script**, then **Select TOP 100 rows**.
 
-4. Ensure **SQL on-demand** is selected in the **Connect to** dropdown list above the query window, then run the query. Data is loaded by the Synapse SQL Serverless endpoint and processed as if was coming from any regular relational database.
+    ![The Storage accounts section is expanded with the context menu visible on the asadatalake{SUFFIX} account with the Select TOP 100 rows option highlighted.](media/data-hub-parquet-select-rows.png "Querying parquet data in SQL Serverless")
+
+5. Ensure **SQL on-demand** is selected in the **Connect to** dropdown list above the query window, then run the query. Data is loaded by the Synapse SQL Serverless endpoint and processed as if was coming from any regular relational database.
 
     ![The SQL on-demand connection is highlighted on the query window toolbar.](media/sql-on-demand-selected.png "SQL on-demand")
 
-5. Modify the SQL query to perform aggregates and grouping operations to better understand the data. Replace the query with the following, making sure that the file path in **OPENROWSET** matches your current file path, be sure to substitute `asadatalake{SUFFIX}` for the appropriate value in your environment:
+6. Modify the SQL query to perform aggregates and grouping operations to better understand the data. Replace the query with the following, making sure that the file path in **OPENROWSET** matches your current file path, be sure to substitute `asadatalake{SUFFIX}` for the appropriate value in your environment:
 
     ```sql
     SELECT
@@ -826,7 +815,7 @@ When you query Parquet files using Synapse SQL Serverless, you can explore the d
 
     ![The T-SQL query above is displayed within the query window.](media/sql-serverless-aggregates.png "Query window")
 
-6. Now let's figure out how many records are contained within the Parquet files for 2019 data. This information is important for planning how we optimize for importing the data into Azure Synapse Analytics. To do this, replace your query with the following (be sure to update the name of your data lake in BULK statement, by replacing `asadatalake{SUFFIX}`):
+7. Now let's figure out how many records are contained within the Parquet files for 2019 data. This information is important for planning how we optimize for importing the data into Azure Synapse Analytics. To do this, replace your query with the following (be sure to update the name of your data lake in BULK statement, by replacing `asadatalake{SUFFIX}`):
 
     ```sql
     SELECT
@@ -844,7 +833,7 @@ When you query Parquet files using Synapse SQL Serverless, you can explore the d
 
 ### Task 2: Query sales Parquet data with Azure Synapse Spark
 
-1. Select **Data** from the left menu, then browse to the data lake storage account folder **sale-small/Year=2010/Quarter=Q4/Month=12/Day=20101231** located in `asadatalake{SUFFIX}` if needed, then right-click the Parquet file and select New notebook.
+1. Select **Data** from the left menu, select the **Linked** tab, then browse to the data lake storage account `asadatalake{SUFFIX}` to  **sale-small/Year=2010/Quarter=Q4/Month=12/Day=20101231**, then right-click the Parquet file and select New notebook.
 
     ![The Parquet file is displayed with the New notebook menu item highlighted.](media/new-spark-notebook-sales.png "New notebook")
 
@@ -857,6 +846,7 @@ When you query Parquet files using Synapse SQL Serverless, you can explore the d
 4. Select **Run all** on the notebook toolbar to execute the notebook.
 
     > **Note:** The first time you run a notebook in a Spark pool, Synapse creates a new session. This can take approximately 5 minutes.
+    
     > **Note:** To run just the cell, either hover over the cell and select the _Run cell_ icon to the left of the cell, or select the cell then type **Ctrl+Enter** on your keyboard.
 
 5. Create a new cell underneath by selecting **{} Add code** when hovering over the blank space at the bottom of the notebook.
@@ -906,13 +896,13 @@ When you query Parquet files using Synapse SQL Serverless, you can explore the d
 
 ## Exercise 4: Exploring raw text based data with Azure Synapse SQL Serverless
 
-**Duration**: 10 minutes
+**Duration**: 15 minutes
 
 A common format for exporting and storing data is with text based files. These can delimited text files such as CSV as well as JSON structured data files. Azure Synapse Analytics also provides ways of querying into these types of raw files to gain valuable insights into the data without having to wait for them to be processed.
 
 ### Task 1: Query CSV data
 
-1. Create a new SQL Script by selecting **Develop** from the left menu, then in the **Develop** blade, expanding the **+** button and selecting **SQL Query**.
+1. Create a new SQL script by selecting **Develop** from the left menu, then in the **Develop** blade, expanding the **+** button and selecting **SQL script**.
 
 2. Ensure **SQL on-demand** is selected in the **Connect to** dropdown list above the query window.
 
@@ -962,15 +952,15 @@ A common format for exporting and storing data is with text based files. These c
 
 5. After you have run the previous query, switch the view on the **Results** tab to **Chart** to see a visualization of the aggregation of this data. Feel free to experiment with the chart settings to obtain the best visualization!
 
-    ![The result of the previous aggregation query is displayed as a chart in the Results pane.](media/querycsv_serverless_chart.png)
+    ![The result of the previous aggregation query is displayed as a chart in the Results pane.](media/querycsv_serverless_chart.png "Aggregation query results")
 
-6. From the top toolbar, select the **Discard all** button as we will not be saving this query. When prompted, choose to **Discard all changes**.
+6. From the top toolbar, select the **Discard all** button as we will not be saving this query. When prompted, choose to **Discard changes**.
 
-   ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png)
+   ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png "Discard changes")
 
 ### Task 2: Query JSON data
 
-1. Create a new SQL Script by selecting **Develop** from the left menu, then in the **Develop** blade, expanding the **+** button and selecting **SQL Query**.
+1. Create a new SQL script by selecting **Develop** from the left menu, then in the **Develop** blade, expanding the **+** button and selecting **SQL script**.
 
 2. Ensure **SQL on-demand** is selected in the **Connect to** dropdown list above the query window.
 
@@ -1001,19 +991,19 @@ A common format for exporting and storing data is with text based files. These c
     ) AS products
     ```
 
-4. From the top toolbar, select the **Discard all** button as we will not be saving this query. When prompted, choose to **Discard all changes**.
+4. From the top toolbar, select the **Discard all** button as we will not be saving this query. When prompted, choose to **Discard changes**.
 
-   ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png)
+   ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png "Discard changes")
 
 ## Exercise 5: Security
 
-**Duration**: 15 minutes
+**Duration**: 30 minutes
 
 ### Task 1: Column level security
 
 It is important to identify data columns of that hold sensitive information. Types of sensitive information could be social security numbers, email addresses, credit card numbers, financial totals, and more. Azure Synapse Analytics allows you define permissions that prevent users or roles select privileges on specific columns.
 
-1. Create a new SQL Script by selecting **Develop** from the left menu, then in the **Develop** blade, expanding the **+** button and selecting **SQL Query**.
+1. Create a new SQL script by selecting **Develop** from the left menu, then in the **Develop** blade, expanding the **+** button and selecting **SQL script**.
 
 2. Copy and paste the following query into the query window. Then, step through each statement by highlighting it in the query window, and selecting **Run** from the query window toolbar menu. The query is documented inline. Ensure you are connected to **SQLPool01** when running the queries.
 
@@ -1067,17 +1057,17 @@ It is important to identify data columns of that hold sensitive information. Typ
     Revert;
     ```
 
-    ![The query tab toolbar is displayed with the Run button selected.](media/querytoolbar_run.png)
+    ![The query tab toolbar is displayed with the Run button selected.](media/querytoolbar_run.png "Running a SQL Query")
 
-3. From the top toolbar, select the **Discard all** button as we will not be saving this query. When prompted, choose to **Discard all changes**.
+3. From the top toolbar, select the **Discard all** button as we will not be saving this query. When prompted, choose to **Discard changes**.
 
-   ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png)
+   ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png "Discard changes")
 
 ### Task 2: Row level security
 
 In many organizations it is important to filter certain rows of data by user. In the case of WWI, they wish to have data analysts only see their data. In the campaign analytics table, there is an Analyst column that indicates to which analyst that row of data belongs. In the past, organizations would create views for each analyst - this was a lot of work and unnecessary overhead. Using Azure Synapse Analytics, you can define row level security that compares the user executing the query to the Analyst column, filtering the data so they only see the data destined for them.
 
-1. Create a new SQL Script by selecting **Develop** from the left menu, then in the **Develop** blade, expanding the **+** button and selecting **SQL Query**.
+1. Create a new SQL script by selecting **Develop** from the left menu, then in the **Develop** blade, expanding the **+** button and selecting **SQL script**.
 
 2. Copy and paste the following query into the query window. Then, step through each statement by highlighting it in the query window, and selecting **Run** from the query window toolbar menu. The query is documented inline.
 
@@ -1152,17 +1142,17 @@ In many organizations it is important to filter certain rows of data by user. In
     DROP SCHEMA Security;
     ```
 
-    ![The query tab toolbar is displayed with the Run button selected.](media/querytoolbar_run.png)
+    ![The query tab toolbar is displayed with the Run button selected.](media/querytoolbar_run.png "Running a query")
 
-3. From the top toolbar, select the **Discard all** button as we will not be saving this query. When prompted, choose to **Discard all changes**.
+3. From the top toolbar, select the **Discard all** button as we will not be saving this query. When prompted, choose to **Discard changes**.
 
-   ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png)
+   ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png "Discard changes")
 
 ### Task 3: Dynamic data masking
 
 As an alternative to column level security, SQL Administrators also have the option of masking sensitive data. This will result in data being obfuscated when returned in queries. The data is still stored in a pristine state in the table itself. SQL Administrators can grant unmask privileges to users that have permissions to see this data.
 
-1. Create a new SQL Script by selecting **Develop** from the left menu, then in the **Develop** blade, expanding the **+** button and selecting **SQL Query**.
+1. Create a new SQL script by selecting **Develop** from the left menu, then in the **Develop** blade, expanding the **+** button and selecting **SQL script**.
 
 2. Copy and paste the following query into the query window. Then, step through each statement by highlighting it in the query window, and selecting **Run** from the query window toolbar menu. The query is documented inline.
 
@@ -1175,7 +1165,7 @@ As an alternative to column level security, SQL Administrators also have the opt
     /* Scenario: WWI has identified sensitive information in the CustomerInfo table. They would like us to
         obfuscate the CreditCard and Email columns of the CustomerInfo table to DataAnalysts */
 
-    -- Step:1 Let us first get a view of CustomerInfo table.
+    -- Step:1 Let's first get a view of CustomerInfo table.
     SELECT TOP (100) * FROM wwi_mcw.CustomerInfo;
 
     -- Step:2 Let's confirm that there are no Dynamic Data Masking (DDM) applied on columns.
@@ -1187,7 +1177,7 @@ As an alternative to column level security, SQL Administrators also have the opt
         AND tbl.name = 'CustomerInfo';
     -- No results returned verify that no data masking has been done yet.
 
-    -- Step:3 Now lets mask 'CreditCard' and 'Email' Column of 'CustomerInfo' table.
+    -- Step:3 Now let's mask 'CreditCard' and 'Email' Column of 'CustomerInfo' table.
     ALTER TABLE wwi_mcw.CustomerInfo  
     ALTER COLUMN [CreditCard] ADD MASKED WITH (FUNCTION = 'partial(0,"XXXX-XXXX-XXXX-",4)');
     GO
@@ -1204,14 +1194,14 @@ As an alternative to column level security, SQL Administrators also have the opt
     WHERE is_masked = 1
         AND tbl.name ='CustomerInfo';
 
-    -- Step:5 Now, let us grant SELECT permission to 'DataAnalystMiami' on the 'CustomerInfo' table.
+    -- Step:5 Now, let's grant SELECT permission to 'DataAnalystMiami' on the 'CustomerInfo' table.
    GRANT SELECT ON wwi_mcw.CustomerInfo TO DataAnalystMiami;  
 
-    -- Step:6 Logged in as  'DataAnalystMiami' let us execute the select query and view the result.
+    -- Step:6 Logged in as  'DataAnalystMiami' let's execute the select query and view the result.
     EXECUTE AS USER = 'DataAnalystMiami';  
     SELECT * FROM wwi_mcw.CustomerInfo;
 
-    -- Step:7 Let us remove the data masking using UNMASK permission
+    -- Step:7 Let's remove the data masking using UNMASK permission
     GRANT UNMASK TO DataAnalystMiami;
     EXECUTE AS USER = 'DataAnalystMiami';  
     SELECT *
@@ -1228,208 +1218,39 @@ As an alternative to column level security, SQL Administrators also have the opt
     GO
     ```
 
-    ![The query tab toolbar is displayed with the Run button selected.](media/querytoolbar_run.png)
+    ![The query tab toolbar is displayed with the Run button selected.](media/querytoolbar_run.png "Running a query")
 
-3. From the top toolbar, select the **Discard all** button as we will not be saving this query. When prompted, choose to **Discard all changes**.
+3. From the top toolbar, select the **Discard all** button as we will not be saving this query. When prompted, choose to **Discard changes**.
 
-   ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png)
+   ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png "Discard changes")
 
 ## Exercise 6: Machine Learning
 
-**Duration**: 45 minutes
+**Duration**: 60 minutes
 
-Azure Synapse Analytics provides a unified environment for both data science and data engineering. What this means in practice, is that your data scientists can train and deploy models using Azure Synapse Analytics and your data engineers can write T-SQL queries that use those models to make predictions against tabular data stored in a SQL Pool database table.
+Using Azure Synapse Analytics, data scientists are no longer required to use separate tooling to create and deploy machine learning models.
 
-In this lab, you will create several machine learning models and use them to make predictions using the T-SQL `Predict` statement.
+In this exercise, you will create multiple machine learning models. You will learn how to consume these models in your notebook. You will also deploy a model as a web service to Azure Container Instances and consume the service - without ever having to leave the Azure Synapse Analytics workspace.
 
-For context, the following are the high level steps taken to create a Spark ML based model and deploy it so it is ready for use from T-SQL.
-
-![The process for registering and using a model](media/lab06-machine-learning-process.png "Review model registration process")
-
-All of the steps are performed within your Azure Synapse Analytics Studio.
-
-- Within a notebook, a data scientist will:
-
-  a. Train a model using Spark ML, the machine learning library included with Apache Spark. Models can also be trained using other approaches, including by using Azure Machine Learning automated ML. The main requirement is that the model format must be supported by ONNX.
-
-  b. Convert the model to the ONNX format using the `onnxml` tools.
-
-  c. Save a hexadecimal encoded version of the ONNX model to a table in the SQL Pool database. This is an interim step while this feature is in preview.
-
-- To use the model for making predictions, in a SQL Script a data engineer will:
-
-  a. Read the model into a binary variable by querying it from the table in which it was stored.
-
-  b. Execute a query using the `FROM PREDICT` statement as you would a table. This statement defines both the model to use and the query to execute that will provide the data used for prediction. You can then take these predictions and insert them into a table for use by downstream analytics applications.
-
-> What is ONNX? [ONNX](https://onnx.ai/) is an acronym for the Open Neural Network eXchange and is an open format built to represent machine learning models, regardless of what frameworks were used to create the model. This enables model portability, as models in the ONNX format can be run using a wide variety of frameworks, tools, runtimes and platforms. Think of it like a universal file format for machine learning models.
-
-### Task 1: Training models
+### Task 1: Training, consuming, and deploying models
 
 1. Open the **ASAMCW - Exercise 6 - Machine Learning** notebook (select **Develop** from the left menu, from the **Develop** menu, expand the **Notebooks** section and select the notebook)
+
 2. Run the notebook step by step (DO NOT `RUN ALL`) to complete this exercise. Some of the most important tasks you will perform are:
 
 - Exploratory data analysis (basic stats)
 - Use PCA for dimensionality reduction
 - Train ensemble of trees classifier (using XGBoost)
 - Train classifier using Auto ML
-
-Please note that each of these tasks will be addressed through several cells in the notebook.
-
-### Task 2: Registering the models with Azure Synapse Analytics
-
-In this task, you will explore the model registration process in Azure Synapse Analytics that enables trained model for use from T-SQL. This task picks up where you left off, with the ONNX model being made available in Azure Storage.
-
-1. The next step is to convert the ONNX model to hexadecimal. The resulting hex encoded model is also upload to Azure Storage. A sample script that performs this functionality is available in [this PowerShell script](https://github.com/microsoft/MCW-Azure-Synapse-Analytics-end-to-end-solution/raw/master/Hands-on%20lab/artifacts/convert-to-hex.ps1). We will execute the following Powershell script that leverages this functionality. Open the **Cloud Console** and execute the following:
-
-   ```PowerShell
-   './Synapse-MCW/Hands-on lab/artifacts/convert-automl-model-to-hex.ps1'
-   ```
-
-   You will be prompted for the following information:
-    | Prompt |
-    |--------|  
-    | Enter the name of the resource group containing the Azure Synapse Analytics Workspace |
-    | Enter the unique suffix you used in the deployment |
-
-2. From the left menu, select **Data**.
-
-3. Expand the **Databases** section, right click your SQL Pool, `SQLPool01`, and then select **New SQL Script**, and then **Empty script**.
-
-   ![Showing the context menu, selecting New SQL Script, Empty Script](media/lab06-new-sql-script.png "Create new script")
-
-4. Replace the contents of this script with following:
-
-    ```sql
-    SELECT
-        *
-    FROM
-        [wwi_mcw].[ASAMCWMLModelExt]
-    ```
-
-    The result shows your persisted ONNX model in hexadecimal format:
-
-    ![Persisted ONNX model in hexadecimal format](media/lab06-persisted-model.png)
-
-5. **ASAMCWMLModelExt** is an external table that maps to the data lake location where the trained model was persisted (and then converted to hexadecimal format). Take a moment to read through the code that was used to create the external table (**you don't need to run this code as it was already run during the deployment of your environment**):
-
-    ``` sql
-      -- Replace <data_lake_account_key> with the key of the primary data lake account
-
-      CREATE DATABASE SCOPED CREDENTIAL StorageCredential
-      WITH
-      IDENTITY = 'SHARED ACCESS SIGNATURE'
-      ,SECRET = '<data_lake_account_key>';
-
-      -- Create an external data source with CREDENTIAL option.
-      -- Replace <data_lake_account_name> with the actual name of the primary data lake account
-
-      CREATE EXTERNAL DATA SOURCE ASAMCWModelStorage
-      WITH
-      (
-          LOCATION = 'wasbs://wwi-02@<data_lake_account_name>.blob.core.windows.net'
-          ,CREDENTIAL = StorageCredential
-          ,TYPE = HADOOP
-      );
-
-      CREATE EXTERNAL FILE FORMAT csv
-      WITH (
-          FORMAT_TYPE = DELIMITEDTEXT,
-          FORMAT_OPTIONS (
-              FIELD_TERMINATOR = ',',
-              STRING_DELIMITER = '',
-              DATE_FORMAT = '',
-              USE_TYPE_DEFAULT = False
-          )
-      );
-
-      CREATE EXTERNAL TABLE [wwi_mcw].[ASAMCWMLModelExt]
-      (
-      [Model] [varbinary](max) NULL
-      )
-      WITH
-      (
-          LOCATION='/ml/onnx-hex' ,
-          DATA_SOURCE = ModelStorage ,
-          FILE_FORMAT = csv ,
-          REJECT_TYPE = VALUE ,
-          REJECT_VALUE = 0
-      );
-      GO
-
-      CREATE TABLE [wwi_mcw].[ASAMCWMLModel]
-      (
-          [Id] [int] IDENTITY(1,1) NOT NULL,
-          [Model] [varbinary](max) NULL,
-          [Description] [varchar](200) NULL
-      )
-      WITH
-      (
-          DISTRIBUTION = REPLICATE,
-          HEAP
-      );
-      GO
-    ```
-
-6. Import the persisted ONNX model in hexadecimal format into the main models table (to be later used with the `PREDICT` function) by executing the following query on **SQLPool01**:
-
-    ```sql
-    -- Register the model by inserting it into the table.
-    INSERT INTO
-        [wwi_mcw].[ASAMCWMLModel]
-    SELECT
-        Model, 'Product Seasonality Classifier'
-    FROM
-        [wwi_mcw].[ASAMCWMLModelExt]
-    ```
-
-### Task 3: Making predictions with the registered models
-
-In this task, you will author a T-SQL query that uses the previously trained model to make predictions.
-
-> **Note**: In order to make use of the `PREDICT` T-SQL function, your environment will need to be whitelisted. If your environment is not whitelisted, then you should read through the steps of this task as a reference as you will not be able to run the prediction queries.
-
-1. From the left menu, select **Data**.
-
-2. Expand the **Databases** section, right-click your SQL Pool and then select **New SQL Script**, and then **Empty script**.
-
-   ![The database context menu is shown, with New SQL Script and Empty Script selected.](media/lab06-new-sql-script.png "Create new script")
-
-3. Replace the contents of this script with following:
-
-    ```sql
-    SELECT TOP 100
-        *
-    FROM
-        [wwi_mcw].[ProductPCA]
-    WHERE
-        ProductId > 4500
-    ```
-
-    This is the input data you will use to make the predictions.
-
-4. Select **Run** from the menubar.
-
-   ![The Run button is selected from the toolbar.](media/lab06-select-run.png "Select Run")
-
-5. Create another new SQL script and replace the contents with the following:
-
-   ```sql
-   -- Retrieve the latest hex encoded ONNX model from the table
-   DECLARE @model varbinary(max) = (SELECT Model FROM [wwi_mcw].[ASAMCWMLModel] WHERE Id = (SELECT Top(1) max(ID) FROM [wwi_mcw].[ASAMCWMLModel]));
-
-   -- Run a prediction query
-   SELECT d.*, p.*
-   FROM PREDICT(MODEL = @model, DATA = [wwi_mcw].[ProductPCA] AS d) WITH (prediction real) AS p;
-   ```
-
-6. Run the script and view the results, notice that the `Prediction` column is the model's prediction of the `Seasonality` property of each product.
-
-   ![The query results pane is displayed with the prediction results.](media/lab06-view-prediction-results.png "View prediction results")
+- Register the best run model
+- Deploy the model as a web service to Azure Container Instances
+- Consume the web service to make predictions on sample data
+  
+> **Note**: Please note that each of these tasks will be addressed through several cells in the notebook.
 
 ## Exercise 7: Monitoring
 
-**Duration**: 25 minutes
+**Duration**: 45 minutes
 
 Azure Synapse Analytics provides a rich monitoring experience within the Azure portal to surface insights regarding your data warehouse workload.
 
@@ -1439,7 +1260,7 @@ Pipeline runs can be monitored using the Monitor Hub and selecting Pipeline runs
 
 ### Task 1: Workload Importance
 
-Running mixed workloads can pose resource challenges on busy systems. Solution Architects seek ways to separate classic data warehousing activities (such as loading, transforming, and querying data) to ensure that enough resources exist to hit SLAs.
+Running mixed workloads can pose resource challenges on busy systems. Solution architects seek ways to separate classic data warehousing activities (such as loading, transforming, and querying data) to ensure that enough resources exist to hit SLAs.
 
 Synapse SQL pool workload management in Azure Synapse consists of three high-level concepts: Workload Classification, Workload Importance and Workload Isolation. These capabilities give you more control over how your workload utilizes system resources.
 
@@ -1459,7 +1280,7 @@ Setting importance in Synapse SQL for Azure Synapse allows you to influence the 
 
     ![The connect to option is highlighted in the query toolbar.](media/synapse-studio-query-toolbar-connect.png "Query toolbar")
 
-4. In the query window, replace the script with the following to confirm that there are NO queries currently being run by users logged in as `asa.sql.workload01`, representing the CEO of the organization or `asa.sql.workload02` representing the data analyst working on the project:
+4. In the query window, replace the script with the following to confirm that there are no queries currently being run by users logged in as `asa.sql.workload01`, representing the CEO of the organization or `asa.sql.workload02` representing the data analyst working on the project:
 
     ```sql
     --First, let's confirm that there are no queries currently being run by users logged in as CEONYC or AnalystNYC.
@@ -1477,15 +1298,21 @@ Setting importance in Synapse SQL for Azure Synapse allows you to influence the 
 
     ![The run button is highlighted in the query toolbar.](media/synapse-studio-query-toolbar-run.png "Run")
 
-6. You will flood the system with queries and see what happens for `asa.sql.workload01` and `asa.sql.workload02`. To do this, we'll run a Azure Synapse Pipeline which triggers queries.
+6. Next, you will flood the system with queries and see what happens for `asa.sql.workload01` and `asa.sql.workload02`. To do this, we'll run a Azure Synapse Pipeline that executes a large number of queries.
 
 7. Select the `Orchestrate` Tab.
-8. **Run** the **Exercise 7 - Execute Data Analyst and CEO Queries** Pipeline, which will run / trigger the `asa.sql.workload01` and `asa.sql.workload02` queries. You can run the pipeline with the Debug option if you have an instance of the Integration Runtime running.
-9. Select **Add trigger**, then **Trigger now**. In the dialog that appears, select **OK**.
+
+8. **Run** the **Exercise 7 - Execute Data Analyst and CEO Queries** Pipeline, which will run the `asa.sql.workload01` and `asa.sql.workload02` queries. You can run the pipeline with the Debug option if you have an instance of the Integration Runtime running.
+
+9. Select **Add trigger**, then **Trigger now**. In the dialog that appears, select **OK**. **Let this pipeline run for 30 seconds to 1 minute, then proceed to the next step**.
 
     ![The add trigger and trigger now menu items are highlighted.](media/trigger-data-analyst-and-ceo-queries-pipeline.png "Add trigger")
 
-10. Let's see what happened to all the queries we just triggered as they flood the system. In the query window, replace the script with the following:
+10. From the left menu, select the **Monitor** hub. Hover over the link of the in-progress pipeline, and select the **Cancel recursive** icon that displays.
+
+    ![The Monitor Hub icon is selected from the left menu, and the Cancel recursive button is selected on the in progress pipeline.](media/cancel_running_pipeline_monitor_hub.png)
+
+11. From the left menu, select the **Develop** hub and return to your SQL script. Let's see what happened to all the queries that flooded the system. In the query window, replace the script with the following:
 
     ```sql
     SELECT s.login_name, r.[Status], r.Importance, submit_time, start_time ,s.session_id FROM sys.dm_pdw_exec_sessions s
@@ -1495,11 +1322,13 @@ Setting importance in Synapse SQL for Azure Synapse allows you to influence the 
     ORDER BY submit_time ,status
     ```
 
-11. Select **Run** from the toolbar menu to execute the SQL command. You should see an output similar to the following:
+12. Select **Run** from the toolbar menu to execute the SQL command. You should see an output similar to the following:
 
     ![SQL query results.](media/sql-query-2-results.png "SQL script")
 
-12. We will give our `asa.sql.workload01` user queries priority by implementing the **Workload Importance** feature. In the query window, replace the script with the following:
+13. Intermittently perform the preceding query until all queries have been run and no results are returned.
+
+14. We will give our `asa.sql.workload01` user queries priority by implementing the **Workload Importance** feature. In the query window, replace the script with the following:
 
     ```sql
     IF EXISTS (SELECT * FROM sys.workload_management_workload_classifiers WHERE name = 'CEO')
@@ -1511,15 +1340,15 @@ Setting importance in Synapse SQL for Azure Synapse allows you to influence the 
       ,MEMBERNAME = 'asa.sql.workload01',IMPORTANCE = High);
     ```
 
-13. Select **Run** from the toolbar menu to execute the SQL command.
+15. Select **Run** from the toolbar menu to execute the SQL command.
 
-14. Let's flood the system again with queries and see what happens this time for `asa.sql.workload01` and `asa.sql.workload02` queries. To do this, we'll run an Azure Synapse Pipeline which triggers queries.
+16. Let's flood the system again with queries and see what happens this time for `asa.sql.workload01` and `asa.sql.workload02` queries. To do this, we'll run an Azure Synapse Pipeline that runs a large number queries. **Similar to before, run this pipeline for about 30 seconds to 1 minute**.
 
-    - **Select** the `Orchestrate` Tab
+    - **Select** the `Orchestrate` Tab.
 
-    - **Run** the **Exercise 7 - Execute Data Analyst and CEO Queries** Pipeline, which will run / trigger the `asa.sql.workload01` and `asa.sql.workload02` queries.
+    - **Run** the **Exercise 7 - Execute Data Analyst and CEO Queries** Pipeline, which will run the `asa.sql.workload01` and `asa.sql.workload02` queries.
 
-15. In the query window, replace the script with the following to see what happens to the `asa.sql.workload01` queries this time:
+17. In the query window, replace the script with the following to see what happens to the `asa.sql.workload01` queries this time:
 
     ```sql
     SELECT s.login_name, r.[Status], r.Importance, submit_time, start_time ,s.session_id FROM sys.dm_pdw_exec_sessions s
@@ -1529,13 +1358,9 @@ Setting importance in Synapse SQL for Azure Synapse allows you to influence the 
     ORDER BY submit_time ,status desc
     ```
 
-16. Select **Run** from the toolbar menu to execute the SQL command. You should see an output similar to the following that shows query executions for the `asa.sql.workload01` user having a **high** importance.
+18. Select **Run** from the toolbar menu to execute the SQL command. You should see an output similar to the following that shows query executions for the `asa.sql.workload01` user having a **high** importance. Also note that the 'asa.sql.workload02' queries are in **Suspended** status while the high priority queries are being run.
 
-    ![SQL query results.](media/sql-query-4-results.png "SQL script")
-
-17. Navigate to the **Monitor** hub, select **Pipeline runs**, and then select **Cancel recursive** for each running Exercise 7 pipelines. This will help speed up the remaining tasks.
-
-    ![The cancel recursive option is shown.](media/cancel-recursive.png "Pipeline runs - Cancel recursive")
+    ![SQL query results showing asa.sql.workload01 queries with a higher importance than those queries from asa.sql.workload02.](media/sql-query-4-results.png "SQL script")
 
 ### Task 2: Workload Isolation
 
@@ -1572,7 +1397,7 @@ Users should avoid a workload management solution that configures 100% workload 
     END
     ```
 
-    The code creates a workload group called `CEODemo` to reserve resources exclusively for the workload group. In this example, a workload group with a `MIN_PERCENTAGE_RESOURCE` set to 50% and `REQUEST_MIN_RESOURCE_GRANT_PERCENT` set to 25% is guaranteed 2 concurrency.
+    The code creates a workload group called `CEODemo` that reserves resources exclusively for the workload group. In this example, a workload group with a `MIN_PERCENTAGE_RESOURCE` set to 50% and `REQUEST_MIN_RESOURCE_GRANT_PERCENT` set to 25% is guaranteed 2 concurrent queries.
 
 5. Select **Run** from the toolbar menu to execute the SQL command.
 
@@ -1599,9 +1424,9 @@ Users should avoid a workload management solution that configures 100% workload 
     ORDER BY submit_time, status
     ```
 
-9. Let's flood the system with queries and see what happens for `asa.sql.workload02`. To do this, we will run a Azure Synapse Pipeline which triggers queries. Select the `Orchestrate` Tab. **Run** the **Exercise 7 - Execute Business Analyst Queries** Pipeline, which will run / trigger  `asa.sql.workload02` queries.
+9. Let's flood the system with queries and see what happens for `asa.sql.workload02`. To do this, we will run an Azure Synapse Pipeline that runs a large number of queries. Select the `Orchestrate` Tab. **Run** the **Exercise 7 - Execute Business Analyst Queries** Pipeline, which will run the  `asa.sql.workload02` queries. **Let this pipeline run for 30 seconds to 1 minute, then cancel the run recursively**.
 
-10. In the query window, replace the script with the following to see what happened to all the `asa.sql.workload02` queries we just triggered as they flood the system:
+10. In the query window, replace the script with the following to see what happened to all the `asa.sql.workload02` queries that were flooded into the system:
 
     ```sql
     SELECT s.login_name, r.[Status], r.Importance, submit_time,
@@ -1612,15 +1437,11 @@ Users should avoid a workload management solution that configures 100% workload 
     ORDER BY submit_time, status
     ```
 
-11. Select **Run** from the toolbar menu to execute the SQL command. You should see an output similar to the following that shows the importance for each session set to `below_normal`:
+11. Select **Run** from the toolbar menu to execute the SQL command. You should see an output similar to the following that shows the importance for each session set to `below_normal` and two queries being run in parallel:
 
-    ![The script results show that each session was executed with below normal importance.](media/sql-result-below-normal.png "SQL script")
+    ![The script results show that each session was executed with below normal importance with two queries being run in parallel.](media/sql-result-below-normal.png "SQL script")
 
-12. Navigate to the **Monitor** hub, select **Pipeline runs**, and then select **Cancel recursive** for each running Exercise 7 pipelines. This will help speed up the remaining tasks.
-
-    ![The cancel recursive option is shown.](media/cancel-recursive-ba.png "Pipeline runs - Cancel recursive")
-
-13. In the query window, replace the script with the following to set 3.25% minimum resources per request:
+12. In the query window, replace the script with the following to set 3.25% minimum resources per request:
 
     ```sql
     IF  EXISTS (SELECT * FROM sys.workload_management_workload_classifiers where group_name = 'CEODemo')
@@ -1643,9 +1464,9 @@ Users should avoid a workload management solution that configures 100% workload 
     > 
     > [Max Concurrency] = [CAP_PERCENTAGE_RESOURCE] / [REQUEST_MIN_RESOURCE_GRANT_PERCENT]
 
-14. Let's flood the system again and see what happens for `asa.sql.workload02`. To do this, we will run an Azure Synapse Pipeline which triggers queries. Select the `Orchestrate` Tab. **Run** the **Exercise 7 - Execute Business Analyst Queries** Pipeline, which will run / trigger  `asa.sql.workload02` queries.
+13. Let's flood the system again and see what happens for `asa.sql.workload02`. To do this, we will run an Azure Synapse Pipeline that runs a large number of queries. Select the `Orchestrate` Tab. **Run** the **Exercise 7 - Execute Business Analyst Queries** Pipeline, which will run the `asa.sql.workload02` queries.
 
-15. In the query window, replace the script with the following to see what happened to all of the `asa.sql.workload02` queries we just triggered as they flood the system:
+14. In the query window, replace the script with the following to see what happened to all of the `asa.sql.workload02` queries that flooded the system, note that many more queries are now being performed in parallel for asa.sql.workload02:
 
     ```sql
     SELECT s.login_name, r.[Status], r.Importance, submit_time,
@@ -1656,7 +1477,9 @@ Users should avoid a workload management solution that configures 100% workload 
     ORDER BY submit_time, status
     ```
 
-16. Select **Run** from the toolbar menu to execute the SQL command.
+15. Select **Run** from the toolbar menu to execute the SQL command.
+
+  ![The SQL results pane is shown with multiple queries being run in parallel.](media/multiple_parallel_queries_workload02.png "More than 2 queries being run in parallel")
 
 ### Task 3: Monitoring with Dynamic Management Views
 
@@ -1686,7 +1509,7 @@ All logins to your data warehouse are logged to `sys.dm_pdw_exec_sessions`. This
 
 5. Select **Run** from the toolbar menu to execute the SQL command.
 
-6. Let's flood the system with queries to create operations to monitor. To do this, we will run a Azure Synapse Pipeline which triggers queries. Select the `Orchestrate` Tab. **Run** the **Exercise 7 - Execute Business Analyst Queries** Pipeline, which will run / trigger  `asa.sql.workload02` queries.
+6. Let's flood the system with queries to create operations to monitor. To do this, we will run a Azure Synapse Pipeline which triggers queries. Select the `Orchestrate` Tab. **Run** the **Exercise 7 - Execute Business Analyst Queries** Pipeline, which will run / trigger  `asa.sql.workload02` queries. **Let this pipeline run for 30 seconds to 1 minute, then cancel the run recursively**.
 
 7. In the query window, replace the script with the following:
 
@@ -1724,7 +1547,7 @@ All logins to your data warehouse are logged to `sys.dm_pdw_exec_sessions`. This
 
     ```sql
     -- Find a query with the Label 'My Query'
-    -- Use brackets when querying the label column, as it it a key word
+    -- Use brackets when querying the label column, as it is a key word
     SELECT  *
     FROM sys.dm_pdw_exec_requests
     WHERE [label] = 'My Query';
@@ -1775,6 +1598,8 @@ All logins to your data warehouse are logged to `sys.dm_pdw_exec_sessions`. This
 4. Hover onto a SQL Request log and select `Request Content` to access the actual T-SQL command executed as part of the SQL Request.
 
     ![The request content link is displayed over a SQL request.](media/ex7-task5-03.png "SQL requests")
+
+5. You may now return to the **Monitor** hub and cancel the in-progress pipeline run.
   
 ## After the hands-on lab
 
