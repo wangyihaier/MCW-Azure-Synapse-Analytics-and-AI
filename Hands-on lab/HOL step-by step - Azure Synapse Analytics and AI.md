@@ -49,13 +49,23 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
   - [Exercise 4: Exploring raw text based data with Azure Synapse SQL Serverless](#exercise-4-exploring-raw-text-based-data-with-azure-synapse-sql-serverless)
     - [Task 1: Query CSV data](#task-1-query-csv-data)
     - [Task 2: Query JSON data](#task-2-query-json-data)
-  - [Exercise 5: Security](#exercise-5-security)
+  - [Exercise 5: Synapse Pipelines & Cognitive Search](#exercise-5-synapse-pipelines--cognitive-search)
+    - [Task 1: Create the necessary storage account](#task-1-create-the-necessary-storage-account)
+    - [Task 2: Create and train Azure Forms Recognizer model and Cognitive search](#task-2-create-and-train-azure-forms-recognizer-model-and-cognitive-search)
+    - [Task 3: Configure a skillset with form recognizer](#task-3-configure-a-skillset-with-form-recognizer)
+    - [Task 4: Create the Synapse pipeline](#task-4-create-the-synapse-pipeline)
+  - [Exercise 6: Security](#exercise-6-security)
     - [Task 1: Column level security](#task-1-column-level-security)
     - [Task 2: Row level security](#task-2-row-level-security)
     - [Task 3: Dynamic data masking](#task-3-dynamic-data-masking)
   - [Exercise 6: Machine Learning](#exercise-6-machine-learning)
     - [Task 1: Training, consuming, and deploying models](#task-1-training-consuming-and-deploying-models)
   - [Exercise 7: Monitoring](#exercise-7-monitoring)
+  - [Exercise 7: Machine Learning](#exercise-7-machine-learning)
+    - [Task 1: Training models](#task-1-training-models)
+    - [Task 2: Registering the models with Azure Synapse Analytics](#task-2-registering-the-models-with-azure-synapse-analytics)
+    - [Task 3: Making predictions with the registered models](#task-3-making-predictions-with-the-registered-models)
+  - [Exercise 8: Monitoring](#exercise-8-monitoring)
     - [Task 1: Workload Importance](#task-1-workload-importance)
     - [Task 2: Workload Isolation](#task-2-workload-isolation)
     - [Task 3: Monitoring with Dynamic Management Views](#task-3-monitoring-with-dynamic-management-views)
@@ -995,7 +1005,525 @@ A common format for exporting and storing data is with text based files. These c
 
    ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png "Discard changes")
 
-## Exercise 5: Security
+
+## Exercise 5: Synapse Pipelines & Cognitive Search
+
+**Duration**: 15 minutes
+
+In this exercise you will create a Synapse Pipeline that will orchestrate updating the part prices from a supplier invoice. You will accomplish this by a combination of a Synapse Pipeline with an Azure Cognitive Search Skillset that invokes the Form Recognizer service as a custom skill. The pipeline will work as follows:
+
+- Invoice is uploaded to Azure Storage.
+- An Azure Cognitive Search index is started
+- The index of any new or updated invoices invokes an Azure Cognitive Search skillset.
+- The first skill in the skillset invokes an Azure Function, passing it the URL to the PDF invoice. 
+- The Azure Function invokes the Form Recognizer service, passing it the URL and SAS token to the PDF invoice. Forms recognizer returns the OCR results to the function.
+- The Azure Function returns the results to skillset. The skillset then extracts only the product names and costs and sends that to a configure knowledge store that writes the extracted data to JSON files in Azure Blob Storage.
+- The Synapse pipeline reads these JSON files from Azure Storage in a Data Flow activity and performs an upsert against the product catalog table in the Synapse SQL Pool. 
+
+### Task 1: Create the necessary storage account
+
+1. Create a new storage account in your Resource group
+
+    ![displaying creating a new storage account](media/ex5-task1a-000.png)
+
+1. In the properties for the storage account set:
+    - Resource group to the group you're using for this workshop
+    - Storage account name to something related to invoices
+    - Location should be the same location you're Synapse workspace is in
+    - Performance: Standard
+    - Account kind: StorageV2
+    - Replication: Locally-redundant storage
+    - Access tier: Hot
+
+        Click "Review + create"
+
+        ![display the configuration settings described above](media/ex5-task1a-001.png)
+
+3. Click Create
+4. Once it's created, navigate to the resource
+
+    ![display the completed provisioning and clicking to go to the resource](media/ex5-task1a-002.png)
+
+1. Click Access keys
+
+    ![displaying the location of access keys link in the navigation on the left](media/ex5-task1a-003.png)
+
+1. Copy the Connection string under "key1". Save it to notepad, Visual Studio Code, or another text file. We'll use this several times
+
+    ![display the button to click in order to copy the connection string](media/ex5-task1a-004.png)
+
+1. Click on Shared access signature
+1. Make sure all the checkboxes are selected and click Generate SAS
+
+    ![display configuration for the shared access signature](media/ex5-task1a-012.png)
+
+1. Copy the generated Blob service SAS URL to the same text file as above
+
+    ![display the shared access signature blob service SAS URL that was generated](media/ex5-task1a-013.png)
+
+1. Under the "Blob service" header, click "Containers"
+
+    ![display the link on the left side navigation to go to Containers](media/ex5-task1a-005.png)
+
+1. Create the following three containers
+
+    - invoices
+    - invoices-json
+    - invoices-staging
+
+    1. Click on +Container
+
+    ![display the +container button](media/ex5-task1a-006.png)
+
+    2. Type in the name and click Create
+
+    ![display creating a new container](media/ex5-task1a-007.png)
+
+    3. Repeat this for the other two containers
+
+    ![displaying all the containers created](media/ex5-task1a-008.png)
+
+8. Use [Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/) to open up the invoices container and create two folders Test and Train
+
+    1. Create a Train folder
+
+    ![displaying Azure Storage explorer and the steps to create the Train](media/ex5-task1a-009.png)
+
+    2. Upload the 5 invoices to it from /artifacts/sample_invoices/Train
+
+    ![displaying uploading the Train files to Azure](media/ex5-task1a-010.png)
+
+    3. Repeat the same for the Test folder and use the files in /Test instead of Train
+    
+    When you're done you should have a Train folder with Invoices 1 - 5 in it and a Test folder with Invoices 6 and 7
+
+    ![showing the Train and Test folders](media/ex5-task1a-011.png)
+
+### Task 2: Create and train Azure Forms recognizer model and Cognitive Search
+
+1. Browse to your Azure Portal, create a resource, and create a new instance of Cognitive Services
+
+    ![display creating Cognitive Services](media/ex5-task2a-01.png)
+
+2. Click Create
+
+    ![display the create button](media/ex5-task2a-02.png)
+
+3. Set the following configuration settings:
+
+    - Name: choose a name for processing invoice forms that you want to use
+    - Subscription: the subscription that you're using for his exercise
+    - Location: the same location you've been using for all other resources
+    - Pricing: Free F0
+    - Resource group: the same resource group you've been using for this exercise
+    - Check the confirmation checkbox
+
+    Then click Create
+
+    ![display the configuraiton settings for Cognitive Services](media/ex5-task2a-03.png)
+
+4. Wait for the service to provision then navigate to the resource
+5. Click on "Keys and Endpoint on the left side"
+
+    ![display the keys and endpoint navigation link in the left side navigation](media/ex5-task2a-04.png)
+
+6. Copy and Paste both KEY 1 and the ENDPOINT. Put these in the same location as the storage connection string you copied earlier
+
+    ![display the endpoint and keys for Cognitive services](media/ex5-task2a-05.png)
+
+7. Browse to your Azure Portal a create a new resource and create a new instance of Azure Cognitive Search
+
+    ![search for and select Azure Cognitive Search](media/ex5-task1-006.png)
+
+1. Choose the subscription and resource group you've been using. Set the URL of the Cognitive Search Service and switch the pricing tier to free
+
+    ![displaying the basics tab of the new search service and the configuration settings](media/ex5-task1-007.png)
+
+2. Click "Review + create"
+
+    ![displaying the review + create button](media/ex5-task1-008.png)
+
+3. Click "Create"
+4. Wait for the service to be provisioned
+9. Make sure python is installed on computer
+10. Open Visual Studio Code
+11. Open the file /artifacts/pocofrmreader.py
+12. Update Lines 7, 9, and 17 with the appropriate
+    
+    - Line 7: The endpoint of Azure Cognitive Services
+    - Line 9: The Blob Service SAS URL storage account with your Train and Test invoice folders. Make sure to update the URL to include /invoices 
+    - Line 13: The key for your Azure Cognitive Service endpoint
+    
+    ![display lines 7 - 13 of the python script to update](media/ex5-task2a-06.png)
+
+13. Save the file
+14. Click Run, Start Debugging
+
+    ![display clicking Run in the file menu, then start debugging](media/ex5-task2a-07.png)
+
+15. Choose Python File
+
+    ![display python file selection](media/ex5-task2a-08.png)
+
+16. When it completes, you should see an output similar to what is seen in the screenshot below. The output should also contain a modelID. Copy and paste this into your text file to use later
+
+    ![display the output of the python script, including the  modelID](media/ex5-task2a-09.png)
+
+### Task 3: Configure a skillset with Form Recognizer
+
+1. Open Visual Studio Code
+2. Make sure you have the Azure Functions extension installed.
+
+   ![The header of the azure functions module is show](media/ex5-task1-000.png)
+
+3. In Visual Studio Code open the folder /environment-setup/functions
+
+   ![The functions folder to open is shown](media/ex5-task1-001.png)
+
+4. In __init__.py update lines 66, 68, 70, and 73 to have the appropriate values for your environment
+
+   ![The lines of code thta need to be updated are displayed](media/ex5-task1-step2.png)
+
+5. Use the Azure Functions extension to publish to a new Azure function in the same Resource Group as your Synapse workspace
+
+   ![the button to publish the function is displayed](media/ex5-task1-002.png)
+
+    1. Select the same subscription as your Synapse workspace
+    2. Choose to "Create new Function App in Azure..."
+    3. Give you function a name. This function is what will call the Azure Form Recognizer
+
+      ![setting the function name in visual studio](media/ex5-task1-003.png)
+
+    4. For the runtime select Python 3.7
+
+      ![setting the python runtime version](media/ex5-task1-004.png)
+
+    5. Deploy the function to the same region as your Synapse workspace
+
+        ![choosing the deployment region](media/ex5-task1-005.png)
+
+    6. Your function is now ready for user in the skillset
+6. Now that we have the function publish and all our resources created, we can create the skillset. This will be accomplished using postman. If you don't have it downloaded and installed, you can get it from [https://www.postman.com/downloads/](https://www.postman.com/downloads/)
+7. Open Postman
+8. Import the postman collection  from /environment-setup/skillset
+
+    ![view the import option in the menu](media/ex5-task3-004.png)
+
+    ![view the upload file button](media/ex5-task3-005.png)
+
+    ![view adding the file to postman](media/ex5-task3-006.png)
+
+9. Click Import
+10.  This will give you 4 items on the left side. Create Index, Create Datasource, Create the skillset, and Create the Indexer.
+
+    ![display the four options on the left side of postman](media/ex5-task3-007.png)
+
+11. The first thing we need to do, is edit some properties that effect all of these. Hover over "Create a KnowledgeStore", click ..., and then click Edit
+
+    ![display the edit menu option](media/ex5-task3-008.png)
+
+12. Select the variables tab at the top
+
+    ![displyas the tabs across the top](media/ex5-task3-009.png)
+
+13. We are going to need to edit each one of these variables to match the following:
+    
+    -  admin-key: The key from the search service you created
+
+        ![displyas the search service key to copy](media/ex5-task3-010.png)
+
+    - search-service-name: The name of the search service that you just got the key from
+
+        ![displyas the search service name](media/ex5-task3-011.png)
+
+    - storage-account-name: The name of the storage account used for blob storage for your invoices
+
+        ![displyas the name of the storage account](media/ex5-task3-012.png)
+
+    - storage-connection-string: The connection string from the same storage account
+
+        ![displyas the connection string to the storage account](media/ex5-task3-013.png)
+
+    - datasourcename: invoices
+    - indexer-name: invoice-indexer
+    - index-name: invoice-index
+    - skillset-name: invoice-skillset
+    - storage-container-name: invoices
+    - skillset-function: the function URL from the function you published
+
+        ![displays function url from the app service, functions, the function name, overview, and get function url](media/ex5-task3-021.png)
+
+    - cognitive-services-key: the key from the cognitive service being used for forms processing
+
+        ![displays the key from the cognitive service, keys and endpoint, key 1](media/ex5-task3-022.png)
+
+    - cognitive-service-path: this is the URL to the cognitive service from /subscription all the way through /accounts/[servicename]. An example is: /subscriptions/[SUBSCRIPTOIN ID]/resourceGroups/synapse-mcw-v2-zst/providers/Microsoft.CognitiveServices/accounts/wwiformsreader
+
+        ![displays the url for the service path](media/ex5-task3-023.png)
+
+14. Update the collection
+
+    ![displays all the updated variables and the update button](media/ex5-task3-014.png)
+
+15. Select "Create Index" and click the "Body" tab
+
+    ![displays create index and body](media/ex5-task3-015.png)
+
+16. Copy and paste all the text from /environment-setup/skillset/index.body.txt into the body of the request
+ 17. Click "Send"
+ 
+   ![displays the send button](media/ex5-task3-016.png)
+
+18. You should get a response that it was created
+
+    ![displays the responce that it was created](media/ex5-task3-017.png)
+
+19. Do the same for Create Datasource, Create the Skillset, and Create the indexer using the corresponding text files in the same location
+20. After you Send the Indexer request, if you navigate to your search service you should see your indexer running. It will take a couple minutes to run.
+
+   ![displays the running indexer](media/ex5-task3-018.png)
+
+21. Once the indexer has run, it will show two successful documents. If you go to your Blob storage account and look at the invoices-json you will also have two folders with .json documents in them.
+
+    ![displays the sucessful index](media/ex5-task3-019.png)
+
+    ![displays the json documents](media/ex5-task3-020.png)
+    
+### Task 4: Create the Synapse Pipeline
+
+1.  Open your Synapse workspace
+
+![displays open synapse studio](media/ex5-task4-001.png)
+
+2.  Expand the left menu and select the **Develop** item. From the **Develop** blade, expand the **+** button and select the **SQL script** item.
+
+    ![The left menu is expanded with the Develop item selected. The Develop blade has the + button expanded with the SQL script item highlighted.](media/develop_newsqlscript_menu.png)
+
+3. In the query tab toolbar menu, ensure you connect to your SQL Pool, `SQLPool01`.
+
+    ![The query tab toolbar menu is displayed with the Connect to set to the SQL Pool.](media/querytoolbar_connecttosqlpool.png)
+
+4. In the query window, copy and paste the following query to create the invoice information table. Then select the **Run** button in the query tab toolbar.
+
+    ```sql
+      CREATE TABLE [wwi_mcw].[Invoices]
+      (
+        [TransactionId] [uniqueidentifier]  NOT NULL,
+        [CustomerId] [int]  NOT NULL,
+        [ProductId] [smallint]  NOT NULL,
+        [Quantity] [tinyint]  NOT NULL,
+        [Price] [decimal](9,2)  NOT NULL,
+        [TotalAmount] [decimal](9,2)  NOT NULL
+      );
+    ```
+
+5. From the top toolbar, select the **Discard all** button as we will not be saving this query. When prompted, choose to **Discard all changes**.
+
+   ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png)
+
+6. Click on "Manage" on the left menu
+
+![display the manage link on the left side navigation](media/ex5-task4-002.png)
+
+7. Click on "Linked services"
+
+![display the Linked service link on the left side navigation](media/ex5-task4-003.png)
+
+8. Click "+ New" to create a new linked service to the blob storage
+
+![display the new button](media/ex5-task4-004.png)
+
+9. Select Azure Blob Storage, click "Continue"
+
+![display the Azure Blob Storage button when adding a new service](media/ex5-task4-005.png)
+
+10. Configure the linked service in the way shown here. Provide a name that makes sense. Select the Azure subscription and Storage account name. Leave everything else set to its default. Click "Create"
+
+![display the Azure Blob Storage connected service configuration](media/ex5-task4-006.png)
+
+11. Click "+ New" to create a new linked service to the blob storage
+
+![display the new button](media/ex5-task4-004.png)
+
+12. Select Azure Synapse Analytics and click Continue
+
+![display the Azure Synapse Analytics button when adding a new service](media/ex5-task4-007.png)
+
+13. Configure the linked service in the way shown here. Provide a name that makes sense. Select the Azure subscription, server name, database name. Switch the Authentication type to managed identity. Leave everything else with their defaults. Click "Create"
+
+![display the Azure Synapse Analytics connected service configuration](media/ex5-task4-008.png)
+
+14. You should see the two new linked services now.
+
+![display the Azure Synapse Analytics connected service configuration](media/ex5-task4-010.png)
+
+15. Using the same steps and 3 and 4, run a new SQL query against the  master database to create a new master key.
+
+```CREATE MASTER KEY ENCRYPTION BY PASSWORD =’Pass@Word01’;```
+
+![display the SQL Query to create the master database](media/ex5-task4-011.png)
+
+16. Click Orchestrate in the left navigation
+
+![display the orchestrate link in the left navigation](media/ex5-task4-012.png)
+
+17. Click + and then Pipeline to create a new pipeline
+
+![display + link to create a new pipeline](media/ex5-task4-013.png)
+
+18. Choose a name for your new pipeline
+
+![display the pipeline properties](media/ex5-task4-014.png)
+
+19. Click "Add trigger" then "New/Edit" to create an event to start the pipeline
+
+![display the add new trigger](media/ex5-task4-015.png)
+
+20. Select the dropdown and click +New
+
+![display the new trigger option](media/ex5-task4-016.png)
+
+21. For this exercise, we're going to do a schedule. However, in the future you'll also be able to use an event-based trigger that would fire off new JSON files being added to blob storage
+22. Set the trigger to start every 5 minutes, then click OK
+
+![display the trigger properties for the trigger to start every 5 minutes](media/ex5-task4-017.png)
+
+23. Click OK on the Run Parameters, nothing needs to be done here
+24. Next we need to add a Data Flow to the pipeline. Under Activities, expand "Move & transform" then click and drag Data flow onto the canvas
+
+![display selecting Data flow and dragging in onto the canvase](media/ex5-task4-018.png)
+
+25. Create a new Data Flow and give it a name, click finish
+
+![display the new data flow properties](media/ex5-task4-019.png)
+
+26. Now we need to add our blob storage as a source for our data flow. Click "Add Source"
+
+![display the add source button](media/ex5-task4-020.png)
+
+27. Name your output stream, leave the source type to Dataset, Leave all the options and sampling set to their defaults. Click + New next to Dataset to add a new dataset
+
+![dispaly the Source settings](media/ex5-task4-021.png)
+
+28. Choose Azure Blob Storage
+
+![dispaly the Azure Blob Storage option](media/ex5-task4-022.png)
+
+29. Choose Json and click Continue
+
+![dispaly the Json option](media/ex5-task4-023.png)
+
+30. Provide a name and then choose the Azure Storage linked service that you created earlier
+
+![dispaly the Data set properties](media/ex5-task4-024.png)
+
+31. For the file path chose invoices-json. Set import schema to "From sample file"
+
+![dispaly the file path settings](media/ex5-task4-025.png)
+
+32. Click to select a file and use the file /environment-setup/synapse/sampleformrecognizer.json. Click OK
+
+![dispaly the Data set properties](media/ex5-task4-026.png)
+
+33. With the jsonInvoice selected, switch to the "Source options tab" at the bottom. Add \*/\* to Wildcard paths
+
+![dispaly the Data set properties](media/ex5-task4-048.png)
+
+34. Click + to add another step in your data flow
+
+![dispaly adding another step to the data flow](media/ex5-task4-028.png)
+
+35. This one will be a derived column. This will be used to do some processing of the incoming data.
+
+![dispaly adding another step to the data flow](media/ex5-task4-029.png)
+
+36. Give it a name and add 3 columns that are going to be configured in the following ways
+    
+    - productprice: toDecimal(replace(productprice,'$',''))
+    - totalcharges: toDecimal(replace(replace(totalcharges,'$',''),',',''))
+    - quantity: toInteger(replace(quantity,',',''))
+
+     ![dispaly the drives column settings](media/ex5-task4-030.png)
+
+37. Click + again to add another step in your data flow
+
+![dispaly adding another step to the data flow](media/ex5-task4-028.png)
+
+38. This time select "Alter Row"
+
+![dispaly adding alter row](media/ex5-task4-031.png)
+
+39. Name the Output stream, leave incoming stream set to the default. Change Altar row conditions to "Upsert If" and then set the expression to notEquals(transactionid,"")
+
+![dispaly adding alter row](media/ex5-task4-032.png)
+
+40. Click + again to add another step in your data flow
+
+![dispaly adding another step to the data flow](media/ex5-task4-028.png)
+
+41. This time add a Sink
+
+![dispaly adding a sink](media/ex5-task4-033.png)
+
+42. Give it a name, leave everything else set to the defaults, and click "+New" to add a new Dataset
+
+![dispaly sink settings](media/ex5-task4-034.png)
+
+43. This time choose "Azure Synapse Analytics" and click "Continue"
+
+![dispaly azure synapse analytics button](media/ex5-task4-035.png)
+
+44. Provide a name, choose the linked Service we created earlier, then select the database we created in the beginning of this exercise. If you don't see it in the list of your table names, click the refresh button and it should show up. Click OK
+
+![display SQL Dataset properties](media/ex5-task4-036.png)
+
+45. Click the settings table and check the box to "Allow upsert", set the Key columns to transactionid
+
+![display the settings tab](media/ex5-task4-037.png)
+
+46. Click the Mapping tab, disable Auto mapping and configure the mappings between the json file and the database. Use "+ Add mapping" -> "Fixed mapping" to add a mapping
+
+![display the settings tab](media/ex5-task4-038.png)
+
+47. Click back to your pipeline using the tab at the top of your workspace
+
+![display the mapping tab](media/ex5-task4-039.png)
+
+48. Select your dataflow, and then go to the settings tab. We need to configure the staging settings
+
+![display the mapping tab](media/ex5-task4-040.png)
+
+49. Under the "PolyBase" settings, set the Staging linked service to the storage account we've been using and set the container to invoices-json
+
+![display the completed settings tab](media/ex5-task4-041.png)
+
+50. Click Publish All at the top to save your pipeline
+
+![display the tab to go back to your pipeline](media/ex5-task4-042.png)
+
+51. Click Publish
+
+52. Shortly, you should see a notification that Publishing completed
+
+![display publishing completed](media/ex5-task4-043.png)
+
+53. Click on Monitor
+
+![display publishing completed](media/ex5-task4-044.png)
+
+54. Within 5 minutes, you should see a processing pipeline
+
+![display publishing completed](media/ex5-task4-045.png)
+
+55. After about 3 or 4 minutes it will complete.
+
+![show completed pipeline](media/ex5-task4-046.png)
+
+56. Then you can go query your database and you'll see the data from the two Test invoices
+
+![show the data in the databases](media/ex5-task4-047.png)
+
+## Exercise 6: Security
 
 **Duration**: 30 minutes
 
@@ -1224,7 +1752,7 @@ As an alternative to column level security, SQL Administrators also have the opt
 
    ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png "Discard changes")
 
-## Exercise 6: Machine Learning
+## Exercise 7: Machine Learning
 
 **Duration**: 60 minutes
 
@@ -1242,13 +1770,169 @@ In this exercise, you will create multiple machine learning models. You will lea
 - Use PCA for dimensionality reduction
 - Train ensemble of trees classifier (using XGBoost)
 - Train classifier using Auto ML
+<<<<<<< HEAD:Hands-on lab/HOL step-by step - Azure Synapse Analytics and AI.md
 - Register the best run model
 - Deploy the model as a web service to Azure Container Instances
 - Consume the web service to make predictions on sample data
   
 > **Note**: Please note that each of these tasks will be addressed through several cells in the notebook.
+=======
 
-## Exercise 7: Monitoring
+Please note that each of these tasks will be addressed through several cells in the notebook.
+
+### Task 2: Registering the models with Azure Synapse Analytics
+
+In this task, you will explore the model registration process in Azure Synapse Analytics that enables trained model for use from T-SQL. This task picks up where you left off, with the ONNX model being made available in Azure Storage.
+
+1. The next step is to convert the ONNX model to hexadecimal. The resulting hex encoded model is also upload to Azure Storage. A sample script that performs this functionality is available in [this PowerShell script](https://github.com/microsoft/MCW-Azure-Synapse-Analytics-end-to-end-solution/raw/master/Hands-on%20lab/artifacts/convert-to-hex.ps1). We will execute the following PowerShell script that leverages this functionality. Open the **Cloud Console** and execute the following:
+
+   ```PowerShell
+   './Synapse-MCW/Hands-on lab/artifacts/convert-automl-model-to-hex.ps1'
+   ```
+
+   You will be prompted for the following information:
+    | Prompt |
+    |--------|  
+    | Enter the name of the resource group containing the Azure Synapse Analytics Workspace |
+    | Enter the unique suffix you used in the deployment |
+
+2. From the left menu, select **Data**.
+
+3. Expand the **Databases** section, right click your SQL Pool, `SQLPool01`, and then select **New SQL Script**, and then **Empty script**.
+
+   ![Showing the context menu, selecting New SQL Script, Empty Script](media/lab06-new-sql-script.png "Create new script")
+
+4. Replace the contents of this script with following:
+
+    ```sql
+    SELECT
+        *
+    FROM
+        [wwi_mcw].[ASAMCWMLModelExt]
+    ```
+
+    The result shows your persisted ONNX model in hexadecimal format:
+
+    ![Persisted ONNX model in hexadecimal format](media/lab06-persisted-model.png)
+
+5. **ASAMCWMLModelExt** is an external table that maps to the data lake location where the trained model was persisted (and then converted to hexadecimal format). Take a moment to read through the code that was used to create the external table (**you don't need to run this code as it was already run during the deployment of your environment**):
+
+    ``` sql
+      -- Replace <data_lake_account_key> with the key of the primary data lake account
+
+      CREATE DATABASE SCOPED CREDENTIAL StorageCredential
+      WITH
+      IDENTITY = 'SHARED ACCESS SIGNATURE'
+      ,SECRET = '<data_lake_account_key>';
+
+      -- Create an external data source with CREDENTIAL option.
+      -- Replace <data_lake_account_name> with the actual name of the primary data lake account
+
+      CREATE EXTERNAL DATA SOURCE ASAMCWModelStorage
+      WITH
+      (
+          LOCATION = 'wasbs://wwi-02@<data_lake_account_name>.blob.core.windows.net'
+          ,CREDENTIAL = StorageCredential
+          ,TYPE = HADOOP
+      );
+
+      CREATE EXTERNAL FILE FORMAT csv
+      WITH (
+          FORMAT_TYPE = DELIMITEDTEXT,
+          FORMAT_OPTIONS (
+              FIELD_TERMINATOR = ',',
+              STRING_DELIMITER = '',
+              DATE_FORMAT = '',
+              USE_TYPE_DEFAULT = False
+          )
+      );
+
+      CREATE EXTERNAL TABLE [wwi_mcw].[ASAMCWMLModelExt]
+      (
+      [Model] [varbinary](max) NULL
+      )
+      WITH
+      (
+          LOCATION='/ml/onnx-hex' ,
+          DATA_SOURCE = ModelStorage ,
+          FILE_FORMAT = csv ,
+          REJECT_TYPE = VALUE ,
+          REJECT_VALUE = 0
+      );
+      GO
+
+      CREATE TABLE [wwi_mcw].[ASAMCWMLModel]
+      (
+          [Id] [int] IDENTITY(1,1) NOT NULL,
+          [Model] [varbinary](max) NULL,
+          [Description] [varchar](200) NULL
+      )
+      WITH
+      (
+          DISTRIBUTION = REPLICATE,
+          HEAP
+      );
+      GO
+    ```
+
+6. Import the persisted ONNX model in hexadecimal format into the main models table (to be later used with the `PREDICT` function) by executing the following query on **SQLPool01**:
+
+    ```sql
+    -- Register the model by inserting it into the table.
+    INSERT INTO
+        [wwi_mcw].[ASAMCWMLModel]
+    SELECT
+        Model, 'Product Seasonality Classifier'
+    FROM
+        [wwi_mcw].[ASAMCWMLModelExt]
+    ```
+
+### Task 3: Making predictions with the registered models
+
+In this task, you will author a T-SQL query that uses the previously trained model to make predictions.
+
+> **Note**: In order to make use of the `PREDICT` T-SQL function, your environment will need to be whitelisted. If your environment is not whitelisted, then you should read through the steps of this task as a reference as you will not be able to run the prediction queries.
+
+1. From the left menu, select **Data**.
+
+2. Expand the **Databases** section, right-click your SQL Pool and then select **New SQL Script**, and then **Empty script**.
+
+   ![The database context menu is shown, with New SQL Script and Empty Script selected.](media/lab06-new-sql-script.png "Create new script")
+
+3. Replace the contents of this script with following:
+
+    ```sql
+    SELECT TOP 100
+        *
+    FROM
+        [wwi_mcw].[ProductPCA]
+    WHERE
+        ProductId > 4500
+    ```
+
+    This is the input data you will use to make the predictions.
+
+4. Select **Run** from the menubar.
+
+   ![The Run button is selected from the toolbar.](media/lab06-select-run.png "Select Run")
+
+5. Create another new SQL script and replace the contents with the following:
+
+   ```sql
+   -- Retrieve the latest hex encoded ONNX model from the table
+   DECLARE @model varbinary(max) = (SELECT Model FROM [wwi_mcw].[ASAMCWMLModel] WHERE Id = (SELECT Top(1) max(ID) FROM [wwi_mcw].[ASAMCWMLModel]));
+
+   -- Run a prediction query
+   SELECT d.*, p.*
+   FROM PREDICT(MODEL = @model, DATA = [wwi_mcw].[ProductPCA] AS d) WITH (prediction real) AS p;
+   ```
+
+6. Run the script and view the results, notice that the `Prediction` column is the model's prediction of the `Seasonality` property of each product.
+
+   ![The query results pane is displayed with the prediction results.](media/lab06-view-prediction-results.png "View prediction results")
+>>>>>>> 438fa950054f04c69a377d0fa61ebd8e69a4266e:Hands-on lab/HOL step-by step - Azure Synapse Analytics end-to-end solution.md
+
+## Exercise 8: Monitoring
 
 **Duration**: 45 minutes
 
