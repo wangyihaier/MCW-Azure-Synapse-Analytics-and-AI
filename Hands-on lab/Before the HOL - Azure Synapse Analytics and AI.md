@@ -54,17 +54,17 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 2. On the Azure Portal home screen, select the **+ Create a resource** tile.
 
-    ![A portion of the Azure Portal home screen is displayed with the + Create a resource tile highlighted.](media/bhol_createaresource.png)
+    ![A portion of the Azure Portal home screen is displayed with the + Create a resource tile highlighted.](media/bhol_createaresource.png "Create a resource")
 
 3. In the **Search the Marketplace** text box, type **Resource group** and press the **Enter** key.
 
-    ![On the new resource screen Resource group is entered as a search term.](media/bhol_searchmarketplaceresourcegroup.png)
+    ![On the new resource screen Resource group is entered as a search term.](media/bhol_searchmarketplaceresourcegroup.png "Searching for resource group")
 
 4. Select the **Create** button on the **Resource group** overview page.
 
 5. On the **Create a resource group** screen, select your desired Subscription and Region. For Resource group, enter **Synapse-MCW**, then select the **Review + Create** button.
 
-    ![The Create a resource group form is displayed populated with Synapse-MCW as the resource group name.](media/bhol_resourcegroupform.png)
+    ![The Create a resource group form is displayed populated with Synapse-MCW as the resource group name.](media/bhol_resourcegroupform.png "Naming the resource group")
 
 6. Select the **Create** button once validation has passed.
 
@@ -76,7 +76,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 2. On the **Custom deployment** form, select your desired subscription and select **Synapse-MCW** for the **Resource group**. Also provide a **Unique Suffix** such as your initials followed by birth year. Finally, provide a strong **SQL Administrator Login Password**. Remember this password value, you'll need it later!
 
-    ![The Custom deployment form is displayed with example data populated.](media/bhol_customdeploymentform.png)
+    ![The Custom deployment form is displayed with example data populated.](media/bhol_customdeploymentform.png "Configuring the custom deployment")
   
 3. Check the **I agree to the terms and conditions stated above**, then select the **Purchase** button.
 
@@ -86,7 +86,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 1. In the Azure Portal, open the Azure Cloud Shell by selecting its icon from the right side of the top toolbar.
 
-    ![A portion of the Azure Portal taskbar is displayed with the Cloud Shell icon highlighted.](media/bhol_azurecloudshellmenu.png)
+    ![A portion of the Azure Portal taskbar is displayed with the Cloud Shell icon highlighted.](media/bhol_azurecloudshellmenu.png "Opening the Cloud Shell")
 
     > **Note**: If you are prompted to create a storage account for the Cloud Shell, agree to have it created.
 
@@ -108,9 +108,9 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 2. A message will be displayed asking you to open a new tab in your web browser, navigate to [https://microsoft.com/devicelogin](https://microsoft.com/devicelogin) and to enter a code for authentication.
 
-   ![A message is displayed indicating to enter an authentication code on the device login page.](media/bhol_devicelogin.png)
+   ![A message is displayed indicating to enter an authentication code on the device login page.](media/bhol_devicelogin.png "Authentication message")
 
-   ![A dialog is shown requesting the entry of a code.](media/bhol_clicodescreen.png)
+   ![A dialog is shown requesting the entry of a code.](media/bhol_clicodescreen.png "Authentication dialog")
 
 3. Once complete, you may close the tab from the previous step and return to the Cloud Shell.
 
@@ -139,7 +139,7 @@ When executing the script below, it is important to let the scripts run to compl
     | Enter the SQL Administrator password you used in the deployment |
     | Enter the unique suffix you used in the deployment |
 
-    ![The Azure Cloud Shell window is displayed with a sample of the output from the preceding command.](media/bhol_sampleshelloutput.png)
+    ![The Azure Cloud Shell window is displayed with a sample of the output from the preceding command.](media/bhol_sampleshelloutput.png "The Azure Cloud Shell output")
 
 3. At the end of the script, you should see a message indicating **Environment validation has succeeded**.
 
