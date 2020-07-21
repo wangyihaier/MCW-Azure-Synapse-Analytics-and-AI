@@ -1,13 +1,12 @@
-# Azure Synapse Analytics end-to-end solution
+# Azure Synapse Analytics and AI
 Wide World Importers (WWI) has hundreds of brick and mortar stores and an online store where they sell a variety of products. They would like to gain business insights using historical, real-time, and predictive analytics using structured and unstructured data sources. In doing so, they want to enable their IT team of data engineers and data scientists to bring in and run complex queries over petabytes of structured data with billions of rows and unstructured enterprise operational data. At the same time, they want to enable business analysts and their IT team to share a single source of truth and have a single workspace to collaborate and work with enterprise data and enriched customer data. They want to accomplish this minimizing the number of disparate services they use across ingest, transformation, querying and storage, so that their team of data engineers, data scientists and database administrators can master one tool, and can build shared best practices for development, management and monitoring.
 
-April 2020
+July 2020
 
 ## Target audience
-- Data Engineer
-- Data Scientist
-- Machine Learning Engineer
-
+- Data engineer
+- Data scientist
+- Machine Learning engineer
 
 ## Abstracts
 
@@ -23,7 +22,7 @@ At the end of this whiteboard design session, you will be better able to design 
 
 ### Hands-on lab
 
-[HOL step-by-step - Azure Synapse Analytics end-to-end solution](Hands-on%20lab/HOL%20step-by%20step%20-%20Azure%20Synapse%20Analytics%20end-to-end%20solution.md)
+In this hands-on-lab, you will build an end-to-end data analytics with machine learning solution using Azure Synapse Analytics. The information will be presented in the context of a retail scenario. We will be heavily leveraging Azure Synapse Studio, a tool that conveniently unifies the most common data operations from ingestion, transformation, querying, and visualization.
 
 ## Azure services and related products
 -	Azure Synapse Analytics
@@ -34,7 +33,6 @@ At the end of this whiteboard design session, you will be better able to design 
 -	Event Hubs
 -	IoT Hub
 -	Power BI
-
 
 ## Related references
 - [MCW](https://github.com/Microsoft/MCW)
