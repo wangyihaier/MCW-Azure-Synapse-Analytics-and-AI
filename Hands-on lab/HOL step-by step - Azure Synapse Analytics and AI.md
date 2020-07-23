@@ -1155,7 +1155,7 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
     - Line 9: The Blob Service SAS URL storage account with your Train and Test invoice folders. Make sure to update the URL to include /invoices.
 
-    - Line 13: The key for your Azure Cognitive Service endpoint.
+    - Line 17: The key for your Azure Cognitive Service endpoint.
 
     ![The source code listing of pocofrmreader.py is displayed with the lines mentioned above highlighted.](media/ex5-task2a-06.png "The source listing of pocofrmreader.py")
 
