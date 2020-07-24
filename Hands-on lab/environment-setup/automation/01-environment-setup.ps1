@@ -174,9 +174,11 @@ foreach ($dataset in $datasets.Keys)
         Wait-ForOperation -WorkspaceName $workspaceName -OperationId $result.operationId
 }
 
-Write-Information "Create pipelines for Exercise 7"
+Write-Information "Create pipelines"
 
-$params = @{}
+$params = @{
+        "STORAGELINKEDSERVICENAME" = $blobStorageAccountName
+}
 $workloadPipelines = [ordered]@{
         copy_products_pipeline = "ASAMCW - Exercise 2 - Copy Product Information"
         execute_business_analyst_queries = "ASAMCW - Exercise 7 - ExecuteBusinessAnalystQueries"
@@ -187,7 +189,7 @@ foreach ($pipeline in $workloadPipelines.Keys)
 {
     try
     {
-        Write-Information "Creating workload pipeline $($workloadPipelines[$pipeline])"
+        Write-Information "Creating pipeline $($workloadPipelines[$pipeline])"
         $result = Create-Pipeline -PipelinesPath $pipelinesPath -WorkspaceName $workspaceName -Name $workloadPipelines[$pipeline] -FileName $workloadPipelines[$pipeline] -Parameters $params
         Wait-ForOperation -WorkspaceName $workspaceName -OperationId $result.operationId
     }

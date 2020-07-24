@@ -15,8 +15,8 @@
                 "container": "wwi-02"
             },
             "columnDelimiter": ",",
-            "escapeChar": "",
-            "quoteChar": ""
+            "escapeChar": "\\",
+            "quoteChar": "\""
         },
         "schema": [
             {
