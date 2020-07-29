@@ -50,7 +50,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
     - [Task 1: Query CSV data](#task-1-query-csv-data)
     - [Task 2: Query JSON data](#task-2-query-json-data)
   - [Exercise 5: Synapse Pipelines & Cognitive Search](#exercise-5-synapse-pipelines--cognitive-search)
-    - [Task 1: Create the necessary storage account](#task-1-create-the-necessary-storage-account)
+    - [Task 1: Create the invoice storage container](#task-1-create-the-invoice-storage-container)
     - [Task 2: Create and train Azure Forms recognizer model and Cognitive Search](#task-2-create-and-train-azure-forms-recognizer-model-and-cognitive-search)
     - [Task 3: Configure a skillset with Form Recognizer](#task-3-configure-a-skillset-with-form-recognizer)
     - [Task 4: Create the Synapse Pipeline](#task-4-create-the-synapse-pipeline)
@@ -814,7 +814,7 @@ When you query Parquet files using Synapse SQL Serverless, you can explore the d
 
 3. Expand **Storage accounts**. Expand the `asadatalake{SUFFIX}` ADLS Gen2 account and select **wwi-02**.
 
-4. Navigate to the **sale-small/Year=2010/Quarter=Q4/Month=12/Day=20101231** folder. Right-click on the **sale-small-20101231-snappy.parquet** file, select **New SQL script**, then **Select TOP 100 rows**.
+4. Navigate to the **wwi-02/sale-small/Year=2010/Quarter=Q4/Month=12/Day=20101231** folder. Right-click on the **sale-small-20101231-snappy.parquet** file, select **New SQL script**, then **Select TOP 100 rows**.
 
     ![The Storage accounts section is expanded with the context menu visible on the asadatalake{SUFFIX} account with the Select TOP 100 rows option highlighted.](media/data-hub-parquet-select-rows.png "Querying parquet data in SQL Serverless")
 
@@ -857,7 +857,7 @@ When you query Parquet files using Synapse SQL Serverless, you can explore the d
 
 ### Task 2: Query sales Parquet data with Azure Synapse Spark
 
-1. Select **Data** from the left menu, select the **Linked** tab, then browse to the data lake storage account `asadatalake{SUFFIX}` to  **sale-small/Year=2010/Quarter=Q4/Month=12/Day=20101231**, then right-click the Parquet file and select New notebook.
+1. Select **Data** from the left menu, select the **Linked** tab, then browse to the data lake storage account `asadatalake{SUFFIX}` to  **wwi-02/sale-small/Year=2010/Quarter=Q4/Month=12/Day=20101231**, then right-click the Parquet file and select New notebook.
 
     ![The Parquet file is displayed with the New notebook menu item highlighted.](media/new-spark-notebook-sales.png "New notebook")
 
@@ -909,10 +909,11 @@ When you query Parquet files using Synapse SQL Serverless, you can explore the d
 
     profitByDateProduct = (data_path.groupBy("TransactionDate","ProductId")
         .agg(
-            sum("ProfitAmount").alias("(sum)ProfitAmount"),
+            round(sum("ProfitAmount",2).alias("(sum)Profit"),
+            round(avg("ProfitAmount",2).alias("(avg)Profit"),
             round(avg("Quantity"), 4).alias("(avg)Quantity"),
             sum("Quantity").alias("(sum)Quantity"))
-        .orderBy("TransactionDate"))
+        .orderBy("TransactionDate", "ProductId"))
     profitByDateProduct.show(100)
     ```
 
@@ -1019,7 +1020,6 @@ A common format for exporting and storing data is with text based files. These c
 
    ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png "Discard changes")
 
-
 ## Exercise 5: Synapse Pipelines & Cognitive Search
 
 **Duration**: 45 minutes
@@ -1034,87 +1034,57 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 - The Azure Function returns the results to skillset. The skillset then extracts only the product names and costs and sends that to a configure knowledge store that writes the extracted data to JSON files in Azure Blob Storage.
 - The Synapse pipeline reads these JSON files from Azure Storage in a Data Flow activity and performs an upsert against the product catalog table in the Synapse SQL Pool.
 
-### Task 1: Create the necessary storage account
+### Task 1: Create the invoice storage container
 
-1. Create a new storage account in your Resource group
+1. In the Azure Portal, navigate to the lab resource group and select the **asastore{suffix}** storage account.
 
-    ![displaying creating a new storage account](media/ex5-task1a-000.png)
-
-2. In the properties for the storage account set:
+    ![The lab resources list is shown with the asastore storage account highlighted.](media/ex5-task1a-000.png "Lab resource group listing")
   
-    | Field | Value |
-    |-------|-------|
-    | Resource group  | Select the lab resource group. |
-    | Storage account name | Enter a unique name, relating to invoices. |
-    | Location | Select  the lab region. |
-    | Performance | Select **Standard**. |
-    | Account kind | Select **Storage**. |
-    | Replication | Select **Locally-redundant storage**. |
-    | Access tier | Select **Hot**. |
+2. From the left menu, beneath **Blob service**, select **Containers**. From the top toolbar menu of the **Containers** screen, select **+ Container**.
+  
+    ![The Containers screen is displayed with Containers selected from the left menu, and + Container selected from the toolbar.](media/ex5-task1a-001.png "Azure Storage Container screen")
 
-    ![The configuration form is shown with settings described as above.](media/ex5-task1a-001.png "Configuration form")
+3. On the **New container** blade, name the container **invoices**, and select **Create**, we will keep the default values for the remaining fields.
 
-3. Select **Review + create**, then **Create**.
+4. Repeat steps 2 and 3, and create two additional containers named **invoices-json** and **invoices-staging**.
 
-4. Once created, navigate to the resource.
+5. From the left menu, select **Storage Explorer (preview)**. Then, in the hierarchical menu, expand the **BLOB CONTAINERS** item.
 
-    ![A toast notification showing the deployment has succeeded.](media/ex5-task1a-002.png "Deployment succeeded notification")
+6. Beneath **BLOB CONTAINERS**, select the **invoices** container, then from the taskbar menu, select **+ New Folder**
 
-5. From the left menu, select **Access keys**.
+    ![The Storage Explorer (preview) screen is shown with Storage Explorer selected from the left menu. In the hierarchical menu, the BLOB CONTAINERS item expanded with the invoices item selected. The + New Folder button is highlighted in the taskbar menu.](media/storageexplorer_invoicesnewfolder.png "Azure Storage Explorer")
+
+7. In the **Create New Virtual Directory** blade, name the directory **Test**, then select **OK**. This will automatically move you into the new **Test** folder.
+
+    ![The Create New Virtual Directory form is displayed with Test entered in the name field.](media/storageexplorer_createnewvirtualdirectoryblade.png "Create New Virtual Directory form")
+
+8. From the taskbar, select **Upload**. Upload all invoices located in **Hands-on lab/artifacts/sample_invoices/Test**. These files are Invoice_6.pdf and Invoice_7.pdf.
+
+9. Return to the root **invoices** folder by selecting the **invoices** breadcrumb from the location textbox found beneath the taskbar.
+
+    ![A portion of the Storage Explorer window is displayed with the invoices breadcrumb selected from the location textbox.](media/storageexplorer_breadcrumbnav.png "Storage Explorer breadcrumb navigation")
+
+10. From the taskbar, select **+ New Folder** once again. This time creating a folder named **Train**. This will automatically move you into the new **Train** folder.
+
+11. From the taskbar, select **Upload**. Upload all invoices located in **Hands-on lab/artifacts/sample_invoices/Train**. These files are Invoice_1.pdf, Invoice_2.pdf, Invoice_3.pdf, Invoice_4.pdf and Invoice_5.pdf.
+
+12. From the left menu, select **Access keys**.
 
     ![The left menu is displayed with the Access keys link highlighted.](media/ex5-task1a-003.png "The Access keys menu item")
 
-6. Copy the Connection string under "key1". Save it to notepad, Visual Studio Code, or another text file. We'll use this several times
+13. Copy the Connection string under **key1**. Save it to notepad, Visual Studio Code, or another text file. We'll use this several times
 
     ![The copy button is selected next to the key1 connection string.](media/ex5-task1a-004.png "Copying the key1 connection string value")
 
-7. Select Shared access signature.
+14. From the left menu, beneath **Settings**, select **Shared access signature**.
 
-8. Make sure all the checkboxes are selected and choose Generate SAS.
+15. Make sure all the checkboxes are selected and choose **Generate SAS and connection string**.
 
     ![The configuration form is displayed for SAS generation.](media/ex5-task1a-012.png "SAS Configuration form")
 
-9. Copy the generated Blob service SAS URL to the same text file as above.
+16. Copy the generated **Blob service SAS URL** to the same text file as above.
 
     ![The SAS form is shown with the shared access signature blob service SAS URL highlighted.](media/ex5-task1a-013.png "The SAS URL")
-
-10. From the left menu, under the **Blob service** header, select **Containers**.
-
-    ![The left menu is displayed with the Containers item highlighted.](media/ex5-task1a-005.png "Containers menu item")
-
-11. Create the following three containers:
-
-    - invoices
-    - invoices-json
-    - invoices-staging
-
-    1. Select **+Container**.
-
-        ![The +Container button is selected from the taskbar.](media/ex5-task1a-006.png "The +Container button")
-
-    2. Type in **invoices** and select **Create**.
-
-        ![The new container form is shown with the name value set to invoices.](media/ex5-task1a-007.png "The new container form")
-
-    3. Repeat the previous steps for the other two containers.
-
-        ![The container list is shown with all three containers created.](media/ex5-task1a-008.png "The container listing")
-
-12. Use [Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/) to open up the **invoices** container and create two folders named **Test** and **Train**.
-
-    1. From the top toolbar, select **+ New Folder** and name it **Train**. Select **OK**.
-
-        ![The Azure Storage Explorer is displayed with the invoices container expanded, the +New Folder item selected, and the name populated with Train. The OK button is highlighted.](media/ex5-task1a-009.png "Azure Storage Explorer")
-
-    2. Upload the 5 invoices located in **/artifacts/sample_invoices/Train**.
-
-        ![The file listing is displayed with the 5 invoices uploaded.](media/ex5-task1a-010.png "Container file listing")
-
-    3. Repeat the same steps for the **Test** folder but use the files in **/artifacts/sample_invoices/Test**.
-
-    When you're done you should have a Train folder with Invoices 1 - 5 in it and a Test folder with Invoices 6 and 7
-
-    ![The invoices container is displayed containing the Train and Test folders.](media/ex5-task1a-011.png "Invoice container folder listing")
 
 ### Task 2: Create and train Azure Forms recognizer model and Cognitive Search
 
@@ -1546,7 +1516,7 @@ It is important to identify data columns of that hold sensitive information. Typ
 
 1. Create a new SQL script by selecting **Develop** from the left menu, then in the **Develop** blade, expanding the **+** button and selecting **SQL script**.
 
-2. Copy and paste the following query into the query window. Then, step through each statement by highlighting it in the query window, and selecting **Run** from the query window toolbar menu. The query is documented inline. Ensure you are connected to **SQLPool01** when running the queries.
+2. Copy and paste the following query into the query window. Then, step through each statement group by highlighting all queries between each comment block in the query window, and selecting **Run** from the query window toolbar menu. The query is documented inline. Ensure you are connected to **SQLPool01** when running the queries.
 
     ```sql
         /*  Column-level security feature in Azure Synapse simplifies the design and coding of security in applications.
@@ -1610,7 +1580,7 @@ In many organizations it is important to filter certain rows of data by user. In
 
 1. Create a new SQL script by selecting **Develop** from the left menu, then in the **Develop** blade, expanding the **+** button and selecting **SQL script**.
 
-2. Copy and paste the following query into the query window. Then, step through each statement by highlighting it in the query window, and selecting **Run** from the query window toolbar menu. The query is documented inline.
+2. Copy and paste the following query into the query window. Then, step through each statement group by highlighting all queries between each comment block in the query window, and selecting **Run** from the query window toolbar menu. The query is documented inline.
 
     ```sql
     /* Row level Security (RLS) in Azure Synapse enables us to use group membership to control access to rows in a table.
@@ -1695,7 +1665,7 @@ As an alternative to column level security, SQL Administrators also have the opt
 
 1. Create a new SQL script by selecting **Develop** from the left menu, then in the **Develop** blade, expanding the **+** button and selecting **SQL script**.
 
-2. Copy and paste the following query into the query window. Then, step through each statement by highlighting it in the query window, and selecting **Run** from the query window toolbar menu. The query is documented inline.
+2. Copy and paste the following query into the query window. Then, step through each statement group by highlighting all queries between each comment block in the query window, and selecting **Run** from the query window toolbar menu. The query is documented inline.
 
     ```sql
     ----- Dynamic Data Masking (DDM) ---------
