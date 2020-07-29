@@ -51,7 +51,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
     - [Task 2: Query JSON data](#task-2-query-json-data)
   - [Exercise 5: Synapse Pipelines & Cognitive Search](#exercise-5-synapse-pipelines--cognitive-search)
     - [Task 1: Create the invoice storage container](#task-1-create-the-invoice-storage-container)
-    - [Task 2: Create and train Azure Forms recognizer model and Cognitive Search](#task-2-create-and-train-azure-forms-recognizer-model-and-cognitive-search)
+    - [Task 2: Create and train an Azure Forms recognizer model and Cognitive Search](#task-2-create-and-train-an-azure-forms-recognizer-model-and-cognitive-search)
     - [Task 3: Configure a skillset with Form Recognizer](#task-3-configure-a-skillset-with-form-recognizer)
     - [Task 4: Create the Synapse Pipeline](#task-4-create-the-synapse-pipeline)
   - [Exercise 6: Security](#exercise-6-security)
@@ -907,13 +907,13 @@ When you query Parquet files using Synapse SQL Serverless, you can explore the d
     from pyspark.sql.types import *
     from pyspark.sql.functions import *
 
-    profitByDateProduct = (data_path.groupBy("TransactionDate","ProductId")
-        .agg(
-            round(sum("ProfitAmount",2).alias("(sum)Profit"),
-            round(avg("ProfitAmount",2).alias("(avg)Profit"),
-            round(avg("Quantity"), 4).alias("(avg)Quantity"),
-            sum("Quantity").alias("(sum)Quantity"))
-        .orderBy("TransactionDate", "ProductId"))
+    profitByDateProduct = (data_path.groupBy("TransactionDate", "ProductId")
+    .agg(
+    round(sum("ProfitAmount"),2).alias("(sum)Profit"),
+    round(avg("ProfitAmount"),2).alias("(avg)Profit"),
+    sum("Quantity").alias("(sum)Quantity")
+    ).orderBy("TransactionDate", "ProductId")
+    )
     profitByDateProduct.show(100)
     ```
 
@@ -1086,15 +1086,15 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
     ![The SAS form is shown with the shared access signature blob service SAS URL highlighted.](media/ex5-task1a-013.png "The SAS URL")
 
-### Task 2: Create and train Azure Forms recognizer model and Cognitive Search
+### Task 2: Create and train an Azure Forms recognizer model and Cognitive Search
 
-1. Browse to your Azure Portal, select **+Create a resource**, then search for and select **Cognitive Services** from the search results.
+1. Browse to your Azure Portal homepage, select **+ Create a resource**, then search for and select **Form Recognizer** from the search results.
 
-    ![The New resource screen is shown with Cognitive Services entered into the search text boxes and selected from the search results.](media/ex5-task2a-01.png "New resource search form")
+    ![The New resource screen is shown with Form Recognizer entered into the search text boxes and selected from the search results.](media/ex5-task2a-01.png "New resource search form")
 
 2. Select **Create**.
 
-    ![The Cognitive Services overview form is displayed with the Create button highlighted.](media/ex5-task2a-02.png "The Cognitive Services overview form")
+    ![The Form Recognizer overview screen is displayed with the Create button highlighted.](media/ex5-task2a-02.png "The Form Recognizer overview form")
 
 3. Enter the following configuration settings, then select **Create**:
 
@@ -1106,7 +1106,7 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
     | Pricing | Select **Free F0**. |
     | Confirmation checkbox | Checked. |
   
-    ![The Cognitive Services configuration screen is displayed populated with the preceding values.](media/ex5-task2a-03.png "Cognitive services configuration screen")
+    ![The Form Recognizer configuration screen is displayed populated with the preceding values.](media/ex5-task2a-03.png "Form Recognizer configuration screen")
 
 4. Wait for the service to provision then navigate to the resource.
 
@@ -1118,7 +1118,7 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
     ![The Keys and Endpoint screen is shown with KEY 1 and ENDPOINT values highlighted.](media/ex5-task2a-05.png "The Keys and Endpoint screen")
 
-7. Browse to your Azure Portal homepage, select **+Create a new resource**, then search for and create a new instance of **Azure Cognitive Search**.
+7. Browse to your Azure Portal homepage, select **+ Create a new resource**, then search for and create a new instance of **Azure Cognitive Search**.
 
     ![The Azure Cognitive Search overview screen is displayed.](media/ex5-task1-006.png "Azure Cognititve Search Overview screen")
 
@@ -1136,9 +1136,9 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
 12. Open Visual Studio Code.
 
-13. Open the file **/artifacts/pocofrmreader.py**.
+13. From the **File** menu, select **Open file** then choose to open **Hands-on lab/artifacts/pocformreader.py**.
 
-14. Update Lines 7, 9, and 17 with the appropriate values indicated below:
+14. Update Lines 7, 9, and 13 with the appropriate values indicated below:
 
     - Line 7: The endpoint of Azure Cognitive Services.
 
@@ -1146,7 +1146,7 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
     - Line 13: The key for your Azure Cognitive Service endpoint.
 
-    ![The source code listing of pocofrmreader.py is displayed with the lines mentioned above highlighted.](media/ex5-task2a-06.png "The source listing of pocofrmreader.py")
+    ![The source code listing of pocformreader.py is displayed with the lines mentioned above highlighted.](media/ex5-task2a-06.png "The source listing of pocofrmreader.py")
 
 15. Save the file.
 
@@ -1161,6 +1161,8 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 18. When it completes, you should see an output similar to what is seen in the screenshot below. The output should also contain a modelID. Copy and paste this into your text file to use later
 
     ![A sample output of the python script is shown with a modelID value highlighted.](media/ex5-task2a-09.png "Visual Studio Code output window")
+
+    >**Note**: If you receive an error stating the **requests** module is not found, from the terminal window in Visual Studio code, execute: **pip install requests**
 
 ### Task 3: Configure a skillset with Form Recognizer
 
@@ -1299,117 +1301,81 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
    ![The top toolbar menu is displayed with the Discard all button highlighted.](media/toptoolbar_discardall.png "Discard changes")
 
-6. Select the **Manage** hub from the left menu.
-
-    ![The left menu is displayed with the Manage item selected.](media/ex5-task4-002.png "The Manage Hub")
-
-7. In the next pane, select **Linked services** from beneath the **External connections** header.
-
-    ![The next navigation pane is shown with the Linked services item highlighted.](media/ex5-task4-003.png "Linked services link")
-
-8. Select **+New** to create a new linked service to the invoice blob storage service.
-
-    ![The New linked service screen is shown with the +New button is highlighted in the toolbar.](media/ex5-task4-004.png "Creating a new Linked service")
-
-9. In the **New linked service** blade, select **Azure Blob Storage** then **Continue**.
-
-    ![The new linked service screen is displayed with the Azure Blob Storage tile selected.](media/ex5-task4-005.png "New linked service type selection")
-
-10. Configure the linked service by providing a name that makes sense, such as invoices. Select the Azure subscription and the invoices Storage account name. Leave everything else set to its default. Select **Create**.
-
-    ![The Azure Blob Storage linked service configuration is shown and populated as indicated above.](media/ex5-task4-006.png "Azure Blob Storage linked service configuration form")
-
-11. Select **+New** to create another linked service.
-
-    ![The +New button is shown on the Linked service page.](media/ex5-task4-004.png "Add a new linked service")
-
-12. In the **New linked service** blade, select **Azure Synapse Analytics (formerly SQL DW)** and select **Continue**.
-
-    ![The Azure Synapse Analytics (formerly SQL DW) tile is selected from a listing of linked serivce types.](media/ex5-task4-007.png "New Azure Synapse Analytics linked service")
-
-13. Configure the linked service by providing a name that makes sense, such as **SQLDatabase**. Select the Azure subscription, server name, database name. Switch the Authentication type to managed identity. Leave everything else with their defaults. Select **Create**.
-
-    ![The Azure Synapse Analytics linked service configuration form is shown populated with the preceding values.](media/ex5-task4-008.png "New Azure Synapse linked service configuration form")
-
-14. You should see the two new linked services now.
-
-    ![Two new linked services are now shown in the linked services list.](media/ex5-task4-010.png "The linked services list")
-
-15. Select the **Orchestrate** hub from the left navigation.
+6. Select the **Orchestrate** hub from the left navigation.
 
     ![The Orchestrate hub is selected from the left navigation.](media/ex5-task4-012.png "The Orchestrate hub")
 
-16. In the Orchestrate blade, expand the **+** button and then select **Pipeline** to create a new pipeline.
+7. In the Orchestrate blade, expand the **+** button and then select **Pipeline** to create a new pipeline.
 
     ![The + button is expanded with the pipeline option selected.](media/ex5-task4-013.png "Create a new pipeline")
 
-17. Name your pipeline **InvoiceProcessing**.
+8. Name your pipeline **InvoiceProcessing**.
 
     ![The new pipeline properties are shown with InvoiceProcessing entered as the name of the pipeline.](media/ex5-task4-014.png "Naming the pipeline")
 
-18. On the pipeline taskbar, select **Add trigger** then choose **New/Edit** to create an event to start the pipeline.
+9. On the pipeline taskbar, select **Add trigger** then choose **New/Edit** to create an event to start the pipeline.
 
     ![The Add trigger button is expanded with the New/Edit option selected.](media/ex5-task4-015.png "New Trigger menu item")
 
-19. On the Add triggers form, select  **+New** from the the **Choose trigger** dropdown.
+10. On the Add triggers form, select  **+New** from the the **Choose trigger** dropdown.
 
     ![The Add triggers form is displayed with the Choose trigger dropdown expanded and the +New item is selected.](media/ex5-task4-016.png "Choosing to create a new trigger")
 
-20. For this exercise, we're going to do a schedule. However, in the future you'll also be able to use an event-based trigger that would fire off new JSON files being added to blob storage. Set the trigger to start every 5 minutes, then select **OK**.
+11. For this exercise, we're going to do a schedule. However, in the future you'll also be able to use an event-based trigger that would fire off new JSON files being added to blob storage. Set the trigger to start every 5 minutes, then select **OK**.
 
     ![The new trigger form is displayed with the trigger set to start every 5 minutes.](media/ex5-task4-017.png "New trigger form")
 
-21. Select **OK** on the Run Parameters form, nothing needs to be done here.
+12. Select **OK** on the Run Parameters form, nothing needs to be done here.
 
-22. Next we need to add a Data Flow to the pipeline. Under Activities, expand **Move & transform** then drag and drop a **Data flow** onto the designer canvas.
+13. Next we need to add a Data Flow to the pipeline. Under Activities, expand **Move & transform** then drag and drop a **Data flow** onto the designer canvas.
 
     ![The pipeline designer is shown with an indicator of a drag and drop operation of the data flow activity.](media/ex5-task4-018.png "The Data flow activity")
 
-23. On the **Adding data flow** form, select **Create new data flow** and name it **NewInvoicesProcessing**.
+14. On the **Adding data flow** form, select **Create new data flow** and name it **NewInvoicesProcessing**.
 
     ![The Adding data flow form is displayed populated with the preceding values.](media/ex5-task4-019.png)
 
-24. On the **NewInvoicesProcessing** data flow design canvas. Select the **Add source** box. Select the **invoices** linked service as the source for our data flow and select **Add Source**.
+15. On the **NewInvoicesProcessing** data flow design canvas. Select the **Add source** box. Select the **invoices** linked service as the source for our data flow and select **Add Source**.
 
     ![The NewInvoicesProcessing designer is shown with the Add source box selected.](media/ex5-task4-020.png "The NewInvoicesProcessing designer")
 
-25. Name the output stream **jsonInvoice**, leave the source type as **Dataset**, and keep all the remaining options set to their defaults. Select **+New** next to the Dataset field.
+16. Name the output stream **jsonInvoice**, leave the source type as **Dataset**, and keep all the remaining options set to their defaults. Select **+New** next to the Dataset field.
 
     ![The Source settings tab is displayed populated with the name of jsonInvoice and the +New button next to the Dataset field is selected.](media/ex5-task4-021.png "Source Settings")
 
-26. In the **New dataset blade**, select **Azure Blob Storage**.
+17. In the **New dataset blade**, select **Azure Blob Storage**.
 
     ![The New dataset blade is displayed with Azure Blob Storage selected.](media/ex5-task4-022.png "Azure Blob Storage dataset")
 
-27. On the **Select format** blade, select **Json** then select **Continue**.
+18. On the **Select format** blade, select **Json** then select **Continue**.
 
     ![The select format screen is displayed with Json selected as the type.](media/ex5-task4-023.png "Select format form")
 
-28. On the **Set properties** screen, name the dataset **InvoicesJson** then for the linked service field, choose the Azure Storage linked service that you created earlier.
+19. On the **Set properties** screen, name the dataset **InvoicesJson** then for the linked service field, choose the Azure Storage linked service that you created earlier.
 
     ![A portion of the Set properties form is displayed populated with the above values.](media/ex5-task4-024.png "Dataset Set properties form")
 
-29. For the file path field, enter **invoices-json** and set the import schema field to **From sample file**.
+20. For the file path field, enter **invoices-json** and set the import schema field to **From sample file**.
 
     ![The set properties form is displayed with the file path and import schema fields populated as described.](media/ex5-task4-025.png "Data set properties form")
 
-30. Select **Browse** and select the file located at **/environment-setup/synapse/sampleformrecognizer.json** and select **OK**.
+21. Select **Browse** and select the file located at **/environment-setup/synapse/sampleformrecognizer.json** and select **OK**.
 
     ![The Set properties form is displayed with the sampleformrecognizer.json selected as the selected file.](media/ex5-task4-026.png "Data set properties form")
 
-31. Select the **Source options** tab on the bottom pane. Add \*/\* to the Wildcard paths field.
+22. Select the **Source options** tab on the bottom pane. Add \*/\* to the Wildcard paths field.
 
     ![The Source options tab is shown with the Wildcard paths field populated as specified.](media/ex5-task4-048.png "Source options tab")
 
-32. On the Data flow designer surface, select **+** to the lower right of the source activity to add another step in your data flow.
+23. On the Data flow designer surface, select **+** to the lower right of the source activity to add another step in your data flow.
 
     ![The + button is highlighted to the lower right of the source activity.](media/ex5-task4-028.png "Adding a data flow step")
 
-33. From the list of options, select **Derived column** from beneath the **Schema modifier** section.
+24. From the list of options, select **Derived column** from beneath the **Schema modifier** section.
 
     ![With the + button expanded, Derived column is selected from the list of options.](media/ex5-task4-029.png "Adding a derived column activity")
 
-34. On the **Derived column's settings** tab, provide the output stream name of **RemoveCharFromStrings**. Then for the Columns field, add 3 columns and configure them as follows:
+25. On the **Derived column's settings** tab, provide the output stream name of **RemoveCharFromStrings**. Then for the Columns field, add 3 columns and configure them as follows:
 
     | Column | Expression |
     |--------|------------|
@@ -1419,39 +1385,39 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
      ![The Derived column's settings tab is shown with the fields populated as described.](media/ex5-task4-030.png "The derived column's settings tab")
 
-35. Return to the Data flow designer, select the **+** next to the derived column activity to add another step to your data flow.
+26. Return to the Data flow designer, select the **+** next to the derived column activity to add another step to your data flow.
 
-36. This time select the **Alter Row** from beneath the **Row modifier** section.
+27. This time select the **Alter Row** from beneath the **Row modifier** section.
 
     ![In the Row modifier section, the Alter Row option is selected.](media/ex5-task4-031.png "The Alter row activity")
 
-37. On the **Alter row settings** tab on the bottom pane, Name the Output stream **AlterTransactionID**, and leave the incoming stream set to the default value. Change **Alter row conditions** field to **"Upsert If** and then set the expression to **notEquals(transactionid,"")**
+28. On the **Alter row settings** tab on the bottom pane, Name the Output stream **AlterTransactionID**, and leave the incoming stream set to the default value. Change **Alter row conditions** field to **"Upsert If** and then set the expression to **notEquals(transactionid,"")**
 
     ![The Alter row settings tab is shown populated with the values described above.](media/ex5-task4-032.png "The Alter row settings tab")
 
-38. Return to the Data flow designer, select the **+** to the lower right of the **Alter Row** activity to add another step into your data flow.
+29. Return to the Data flow designer, select the **+** to the lower right of the **Alter Row** activity to add another step into your data flow.
 
-39. Within the **Destination** section, select **Sink**.
+30. Within the **Destination** section, select **Sink**.
 
     ![In the activity listing, the sink option is selected from within the Destination section.](media/ex5-task4-033.png "The Sink Activity")
 
-40. On the bottom pane, with the **Sink** tab selected, name the Output stream name **SQLDatabase** and leave everything else set to the default values. Next to the **Dataset** field, select **+New** to add a new Dataset.
+31. On the bottom pane, with the **Sink** tab selected, name the Output stream name **SQLDatabase** and leave everything else set to the default values. Next to the **Dataset** field, select **+New** to add a new Dataset.
 
     ![The sink tab is shown with the output stream name set to SQLDatabase and the +New button selected next to the Dataset field.](media/ex5-task4-034.png "The Sink tab")
 
-41. On the **New dataset** blade, select **Azure Synapse Analytics (formerly SQL DW)** and select **Continue**.
+32. On the **New dataset** blade, select **Azure Synapse Analytics (formerly SQL DW)** and select **Continue**.
 
     ![Azure Synapse Analytics is selected in a list of dataset types.](media/ex5-task4-035.png "Selecting the Azure Synapse Analytics dataset type")
 
-42. Set the name of the Dataset to **InvoiceTable** and choose the database linked Service we created earlier. Choose **Select from existing table** and choose the **dbo.Invoices** table. If you don't see it in the list of your table names, select the **Refresh** button and it should show up. Select **OK**.
+33. Set the name of the Dataset to **InvoiceTable** and choose the database linked Service we created earlier. Choose **Select from existing table** and choose the **dbo.Invoices** table. If you don't see it in the list of your table names, select the **Refresh** button and it should show up. Select **OK**.
 
     ![The Dataset Set properties form is displayed populated as described.](media/ex5-task4-036.png "Set properties form")
 
-43. In the bottom pane, with the Sink activity selected on the data flow designer, select the **Settings** tab and check the box to **Allow upsert**. Set the **Key columns** field to **transactionid**.
+34. In the bottom pane, with the Sink activity selected on the data flow designer, select the **Settings** tab and check the box to **Allow upsert**. Set the **Key columns** field to **transactionid**.
 
     ![The Settings tab of the Sink activity is shown and is populated as described.](media/ex5-task4-037.png "Sink Settings tab")
 
-44. Select the **Mapping** tab, disable the **Auto mapping** setting and configure the mappings between the json file and the database. Select **+ Add mapping** then choose **Fixed mapping** to add the following mappings:
+35. Select the **Mapping** tab, disable the **Auto mapping** setting and configure the mappings between the json file and the database. Select **+ Add mapping** then choose **Fixed mapping** to add the following mappings:
 
     | Input column | Output column |
     |--------------|---------------|
@@ -1464,41 +1430,41 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
     ![The Mapping tab is displayed with Auto Mapping disabled and the column mappings from the table above are defined.](media/ex5-task4-038.png "The Mapping tab")
 
-45. Return to the **InvoiceProcessing** pipeline by selecting its tab at the top of the workspace.
+36. Return to the **InvoiceProcessing** pipeline by selecting its tab at the top of the workspace.
 
     ![The InvoiceProcessing tab is selected at the top of the workspace.](media/ex5-task4-039.png "The InvoiceProcessing pipeline tab")
 
-46. Select the data flow activity on the pipeline designer surface, then in the bottom pane, select the **Settings** tab.
+37. Select the data flow activity on the pipeline designer surface, then in the bottom pane, select the **Settings** tab.
 
     ![The data flow activity Settings tab is displayed.](media/ex5-task4-040.png "The Settings tab")
 
-47. Under the **PolyBase** settings, set the **Staging linked service** to the **invoices** linked service. Enter **invoices-staging** as the **Storage staging folder**.
+38. Under the **PolyBase** settings, set the **Staging linked service** to the **invoices** linked service. Enter **invoices-staging** as the **Storage staging folder**.
 
     ![The data flow activity Settings tab is displayed with its form populated as indicated above.](media/ex5-task4-041.png "The Settings tab")
 
-48. Select **Publish All** from the top toolbar.
+39. Select **Publish All** from the top toolbar.
 
     ![The Publish All button is selected from the top toolbar.](media/ex5-task4-042.png "The Publish all button")
 
-49. Select **Publish**.
+40. Select **Publish**.
 
-50. Within a few moments, you should see a notification that Publishing completed.
+41. Within a few moments, you should see a notification that Publishing completed.
 
     ![The Publishing completed notification is shown.](media/ex5-task4-043.png "The Publishing Completed notification")
 
-51. From the left menu, select the **Monitor** hub, then ensure the **Pipeline runs** option is selected from the hub menu.
+42. From the left menu, select the **Monitor** hub, then ensure the **Pipeline runs** option is selected from the hub menu.
 
     ![The Monitor hub is selected from the left menu.](media/ex5-task4-044.png "The Monitor Hub menu option")
 
-52. Within 5 minutes, you should see the **InvoiceProcessing** pipeline begin processing. You may need to refresh this list to see it appear, a refresh button is located in the toolbar.
+43. Within 5 minutes, you should see the **InvoiceProcessing** pipeline begin processing. You may need to refresh this list to see it appear, a refresh button is located in the toolbar.
 
     ![On the Pipeline runs list, the InvoiceProcessing pipeline is shown as in-progress.](media/ex5-task4-045.png "The Pipeline runs list")
 
-53. After about 3 or 4 minutes it will complete. You may need to refresh the list to see the completed pipeline.
+44. After about 3 or 4 minutes it will complete. You may need to refresh the list to see the completed pipeline.
 
     ![The Pipeline runs list is displayed with the InvoiceProcessing pipeline shown as succeeded.](media/ex5-task4-046.png "The pipeline runs list")
 
-54. From the left menu, select the **Develop** hub, then expand the **+** button an choose **SQL Script**. Ensure the proper database is selected, then run the following query to verify the data from the two test invoices.
+45. From the left menu, select the **Develop** hub, then expand the **+** button an choose **SQL Script**. Ensure the proper database is selected, then run the following query to verify the data from the two test invoices.
 
     ```SQL
     SELECT * FROM dbo.Invoices

@@ -4,9 +4,9 @@ import time
 from requests import get, post
 
 # Endpoint URL
-endpoint = r"https://wwiformsreader.cognitiveservices.azure.com/"
+endpoint = r"https://mcwformrecognizer.cognitiveservices.azure.com/"
 post_url = endpoint + r"/formrecognizer/v2.0/custom/models"
-source = r"https://mcwsynapseforms.blob.core.windows.net/invoices?sv=2019-10-10&ss=b&srt=co&sp=rl&se=2021-01-01T06:25:50Z&st=2020-06-23T21:25:50Z&spr=https&sig=6ksjolmm3XokVca3aiQ9tVHhZXySratGKB9dWxoT2ng%3D"
+source = r"https://asastorecep321.blob.core.windows.net/?sv=2019-12-12&ss=bfqt&srt=sco&sp=rwdlacupx&se=2020-08-09T02:35:49Z&st=2020-07-29T18:35:49Z&spr=https&sig=QrLduUGU0NFfnkmoNJu2Gs7dZ0Pr0M56VWygUHkrX3I%3D"
 prefix = "Train"
 includeSubFolders = False
 useLabelFile = False
@@ -14,7 +14,7 @@ useLabelFile = False
 headers = {
     # Request headers
     'Content-Type': 'application/json',
-    'Ocp-Apim-Subscription-Key': '8a5370dee48a42038bcd6dfdca49642b',
+    'Ocp-Apim-Subscription-Key': 'bc0c8f4327e64124862d915d9187d277',
 }
 
 body =     {

@@ -44,6 +44,16 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 1. An Azure Account with the ability to create an Azure Synapse Workspace.
 
+2. [Python v.3.7 or newer](https://www.python.org/downloads/)
+
+3. [PIP](https://pip.pypa.io/en/stable/installing/#do-i-need-to-install-pip)
+
+4. [Visual Studio Code](https://code.visualstudio.com/)
+
+5. [Python Extension for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+
+6. [Postman](https://www.postman.com/downloads/)
+
 ## Before the hands-on lab
 
 **Duration**: 20 minutes
