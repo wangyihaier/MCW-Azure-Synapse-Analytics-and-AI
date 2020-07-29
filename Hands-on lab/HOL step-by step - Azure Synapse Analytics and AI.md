@@ -1154,13 +1154,13 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
 16. From the **File** menu, select **Open file** then choose to open **Hands-on lab/artifacts/pocformreader.py**.
 
-17. Update Lines 7, 9, and 13 with the appropriate values indicated below:
+17. Update Lines 7, 9, and 17 with the appropriate values indicated below:
 
     - Line 7: The endpoint of Azure Cognitive Services.
 
     - Line 9: The Blob Service SAS URL storage account with your Train and Test invoice folders.
 
-    - Line 13: The key for your Azure Cognitive Service endpoint.
+    - Line 17: The key for your Azure Cognitive Service endpoint.
 
     ![The source code listing of pocformreader.py is displayed with the lines mentioned above highlighted.](media/ex5-task2a-06.png "The source listing of pocofrmreader.py")
 
