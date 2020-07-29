@@ -564,15 +564,34 @@ Similar to the customer information table, we will also be populating the campai
 
     ![On the Select format blade the CSV Delimited Text item is highlighted.](media/newdataset_selectfileformat_csv.png "Selecting the dataset format")
 
-4. On the **Properties** blade, set the name of the dataset to **asamcw_campaignanalytics_csv**.
+4. On the **Set properties** blade, set the fields to the following values, then select **OK**. You may choose to preview the data which will show a sample of the CSV file. Notice that since we are not setting the first row as the header, the header columns appear as the first row. Also, notice that the city and state values do not appear. This is because of the mismatch in the number of columns in the header row compared to the rest of the file. Soon, we will exclude the first row as we transform the data.
 
-5. Now we will need to define the destination dataset for our data. In this case we will be storing campaign analytics data in our SQL Pool. On the **Data** blade, expand the **+** button and select **Dataset**.
+   | Field | Value |
+   |-------|-------|
+   | Name  | Enter **asamcw_campaignanalytics_csv** |
+   | Linked service | Select **asadatalake{SUFFIX}**.|
+   | File Path - Container | Enter **wwi-02** |
+   | File Path - Directory | Enter **campaign-analytics** |
+   | File Path - File | Enter **campaignanalytics.csv** |
+   | First row as header | Unchecked |
+   | Import schema | Select **From connection/store** |
 
-6. On the **New dataset** blade, with the **Azure** tab selected, enter **synapse** as a search term and select the **Azure Synapse Analytics (formerly SQL DW)** item. Select **Continue**.
+    ![The Set properties form is displayed with the values specified in the previous table.](media/campaignanalyticsdatasetpropertiesform.png)
+
+5. In the center pane, on the **Connection** tab of **asamcw_campainganalytics_csv** dataset, ensure the following field values are set:
+
+   | Field | Value |
+   |-------|-------|
+   | Escape Character  | **Backslash (\\\)** |
+   | Quote Character | **Double quote (")** |  
+
+6. Now we will need to define the destination dataset for our data. In this case we will be storing campaign analytics data in our SQL Pool. On the **Data** blade, expand the **+** button and select **Dataset**.
+
+7. On the **New dataset** blade, with the **Azure** tab selected, enter **synapse** as a search term and select the **Azure Synapse Analytics (formerly SQL DW)** item. Select **Continue**.
 
     ![On the New dataset blade, synapse is entered as the search term and Azure Synapse Analytics (formerly SQL DW) is selected from the filtered results.](media/newdataset_synapseitem.png "Selecting the dataset type")
   
-7. On the **Set properties** blade, set the field values to the following, then select **OK**.
+8. On the **Set properties** blade, set the field values to the following, then select **OK**.
 
    | Field | Value |
    |-------|-------|
@@ -582,24 +601,24 @@ Similar to the customer information table, we will also be populating the campai
    | Import schema | Select **From connection/store**. |
 
     ![The Set properties blade is populated with the values specified in the preceding table.](media/dataset_campaignanalyticsasaform.png "The dataset configuration form")
-  
-8. In the top toolbar, select **Publish all** to publish the new dataset definitions. When prompted, select the **Publish** button to commit the changes.
+
+9. In the top toolbar, select **Publish all** to publish the new dataset definitions. When prompted, select the **Publish** button to commit the changes.
 
     ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png "Publish changes")
 
-9. Since our source data is malformed and does not contain an Analyst column, we will need to create a data flow to transform the source data. A data flow allows you to graphically define dataset filters and transformations without writing code. These data flows can be leveraged as an activity in an orchestration pipeline. Create a new data flow, start by selecting **Develop** from the left menu, and in the **Develop** blade, expand the **+** button and select **Data flow**.
+10. Since our source data is malformed and does not contain an Analyst column, we will need to create a data flow to transform the source data. A data flow allows you to graphically define dataset filters and transformations without writing code. These data flows can be leveraged as an activity in an orchestration pipeline. Create a new data flow, start by selecting **Develop** from the left menu, and in the **Develop** blade, expand the **+** button and select **Data flow**.
 
     ![From the left menu, the Develop item is selected. From the Develop blade the + button is expanded with the Data flow item highlighted.](media/develop_newdataflow_menu.png "Create a new data flow")
 
-10. In the **Properties** blade name the data flow by entering **ASAMCW_Exercise_2_Campaign_Analytics_Data** in the **Name** field.
+11. In the **Properties** blade name the data flow by entering **ASAMCW_Exercise_2_Campaign_Analytics_Data** in the **Name** field.
 
     ![The Properties blade is displayed with ASAMCW_Exercise_2_Campaign_Analytics_Data entered as the name of the data flow.](media/dataflow_campaignanalytics_propertiesblade.png "Naming the data flow")
 
-11. In the data flow designer window, select the **Add Source** box.
+12. In the data flow designer window, select the **Add Source** box.
 
     ![The Add source box is highlighted in the data flow designer window.](media/dataflow_addsourcebox.png "Adding a data flow source")
 
-12. Under **Source settings**, configure the following:
+13. Under **Source settings**, configure the following:
 
     | Field | Value |
     |-------|-------|
@@ -610,11 +629,11 @@ Similar to the customer information table, we will also be populating the campai
 
     ![The Source settings tab is displayed with a form populated with the values defined in the preceding table.](media/dataflow_campaignanalytics_sourcesettings.png "The data flow configuration form")
 
-13. When you create data flows, certain features are enabled by turning on debug, such as previewing data and importing a schema (projection). Due to the amount of time it takes to enable this option, as well as environmental constraints of the lab environment, we will bypass these features. The data source has a schema we need to set. To do this, select **Script** from the right side of the dataflow designer toolbar menu.
+14. When you create data flows, certain features are enabled by turning on debug, such as previewing data and importing a schema (projection). Due to the amount of time it takes to enable this option, as well as environmental constraints of the lab environment, we will bypass these features. The data source has a schema we need to set. To do this, select **Script** from the right side of the dataflow designer toolbar menu.
 
     ![A portion of the dataflow designer toolbar is shown with the Script icon highlighted.](media/dataflow_toolbarscriptmenu.png "The data flow script icon")
 
-14. Replace the script with the following to provide the column mappings (`output`), then select **OK**:
+15. Replace the script with the following to provide the column mappings (`output`), then select **OK**:
 
     ```json
         source(output(
@@ -636,15 +655,15 @@ Similar to the customer information table, we will also be populating the campai
 
     > **Note**: We are changing the mappings as the source file was corrupted with the wrong headers.
 
-15. Select the **campaignanalyticscsv** data source, then select **Projection**. The projection should display the following schema:
+16. Select the **campaignanalyticscsv** data source, then select **Projection**. The projection should display the following schema:
 
     ![The Projection tab is displayed with columns defined as described in the column mapping script.](media/dataflow_campaignanalytics_projectiontab.png "The column mappings of the source")
 
-16. Select the **+** to the bottom right of the **campaignanalyticscsv** source, then select the **Select** schema modifier from the context menu.
+17. Select the **+** to the bottom right of the **campaignanalyticscsv** source, then select the **Select** schema modifier from the context menu.
 
     ![The + button on the bottom right of the campaignanalyticscsv source is highlighted.](media/dataflow_campaignanalytics_addstep.png "Adding a Select schema modifier")
 
-17. In the bottom pane, under **Select settings**, configure the following:
+18. In the bottom pane, under **Select settings**, configure the following:
 
     | Field | Value |
     |-------|-------|
@@ -664,13 +683,13 @@ Similar to the customer information table, we will also be populating the campai
 
     ![The Select settings tab is displayed with the form filled as described in the preceding table.](media/dataflow_mapcampaignanalytics_selectsettings.png "Configuring the Select schema modifier")
 
-18. Select the **+** to the right of the **mapCampaignAnalytics** source, then select the **Derived Column** schema modifier from the context menu.
+19. Select the **+** to the right of the **mapCampaignAnalytics** source, then select the **Derived Column** schema modifier from the context menu.
 
-19. Under **Derived column's settings**, configure the following:
+20. Under **Derived column's settings**, configure the following:
 
     | Field | Value |
     |-------|-------|
-    | Output stream name  | Enter **convertandaddcolums**. |
+    | Output stream name  | Enter **convertandaddcolumns**. |
 
     For **Columns**, add the following (Note you will need to type in the **Analyst** column):
 
@@ -682,9 +701,9 @@ Similar to the customer information table, we will also be populating the campai
 
     ![The derived column's settings are displayed as described.](media/dataflow_campaignanalytics_derivedcolumns.png "Deriving columns based on expressions")
 
-20. Select the **+** to the right of the **convertandaddcolumns** step, then select the **Select** schema modifier from the context menu.
+21. Select the **+** to the right of the **convertandaddcolumns** step, then select the **Select** schema modifier from the context menu.
 
-21. Under **Select settings**, configure the following:
+22. Under **Select settings**, configure the following:
 
     | Field | Value |
     |-------|-------|
@@ -693,9 +712,9 @@ Similar to the customer information table, we will also be populating the campai
 
     ![The Select settings are displayed showing the updated column mappings.](media/dataflow_campaignanalytics_select2.png "Configuring the Select schema modifier")
 
-22. Select the **+** to the right of the **selectcampaignanalyticscolumns** step, then select the **Sink** destination from the context menu.
+23. Select the **+** to the right of the **selectcampaignanalyticscolumns** step, then select the **Sink** destination from the context menu.
 
-23. In the bottom pane, on the **Sink** tab, configure it as follows:
+24. In the bottom pane, on the **Sink** tab, configure it as follows:
 
     | Field | Value |
     |-------|-------|
@@ -704,31 +723,31 @@ Similar to the customer information table, we will also be populating the campai
 
     ![The Sink settings form is displayed populated with the values defined in the previous table.](media/dataflow_campaignanalytics_sink.png "Configuring the data flow sink")
 
-24. Select **Settings** tab, and for **Table action** select **Truncate table**.
+25. Select **Settings** tab, and for **Table action** select **Truncate table**.
 
     ![The sink Settings tab is displayed with the Table action set to Truncate table.](media/dataflow_campaignanalytics_sinksettings.png "Truncate table action")
 
-25. Your completed data flow should look similar to the following:
+26. Your completed data flow should look similar to the following:
 
     ![The completed data flow is displayed.](media/dataflow_campaignanalytics_complete.png "The completed data flow")
   
-26. Select **Publish all** to save your new data flow.
+27. Select **Publish all** to save your new data flow.
 
     ![Publish all is highlighted.](media/publishall_toolbarmenu.png "Publish all")
 
-27. Now that the data flow is published, we can use it in a pipeline. Create a new pipeline by selecting **Orchestrate** from the left menu, then in the **Orchestrate** blade, expand the **+** button and select **Pipeline**.
+28. Now that the data flow is published, we can use it in a pipeline. Create a new pipeline by selecting **Orchestrate** from the left menu, then in the **Orchestrate** blade, expand the **+** button and select **Pipeline**.
 
-28. In the **Properties** pane on the right side of the pipeline designer. Enter **ASAMCW - Exercise 2 - Copy Campaign Analytics Data** in the **Name** field.
+29. In the **Properties** pane on the right side of the pipeline designer. Enter **ASAMCW - Exercise 2 - Copy Campaign Analytics Data** in the **Name** field.
 
     ![The pipeline properties blade is displayed with the Name field populated with ASAMCW - Exercise 2 - Copy Campaign Analytics Data.](media/pipeline_properties_blade.png "Naming the pipeline")
 
-29. From the **Activities** menu, expand the **Move & transform** section and drag an instance of **Data flow** to the design surface of the pipeline.
+30. From the **Activities** menu, expand the **Move & transform** section and drag an instance of **Data flow** to the design surface of the pipeline.
   
     ![The Activities menu of the pipeline is displayed with the Move and transform section expanded. An arrow indicating a drag operation shows adding a Data flow activity to the design surface of the pipeline.](media/pipeline_sales_dataflowactivitymenu.png "Adding a data flow activity to the pipeline")
 
-30. In the **Adding data flow** blade, select the data flow **ASAMCW_Exercise_2_Campaign_Analytics_Data**, then **Finish**. Select the Mapping Data Flow activity on the design surface.
+31. In the **Adding data flow** blade, select the data flow **ASAMCW_Exercise_2_Campaign_Analytics_Data**, then **Finish**. Select the Mapping Data Flow activity on the design surface.
 
-31. In the bottom pane, select the **Settings** tab and set the form fields to the following values:
+32. In the bottom pane, select the **Settings** tab and set the form fields to the following values:
 
     | Field | Value |
     |-------|-------|
@@ -739,19 +758,19 @@ Similar to the customer information table, we will also be populating the campai
 
     ![The data flow activity Settings tab is displayed with the fields specified in the preceding table highlighted.](media/pipeline_campaigndata_dataflowsettings.png "Configuring the data flow activity")
 
-32. In the top toolbar, select **Publish all** to publish the new pipeline. When prompted, select the **Publish** button to commit the changes.
+33. In the top toolbar, select **Publish all** to publish the new pipeline. When prompted, select the **Publish** button to commit the changes.
 
     ![The top toolbar is displayed with the Publish all button highlighted.](media/publishall_toolbarmenu.png "Publish changes")
 
-33. Once published, expand the **Add trigger** item on the pipeline designer toolbar, and select **Trigger now**. In the **Pipeline run** blade, select **OK** to proceed with the latest published configuration. You will see notification toast window indicating the pipeline is running and when it has completed.
+34. Once published, expand the **Add trigger** item on the pipeline designer toolbar, and select **Trigger now**. In the **Pipeline run** blade, select **OK** to proceed with the latest published configuration. You will see notification toast window indicating the pipeline is running and when it has completed.
 
-34. View the status of the pipeline run by locating the **ASAMCW - Exercise 2 - Copy Campaign Analytics Data** pipeline in the Orchestrate blade. Expand the actions menu, and select the **Monitor** item.
+35. View the status of the pipeline run by locating the **ASAMCW - Exercise 2 - Copy Campaign Analytics Data** pipeline in the Orchestrate blade. Expand the actions menu, and select the **Monitor** item.
 
-    ![In the Orchestrate blade, the Action menu is displayed with the Monitor item selected on the ASAMCW - Exercise 2 - Copy Sale Data pipeline.](media/orchestrate_pipeline_monitor_copysaledata.png "Monitoring the pipeline run")
-  
-35. You should see a run of the pipeline we created in the **Pipeline runs** table showing as in progress. You will need to refresh this table from time to time to see updated progress. Once it has completed. You should see the pipeline run displayed with a Status of **Succeeded**.
+    ![In the Orchestrate blade, the Action menu is displayed with the Monitor item selected on the ASAMCW - Exercise 2 - Copy Campaign Analytics Data pipeline.](media/orchestrate_pipeline_monitor_copycampaigndata.png "Monitoring the pipeline run")
 
-36. Verify the table has populated by creating a new query. Select the **Develop** item from the left menu, and in the **Develop** blade, expand the **+** button, and select **SQL script**. In the query window, be sure to connect to the SQL Pool database (`SQLPool01`), then paste and run the following query. When complete, select the **Discard all** button from the top toolbar.
+36. You should see a run of the pipeline we created in the **Pipeline runs** table showing as in progress. You will need to refresh this table from time to time to see updated progress. Once it has completed. You should see the pipeline run displayed with a Status of **Succeeded**.
+
+37. Verify the table has populated by creating a new query. Select the **Develop** item from the left menu, and in the **Develop** blade, expand the **+** button, and select **SQL script**. In the query window, be sure to connect to the SQL Pool database (`SQLPool01`), then paste and run the following query. When complete, select the **Discard all** button from the top toolbar.
 
   ```sql
     select count(Region) from wwi_mcw.CampaignAnalytics;
@@ -1599,7 +1618,7 @@ In many organizations it is important to filter certain rows of data by user. In
     Let see how we can implement row level security in Azure Synapse.*/
 
     -- Row-Level Security (RLS), 1: Filter predicates
-    -- Step:1 The Sale table has two Analyst values: DataAnalystMiami and DataAnalystSanDiego. 
+    -- Step:1 The Sale table has two Analyst values: DataAnalystMiami and DataAnalystSanDiego.
     --     Each analyst has jurisdiction across a specific Region. DataAnalystMiami on the South East Region
     --      and DataAnalystSanDiego on the Far West region.
     SELECT DISTINCT Analyst, Region FROM wwi_mcw.CampaignAnalytics order by Analyst ;
@@ -1985,7 +2004,7 @@ Users should avoid a workload management solution that configures 100% workload 
     ```
 
     > **Note**: Configuring workload containment implicitly defines a maximum level of concurrency. With a CAP_PERCENTAGE_RESOURCE set to 60% and a REQUEST_MIN_RESOURCE_GRANT_PERCENT set to 1%, up to a 60-concurrency level is allowed for the workload group. Consider the method included below for determining the maximum concurrency:
-    > 
+    >
     > [Max Concurrency] = [CAP_PERCENTAGE_RESOURCE] / [REQUEST_MIN_RESOURCE_GRANT_PERCENT]
 
 13. Let's flood the system again and see what happens for `asa.sql.workload02`. To do this, we will run an Azure Synapse Pipeline that runs a large number of queries. Select the `Orchestrate` Tab. **Run** the **Exercise 7 - Execute Business Analyst Queries** Pipeline, which will run the `asa.sql.workload02` queries.
@@ -2136,8 +2155,7 @@ All logins to your data warehouse are logged to `sys.dm_pdw_exec_sessions`. This
 2. Open the Cloud Shell and issue the following command to remove the lab files:
 
    ```PowerShell
-   Remove-Item -Path .\Synapse-MCW -recurse -force
-   Remove-Item -Path .\modelconversion -recurse -force
+   Remove-Item -Path .\Synapse-MCW -recurse -force  
    ```
 
 You should follow all steps provided *after* attending the Hands-on lab.

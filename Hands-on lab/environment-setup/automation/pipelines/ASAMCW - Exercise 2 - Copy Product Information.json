@@ -36,7 +36,14 @@
                         },
                         "disableMetricsCollection": false
                     },
-                    "enableStaging": false,
+                    "enableStaging": true,
+                    "stagingSettings": {
+                        "linkedServiceName": {
+                            "referenceName": "#STORAGELINKEDSERVICENAME#",
+                            "type": "LinkedServiceReference"
+                        },
+                        "path": "staging"
+                    },
                     "translator": {
                         "type": "TabularTranslator",
                         "mappings": [
