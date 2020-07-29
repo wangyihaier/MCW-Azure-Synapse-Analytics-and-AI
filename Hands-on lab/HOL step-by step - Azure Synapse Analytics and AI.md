@@ -51,7 +51,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
     - [Task 2: Query JSON data](#task-2-query-json-data)
   - [Exercise 5: Synapse Pipelines & Cognitive Search](#exercise-5-synapse-pipelines--cognitive-search)
     - [Task 1: Create the invoice storage container](#task-1-create-the-invoice-storage-container)
-    - [Task 2: Create and train an Azure Forms recognizer model and Cognitive Search](#task-2-create-and-train-an-azure-forms-recognizer-model-and-cognitive-search)
+    - [Task 2: Create and train an Azure Forms recognizer model and setup Cognitive Search](#task-2-create-and-train-an-azure-forms-recognizer-model-and-setup-cognitive-search)
     - [Task 3: Configure a skillset with Form Recognizer](#task-3-configure-a-skillset-with-form-recognizer)
     - [Task 4: Create the Synapse Pipeline](#task-4-create-the-synapse-pipeline)
   - [Exercise 6: Security](#exercise-6-security)
@@ -1086,7 +1086,11 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
     ![The SAS form is shown with the shared access signature blob service SAS URL highlighted.](media/ex5-task1a-013.png "The SAS URL")
 
-### Task 2: Create and train an Azure Forms recognizer model and Cognitive Search
+17. Modify the SAS URL that you just copied and add the **invoices** container name just before the **?** character.
+
+    >**Example**: https://asastore{{suffix}.blob.core.windows.net/**invoices**?sv=2019-12-12&ss=bfqt&srt ...
+
+### Task 2: Create and train an Azure Forms recognizer model and setup Cognitive Search
 
 1. Browse to your Azure Portal homepage, select **+ Create a resource**, then search for and select **Form Recognizer** from the search results.
 
@@ -1110,55 +1114,67 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
 4. Wait for the service to provision then navigate to the resource.
 
-5. From the left menu, select **Keys and Endpoint**.
+5. In your browser, copy the URL of the resource. Extract a portion of this URL from the **/subscription** and ending with the **/accounts/yourservicename**. As an example: **/subscriptions/yoursubscriptionid/resourceGroups/synapse-mcw/providers/Microsoft.CognitiveServices/accounts/yourservicename**. Paste this value into your text document for use later on.
+
+    ![The Form Recognizer resource screen is shown with a portion of the current URL highlighted in the address bar of the web browser.](media/formsrecognizerresourceurl.png "Form recognizer resource URL")
+
+6. From the left menu, select **Keys and Endpoint**.
 
     ![The left side navigation is shown with the Keys and Endpoint item highlighted.](media/ex5-task2a-04.png "Left menu navigation")
 
-6. Copy and Paste both KEY 1 and the ENDPOINT values. Put these in the same location as the storage connection string you copied earlier
+7. Copy and Paste both KEY 1 and the ENDPOINT values. Put these in the same location as the storage connection string you copied earlier
 
     ![The Keys and Endpoint screen is shown with KEY 1 and ENDPOINT values highlighted.](media/ex5-task2a-05.png "The Keys and Endpoint screen")
 
-7. Browse to your Azure Portal homepage, select **+ Create a new resource**, then search for and create a new instance of **Azure Cognitive Search**.
+8. Browse to your Azure Portal homepage, select **+ Create a new resource**, then search for and create a new instance of **Azure Cognitive Search**.
 
     ![The Azure Cognitive Search overview screen is displayed.](media/ex5-task1-006.png "Azure Cognititve Search Overview screen")
 
-8. Choose the subscription and the resource group you've been using for this lab. Set the URL of the Cognitive Search Service to a unique value, relating to search. Then, switch the pricing tier to **Free**.
+9. Choose the subscription and the resource group you've been using for this lab. Set the URL of the Cognitive Search Service to a unique value, relating to search. Then, switch the pricing tier to **Free**.
 
-    ![The configuration screen for Cognitive Search is displayed populated as described above.](media/ex5-task1-007.png "Cognitive services configuration")
+    ![The configuration screen for Cognitive Search is displayed populated as described above.](media/ex5-task1-007.png "Cognitive Search service configuration")
 
-9. Select **Review + create**.
+10. Select **Review + create**.
 
     ![displaying the review + create button](media/ex5-task1-008.png "The review and create button")
 
-10. Select **Create**.
+11. Select **Create**.
 
-11. Wait for the service to be provisioned.
+12. Wait for the Search service to be provisioned then navigate to the resource.
 
-12. Open Visual Studio Code.
+13. From the left menu, select **Keys**, copy the **Primary admin key** and paste it into your text document. Also make note of the name of your search service resource.
 
-13. From the **File** menu, select **Open file** then choose to open **Hands-on lab/artifacts/pocformreader.py**.
+    ![They Keys page of the Search service resource is shown with the Primary admin key value highlighted.](media/ex5-task3-010.png "Cognitive search keys")
 
-14. Update Lines 7, 9, and 13 with the appropriate values indicated below:
+14. Also make note of the name of your search service in the text document.
+
+    ![The Search Service name is highlighted on the Keys screen.](media/ex5-task3-011.png "Search service name")
+
+15. Open Visual Studio Code.
+
+16. From the **File** menu, select **Open file** then choose to open **Hands-on lab/artifacts/pocformreader.py**.
+
+17. Update Lines 7, 9, and 13 with the appropriate values indicated below:
 
     - Line 7: The endpoint of Azure Cognitive Services.
 
-    - Line 9: The Blob Service SAS URL storage account with your Train and Test invoice folders. Make sure to update the URL to include /invoices.
+    - Line 9: The Blob Service SAS URL storage account with your Train and Test invoice folders.
 
     - Line 13: The key for your Azure Cognitive Service endpoint.
 
     ![The source code listing of pocformreader.py is displayed with the lines mentioned above highlighted.](media/ex5-task2a-06.png "The source listing of pocofrmreader.py")
 
-15. Save the file.
+18. Save the file.
 
-16. Select Run, then Start Debugging.
+19. Select Run, then Start Debugging.
 
     ![The VS Code File menu is shown with Run selected and Start Debugging highlighted.](media/ex5-task2a-07.png "The VS Code File menu")
 
-17. In the **Debug Configuration**, select to debug the **Python File - Debug the currently active Python File** value.
+20. In the **Debug Configuration**, select to debug the **Python File - Debug the currently active Python File** value.
 
     ![The Debug Configuration selection is shown with Python File - Debug the currently active Python File highlighted.](media/ex5-task2a-08.png "Debug Configuration selection")
 
-18. When it completes, you should see an output similar to what is seen in the screenshot below. The output should also contain a modelID. Copy and paste this into your text file to use later
+21. When it completes, you should see an output similar to what is seen in the screenshot below. The output should also contain a modelID. Copy and paste this into your text file to use later
 
     ![A sample output of the python script is shown with a modelID value highlighted.](media/ex5-task2a-09.png "Visual Studio Code output window")
 
@@ -1166,17 +1182,17 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
 ### Task 3: Configure a skillset with Form Recognizer
 
-1. Open Visual Studio Code.
+1. Open a new instance of Visual Studio Code.
 
-2. In Visual Studio Code open the folder **/environment-setup/functions**.
+2. In Visual Studio Code open the folder **Hands-on lab/environment-setup/functions**.
 
    ![The file structure of the /environment-setup/functions folder is shown.](media/ex5-task1-001.png "The file structure of the functions folder")
 
-3. In the \_\_init\_\_.py file, update lines 66, 68, 70, and 73 with the appropriate values for your environment, the values that need replacing are located between **\<\<** and **\>\>** values.
+3. In the **GetInvoiceData/\_\_init\_\_.py** file, update lines 66, 68, 70, and 73 with the appropriate values for your environment, the values that need replacing are located between **\<\<** and **\>\>** values.
 
    ![The __init__.py code listing is displayed.](media/ex5-task1-step2.png "The __init__.py code listing")
 
-4. Use the Azure Functions extension to publish to a new Azure function in the same Resource Group as your Synapse workspace
+4. Use the Azure Functions extension to publish to a new Azure function. If you don't see the Azure Functions panel, go to the **View** menu, select **Open View...** and choose **Azure**. If the panel shows the **Sign-in to Azure** link, select it and log into Azure. Select the **Publish** button at the top of the panel.
 
    ![The Azure Functions extension panel in VS Code is displayed highlighting the button to publish the function.](media/ex5-task1-002.png "The Azure Function panel")
 
@@ -1196,11 +1212,23 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
         ![The Region selection dialog is shown.](media/ex5-task1-005.png "The region selection dialog")
 
-5. Now that we have the function publish and all our resources created, we can create the skillset. This will be accomplished using postman. If you don't have it downloaded and installed, you can get it from [https://www.postman.com/downloads/](https://www.postman.com/downloads/).
+5. Once publishing has completed, return to the Azure Portal and search for a resource group that was created with the same name as the Azure Function App.
 
-6. Open Postman.
+6. Within this resource group, open the **App Service** resource with the same name.
 
-7. From the **File** menu, select **Import** and choose to import the postman collection from **/environment-setup/skillset**.
+   ![A resource listing is shown with the App Service highlighted.](media/formrecognizerresourcelist.png "Resource group listing")
+
+7. From the left menu, beneath the **Functions** heading, select **Functions**.
+
+8. From the Functions listing, select **GetInvoiceData**.
+
+9. From the toolbar menu of the **GetInvoiceData** screen, select the **Get Function Url** item, then copy this value to your text document for later reference.
+
+    ![The GetInvoiceData function screen is shown with the Get Function Url button highlighted in the taskbar and the URL displayed in a textbox.](media/azurefunctionurlvalue.png "GetInvoiceData function screen")
+
+10. Now that we have the function published and all our resources created, we can create the skillset. This will be accomplished using **Postman**. Open Postman.
+
+11. From the **File** menu, select **Import** and choose to import the postman collection from **Hands-on lab/environment-setup/skillset**.
 
     ![The Postman File menu is expanded with the Import option selected.](media/ex5-task3-004.png "Postman File menu")
 
@@ -1208,62 +1236,62 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
     ![The file selection dialog is shown with the file located in the skillset folder highlighted.](media/ex5-task3-006.png "File selection dialog")
 
-8. Select Import.
+12. Select Import.
 
-9. In Postman, the Collection that was imported will give you 4 items in the **Create a KnowledgeStore** collection. These are: Create Index, Create Datasource, Create the skillset, and Create the Indexer.
+13. In Postman, the Collection that was imported will give you 4 items in the **Create a KnowledgeStore** collection. These are: Create Index, Create Datasource, Create the skillset, and Create the Indexer.
 
     ![The Collections pane is shown with the Create a KnowledgeStore collection expanded with the four items indicated above.](media/ex5-task3-007.png "The Postman Collections Pane")
 
-10. The first thing we need to do, is edit some properties that will affect each of the calls in the collection. Hover over the **Create a KnowledgeStore** collection, and select the ellipsis button **...**, and then select **Edit**.
+14. The first thing we need to do, is edit some properties that will affect each of the calls in the collection. Hover over the **Create a KnowledgeStore** collection, and select the ellipsis button **...**, and then select **Edit**.
 
     ![In Postman, the ellipsis is expanded next to the Create a KnowledgeStore collection with the the edit menu option selected.](media/ex5-task3-008.png "Editing the Postman Collection")
 
-11. In the Edit Collection screen, select the **Variables** tab.
+15. In the Edit Collection screen, select the **Variables** tab.
 
     ![In the Edit Collection screen, the Variables tab is selected.](media/ex5-task3-009.png "Edit Collection variables screen")
 
-12. We are going to need to edit each one of these variables to match the following:
+16. We are going to need to edit each one of these variables to match the following:
 
-    | Variable | Value | Screenshot |
-    |-------|-------|----------------|
-    | admin-key  | The key from the search service you created. | ![The Search Service resource is displayed with the Keys menu item selected and the Primary admin key highlighted.](media/ex5-task3-010.png "The search service admin key")|
-    | search-service-name | The name of the search service. | ![The Search Service resource screen in the Azure Portal is displayed with the service name highlighted.](media/ex5-task3-011.png "The Search Service Name")|
-    | storage-account-name | The name of the storage account used for blob storage for your invoices. | ![The Storage account resource screen is shown with the name of the account highlighted.](media/ex5-task3-012.png)|
-    | storage-connection-string | The connection string from the invoice storage account. | ![The access keys for the storage account are displayed.](media/ex5-task3-013.png)|
-    | datasourcename | Enter **invoices** ||
-    | indexer-name | Enter **invoice-indexer** ||
-    | index-name | Enter **invoice-index** ||
-    | skillset-name | Enter **invoice-skillset** ||
-    | storage-container-name | Enter **invoices** ||
-    | skillset-function | Enter function URL from the function you published. | ![The GetInvoiceData function from the Azure Function App is displayed with the Get function url button highlighted and the URL selected.](media/ex5-task3-021.png "The GetInvoiceData Function Screen")|
-    | cognitive-services-key | Enter the key from the cognitive service being used for forms processing. | ![The Cognititve Service resource Keys and Endpoint screen is shown with the KEY 1 copy button highlighted.](media/ex5-task3-022.png)|
-    | cognitive-service-path | This is the URL to the cognitive service from /subscription all the way through /accounts/\[servicename\]. An example is: **/subscriptions/[SUBSCRIPTOIN ID]/resourceGroups/synapse-mcw/providers/Microsoft.CognitiveServices/accounts/wwiformsreader** | ![The service URL for the cognititive service.](media/ex5-task3-023.png "The cognitive service URL")|
+    | Variable | Value |
+    |-------|-------|
+    | admin-key  | The key from the search service you created. |
+    | search-service-name | The name of the search service. |
+    | storage-account-name | asastore{{suffix}} |
+    | storage-connection-string | The connection string from the asastore{{suffix}} storage account. |
+    | datasourcename | Enter **invoices** |
+    | indexer-name | Enter **invoice-indexer** |
+    | index-name | Enter **invoice-index** |
+    | skillset-name | Enter **invoice-skillset** |
+    | storage-container-name | Enter **invoices** |
+    | skillset-function | Enter function URL from the function you published.|
+    | cognitive-services-key | Enter the key from the form recognizer service being used for forms processing. |
+    | cognitive-service-path | Enter the URL segment of the form recognizer service. An example is: **/subscriptions/yoursubscriptionid/resourceGroups/synapse-mcw/providers/Microsoft.CognitiveServices/accounts/formrecognizerservicename** |
 
-13. Select **Update** to update the collection with the modified values.
+17. Select **Update** to update the collection with the modified values.
 
     ![The Edit Collection Variables screen is shown with a sampling of modified values.](media/ex5-task3-014.png "The Edit Collection Values screen")
 
-14. Select the **Create Index** call from the collection, then select the **Body** tab.
+18. Select the **Create Index** call from the collection, then select the **Body** tab.
 
     ![The Create Index call is selected from the collection, and the Body tab is highlighted.](media/ex5-task3-015.png "The Create Index Call")
 
-15. Copy and paste all of the text from **/environment-setup/skillset/index.body.txt** into the body of the request.
+19. Copy and paste all of the text from **Hands-on lab/environment-setup/skillset/index.body.txt** into the body of the request.
 
-16. Select "Send".
+20. Select "Send".
 
     ![The Postman send button is selected.](media/ex5-task3-016.png "Send button")
 
-17. You should get a response that the index was created.
+21. You should get a response that the index was created.
 
     ![The Create Index response is displayed in Postman with the Status of 201 Created highlighted.](media/ex5-task3-017.png "The Create Index call response")
 
-18. Do the same steps for the **Create Datasource, Create the Skillset, and Create the indexer** calls using the corresponding text files located in the **/environment-setup/skillset** folder.
+22. Do the same steps for the **Create Datasource, Create the Skillset, and Create the indexer** calls using the corresponding text files located in the **/environment-setup/skillset** folder.
 
-19. After you Send the Indexer request, if you navigate to your search service you should see your indexer running, indicated by the in-progress indicator. It will take a couple of minutes to run.
+23. After you Send the Indexer request, if you navigate to your search service you should see your indexer running, indicated by the in-progress indicator. It will take a couple of minutes to run.
 
     ![The invoice-indexer is shown with a status of in-progress.](media/ex5-task3-018.png "The invoice-indexer status")
 
-20. Once the indexer has run, it will show two successful documents. If you go to your Blob storage account and look in the **invoices-json** container you will see two folders with .json documents in them.
+24. Once the indexer has run, it will show two successful documents. If you go to your Blob storage account and look in the **invoices-json** container you will see two folders with .json documents in them.
 
     ![The execution history of the invoice-indexer is shown as successful.](media/ex5-task3-019.png "The execution history of the invoice-indexer")
 

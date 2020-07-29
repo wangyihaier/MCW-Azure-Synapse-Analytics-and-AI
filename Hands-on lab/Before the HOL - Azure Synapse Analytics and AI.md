@@ -52,7 +52,9 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 5. [Python Extension for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
 
-6. [Postman](https://www.postman.com/downloads/)
+6. [Azure Functions Extension for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions)
+
+7. [Postman](https://www.postman.com/downloads/)
 
 ## Before the hands-on lab
 

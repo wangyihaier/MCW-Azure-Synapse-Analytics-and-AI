@@ -6,7 +6,7 @@ from requests import get, post
 # Endpoint URL
 endpoint = r"https://mcwformrecognizer.cognitiveservices.azure.com/"
 post_url = endpoint + r"/formrecognizer/v2.0/custom/models"
-source = r"https://asastorecep321.blob.core.windows.net/?sv=2019-12-12&ss=bfqt&srt=sco&sp=rwdlacupx&se=2020-08-09T02:35:49Z&st=2020-07-29T18:35:49Z&spr=https&sig=QrLduUGU0NFfnkmoNJu2Gs7dZ0Pr0M56VWygUHkrX3I%3D"
+source = r"https://asastorecep321.blob.core.windows.net/invoices?sv=2019-12-12&ss=bfqt&srt=sco&sp=rwdlacupx&se=2020-08-09T02:35:49Z&st=2020-07-29T18:35:49Z&spr=https&sig=QrLduUGU0NFfnkmoNJu2Gs7dZ0Pr0M56VWygUHkrX3I%3D"
 prefix = "Train"
 includeSubFolders = False
 useLabelFile = False
