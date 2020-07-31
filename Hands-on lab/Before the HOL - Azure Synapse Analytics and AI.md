@@ -30,6 +30,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 - [Azure Synapse Analytics and AI before the hands-on lab setup guide](#azure-synapse-analytics-and-ai-before-the-hands-on-lab-setup-guide)
   - [Requirements](#requirements)
   - [Before the hands-on lab](#before-the-hands-on-lab)
+    - [Task 1: Download the current lab assets](#task-1-download-the-current-lab-assets)
     - [Task 1: Create a resource group in Azure](#task-1-create-a-resource-group-in-azure)
     - [Task 2: Create the Azure Synapse Analytics workspace](#task-2-create-the-azure-synapse-analytics-workspace)
     - [Task 3: Download lab artifacts](#task-3-download-lab-artifacts)
@@ -59,6 +60,20 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 ## Before the hands-on lab
 
 **Duration**: 20 minutes
+
+### Task 1: Download the current lab assets
+
+1. Access the [GitHub repository page](https://github.com/microsoft/MCW-Azure-Synapse-Analytics-and-AI).
+
+2. Toward the right side of the screen, expand the **Code** button menu.
+
+    ![On the GitHub repository page the Code button is highlighted.](media/githubcodebutton.png "GitHub repository Code button")
+
+3. From the expanded menu, select **Download ZIP**.
+
+    ![The Download ZIP option is selected from the expanded Code menu](media/githubdownloadzip.png "Github Code Menu")
+
+4. Download the ZIP file and extract it to a location of your choosing on your local machine.
 
 ### Task 1: Create a resource group in Azure
 

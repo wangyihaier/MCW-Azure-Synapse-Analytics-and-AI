@@ -1114,47 +1114,43 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
 4. Wait for the service to provision then navigate to the resource.
 
-5. In your browser, copy the URL of the resource. Extract a portion of this URL from the **/subscription** and ending with the **/accounts/yourservicename**. As an example: **/subscriptions/yoursubscriptionid/resourceGroups/synapse-mcw/providers/Microsoft.CognitiveServices/accounts/yourservicename**. Paste this value into your text document for use later on.
-
-    ![The Form Recognizer resource screen is shown with a portion of the current URL highlighted in the address bar of the web browser.](media/formsrecognizerresourceurl.png "Form recognizer resource URL")
-
-6. From the left menu, select **Keys and Endpoint**.
+5. From the left menu, select **Keys and Endpoint**.
 
     ![The left side navigation is shown with the Keys and Endpoint item highlighted.](media/ex5-task2a-04.png "Left menu navigation")
 
-7. Copy and Paste both KEY 1 and the ENDPOINT values. Put these in the same location as the storage connection string you copied earlier
+6. Copy and Paste both KEY 1 and the ENDPOINT values. Put these in the same location as the storage connection string you copied earlier
 
     ![The Keys and Endpoint screen is shown with KEY 1 and ENDPOINT values highlighted.](media/ex5-task2a-05.png "The Keys and Endpoint screen")
 
-8. Browse to your Azure Portal homepage, select **+ Create a new resource**, then search for and create a new instance of **Azure Cognitive Search**.
+7. Browse to your Azure Portal homepage, select **+ Create a new resource**, then search for and create a new instance of **Azure Cognitive Search**.
 
     ![The Azure Cognitive Search overview screen is displayed.](media/ex5-task1-006.png "Azure Cognititve Search Overview screen")
 
-9. Choose the subscription and the resource group you've been using for this lab. Set the URL of the Cognitive Search Service to a unique value, relating to search. Then, switch the pricing tier to **Free**.
+8. Choose the subscription and the resource group you've been using for this lab. Set the URL of the Cognitive Search Service to a unique value, relating to search. Then, switch the pricing tier to **Free**.
 
     ![The configuration screen for Cognitive Search is displayed populated as described above.](media/ex5-task1-007.png "Cognitive Search service configuration")
 
-10. Select **Review + create**.
+9. Select **Review + create**.
 
     ![displaying the review + create button](media/ex5-task1-008.png "The review and create button")
 
-11. Select **Create**.
+10. Select **Create**.
 
-12. Wait for the Search service to be provisioned then navigate to the resource.
+11. Wait for the Search service to be provisioned then navigate to the resource.
 
-13. From the left menu, select **Keys**, copy the **Primary admin key** and paste it into your text document. Also make note of the name of your search service resource.
+12. From the left menu, select **Keys**, copy the **Primary admin key** and paste it into your text document. Also make note of the name of your search service resource.
 
     ![They Keys page of the Search service resource is shown with the Primary admin key value highlighted.](media/ex5-task3-010.png "Cognitive search keys")
 
-14. Also make note of the name of your search service in the text document.
+13. Also make note of the name of your search service in the text document.
 
     ![The Search Service name is highlighted on the Keys screen.](media/ex5-task3-011.png "Search service name")
 
-15. Open Visual Studio Code.
+14. Open Visual Studio Code.
 
-16. From the **File** menu, select **Open file** then choose to open **Hands-on lab/artifacts/pocformreader.py**.
+15. From the **File** menu, select **Open file** then choose to open **Hands-on lab/artifacts/pocformreader.py**.
 
-17. Update Lines 7, 9, and 17 with the appropriate values indicated below:
+16. Update Lines 7, 9, and 17 with the appropriate values indicated below:
 
     - Line 7: The endpoint of Azure Cognitive Services.
 
@@ -1164,17 +1160,17 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
     ![The source code listing of pocformreader.py is displayed with the lines mentioned above highlighted.](media/ex5-task2a-06.png "The source listing of pocofrmreader.py")
 
-18. Save the file.
+17. Save the file.
 
-19. Select Run, then Start Debugging.
+18. Select Run, then Start Debugging.
 
     ![The VS Code File menu is shown with Run selected and Start Debugging highlighted.](media/ex5-task2a-07.png "The VS Code File menu")
 
-20. In the **Debug Configuration**, select to debug the **Python File - Debug the currently active Python File** value.
+19. In the **Debug Configuration**, select to debug the **Python File - Debug the currently active Python File** value.
 
     ![The Debug Configuration selection is shown with Python File - Debug the currently active Python File highlighted.](media/ex5-task2a-08.png "Debug Configuration selection")
 
-21. When it completes, you should see an output similar to what is seen in the screenshot below. The output should also contain a modelID. Copy and paste this into your text file to use later
+20. When it completes, you should see an output similar to what is seen in the screenshot below. The output should also contain a modelID. Copy and paste this into your text file to use later
 
     ![A sample output of the python script is shown with a modelID value highlighted.](media/ex5-task2a-09.png "Visual Studio Code output window")
 
@@ -1264,34 +1260,30 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
     | skillset-name | Enter **invoice-skillset** |
     | storage-container-name | Enter **invoices** |
     | skillset-function | Enter function URL from the function you published.|
-    | cognitive-services-key | Enter the key from the form recognizer service being used for forms processing. |
-    | cognitive-service-path | Enter the URL segment of the form recognizer service. An example is: **/subscriptions/yoursubscriptionid/resourceGroups/synapse-mcw/providers/Microsoft.CognitiveServices/accounts/formrecognizerservicename** |
 
 17. Select **Update** to update the collection with the modified values.
 
     ![The Edit Collection Variables screen is shown with a sampling of modified values.](media/ex5-task3-014.png "The Edit Collection Values screen")
 
-18. Select the **Create Index** call from the collection, then select the **Body** tab.
+18. Select the **Create Index** call from the collection, then select the **Body** tab and review the content.
 
     ![The Create Index call is selected from the collection, and the Body tab is highlighted.](media/ex5-task3-015.png "The Create Index Call")
 
-19. Copy and paste all of the text from **Hands-on lab/environment-setup/skillset/index.body.txt** into the body of the request.
-
-20. Select "Send".
+19. Select "Send".
 
     ![The Postman send button is selected.](media/ex5-task3-016.png "Send button")
 
-21. You should get a response that the index was created.
+20. You should get a response that the index was created.
 
     ![The Create Index response is displayed in Postman with the Status of 201 Created highlighted.](media/ex5-task3-017.png "The Create Index call response")
 
-22. Do the same steps for the **Create Datasource, Create the Skillset, and Create the indexer** calls using the corresponding text files located in the **/environment-setup/skillset** folder.
+21. Do the same steps for the **Create Datasource, Create the Skillset, and Create the indexer** calls.
 
-23. After you Send the Indexer request, if you navigate to your search service you should see your indexer running, indicated by the in-progress indicator. It will take a couple of minutes to run.
+22. After you Send the Indexer request, if you navigate to your search service you should see your indexer running, indicated by the in-progress indicator. It will take a couple of minutes to run.
 
     ![The invoice-indexer is shown with a status of in-progress.](media/ex5-task3-018.png "The invoice-indexer status")
 
-24. Once the indexer has run, it will show two successful documents. If you go to your Blob storage account and look in the **invoices-json** container you will see two folders with .json documents in them.
+23. Once the indexer has run, it will show two successful documents. If you go to your Blob storage account, **asastore{suffix}** and look in the **invoices-json** container you will see two folders with .json documents in them.
 
     ![The execution history of the invoice-indexer is shown as successful.](media/ex5-task3-019.png "The execution history of the invoice-indexer")
 
@@ -1363,15 +1355,15 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
     ![The Adding data flow form is displayed populated with the preceding values.](media/ex5-task4-019.png)
 
-15. On the **NewInvoicesProcessing** data flow design canvas. Select the **Add source** box. Select the **invoices** linked service as the source for our data flow and select **Add Source**.
+15. On the **NewInvoicesProcessing** data flow design canvas. Select the **Add source** box.
 
     ![The NewInvoicesProcessing designer is shown with the Add source box selected.](media/ex5-task4-020.png "The NewInvoicesProcessing designer")
 
-16. Name the output stream **jsonInvoice**, leave the source type as **Dataset**, and keep all the remaining options set to their defaults. Select **+New** next to the Dataset field.
+16. In the bottom pane, name the output stream **jsonInvoice**, leave the source type as **Dataset**, and keep all the remaining options set to their defaults. Select **+New** next to the Dataset field.
 
     ![The Source settings tab is displayed populated with the name of jsonInvoice and the +New button next to the Dataset field is selected.](media/ex5-task4-021.png "Source Settings")
 
-17. In the **New dataset blade**, select **Azure Blob Storage**.
+17. In the **New dataset blade**, select **Azure Blob Storage** then select **Continue**.
 
     ![The New dataset blade is displayed with Azure Blob Storage selected.](media/ex5-task4-022.png "Azure Blob Storage dataset")
 
@@ -1379,7 +1371,7 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
     ![The select format screen is displayed with Json selected as the type.](media/ex5-task4-023.png "Select format form")
 
-19. On the **Set properties** screen, name the dataset **InvoicesJson** then for the linked service field, choose the Azure Storage linked service that you created earlier.
+19. On the **Set properties** screen, name the dataset **InvoicesJson** then for the linked service field, choose the Azure Storage linked service **asastore{suffix}**.
 
     ![A portion of the Set properties form is displayed populated with the above values.](media/ex5-task4-024.png "Dataset Set properties form")
 
@@ -1387,7 +1379,7 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
     ![The set properties form is displayed with the file path and import schema fields populated as described.](media/ex5-task4-025.png "Data set properties form")
 
-21. Select **Browse** and select the file located at **/environment-setup/synapse/sampleformrecognizer.json** and select **OK**.
+21. Select **Browse** and select the file located at **Hands-on lab/environment-setup/synapse/sampleformrecognizer.json** and select **OK**.
 
     ![The Set properties form is displayed with the sampleformrecognizer.json selected as the selected file.](media/ex5-task4-026.png "Data set properties form")
 
@@ -1419,7 +1411,7 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
     ![In the Row modifier section, the Alter Row option is selected.](media/ex5-task4-031.png "The Alter row activity")
 
-28. On the **Alter row settings** tab on the bottom pane, Name the Output stream **AlterTransactionID**, and leave the incoming stream set to the default value. Change **Alter row conditions** field to **"Upsert If** and then set the expression to **notEquals(transactionid,"")**
+28. On the **Alter row settings** tab on the bottom pane, Name the Output stream **AlterTransactionID**, and leave the incoming stream set to the default value. Change **Alter row conditions** field to **Upsert If** and then set the expression to **notEquals(transactionid,"")**
 
     ![The Alter row settings tab is shown populated with the values described above.](media/ex5-task4-032.png "The Alter row settings tab")
 
@@ -1433,11 +1425,11 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
     ![The sink tab is shown with the output stream name set to SQLDatabase and the +New button selected next to the Dataset field.](media/ex5-task4-034.png "The Sink tab")
 
-32. On the **New dataset** blade, select **Azure Synapse Analytics (formerly SQL DW)** and select **Continue**.
+32. On the **New dataset** blade, select the **Azure** tab. Select **Azure Synapse Analytics (formerly SQL DW)** and select **Continue**.
 
     ![Azure Synapse Analytics is selected in a list of dataset types.](media/ex5-task4-035.png "Selecting the Azure Synapse Analytics dataset type")
 
-33. Set the name of the Dataset to **InvoiceTable** and choose the database linked Service we created earlier. Choose **Select from existing table** and choose the **dbo.Invoices** table. If you don't see it in the list of your table names, select the **Refresh** button and it should show up. Select **OK**.
+33. Set the name of the Dataset to **InvoiceTable** and choose the **sqlpool01** Linked service. Choose **Select from existing table** and choose the **wwi_mcw.Invoices** table. If you don't see it in the list of your table names, select the **Refresh** button and it should show up. Select **OK**.
 
     ![The Dataset Set properties form is displayed populated as described.](media/ex5-task4-036.png "Set properties form")
 
@@ -1466,7 +1458,7 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
     ![The data flow activity Settings tab is displayed.](media/ex5-task4-040.png "The Settings tab")
 
-38. Under the **PolyBase** settings, set the **Staging linked service** to the **invoices** linked service. Enter **invoices-staging** as the **Storage staging folder**.
+38. Under the **PolyBase** settings, set the **Staging linked service** to the **asastore{suffix}** linked service. Enter **invoices-staging** as the **Storage staging folder**.
 
     ![The data flow activity Settings tab is displayed with its form populated as indicated above.](media/ex5-task4-041.png "The Settings tab")
 
@@ -1484,7 +1476,7 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
     ![The Monitor hub is selected from the left menu.](media/ex5-task4-044.png "The Monitor Hub menu option")
 
-43. Within 5 minutes, you should see the **InvoiceProcessing** pipeline begin processing. You may need to refresh this list to see it appear, a refresh button is located in the toolbar.
+43. In approximately 5 minutes, you should see the **InvoiceProcessing** pipeline begin processing. You may need to refresh this list to see it appear, a refresh button is located in the toolbar.
 
     ![On the Pipeline runs list, the InvoiceProcessing pipeline is shown as in-progress.](media/ex5-task4-045.png "The Pipeline runs list")
 
@@ -2116,7 +2108,9 @@ All logins to your data warehouse are logged to `sys.dm_pdw_exec_sessions`. This
 
 1. In the Azure Portal, open the resource group for this lab. Select **Delete** from the top toolbar menu.
 
-2. Open the Cloud Shell and issue the following command to remove the lab files:
+2. In the Azure Portal, open the resource group with the same name as your Function App. Select **Delete** from the top toolbar menu.
+
+3. Open the Cloud Shell and issue the following command to remove the lab files:
 
    ```PowerShell
    Remove-Item -Path .\Synapse-MCW -recurse -force  

@@ -27,11 +27,7 @@
       "httpHeaders": {}
     }
   ],
-  "cognitiveServices": {
-    "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey",
-    "description": "{{cognitive-service-path}}",
-    "key": "{{cognitive-service-key}}"
-  },
+  "cognitiveServices": null,
   "knowledgeStore": {
     "storageConnectionString": "{{storage-connection-string}}",
     "projections": [

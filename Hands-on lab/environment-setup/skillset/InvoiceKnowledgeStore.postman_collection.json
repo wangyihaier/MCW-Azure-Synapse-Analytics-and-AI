@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "a8018e97-37bb-4cd4-9b8e-9f85a7cc3cff",
+		"_postman_id": "f424a0f1-7995-45d0-8c25-3394ae8899a3",
 		"name": "Create a KnowledgeStore",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -23,10 +23,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"{{index-name}}\",\r\n    \"fields\": [\r\n        { \"name\": \"address\", \"type\": \"Edm.String\", \"searchable\": false, \"filterable\": false, \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"categories\", \"type\": \"Edm.String\", \"searchable\": false, \"filterable\": false, \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"city\", \"type\": \"Edm.String\", \"filterable\": false, \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"country\", \"type\": \"Edm.String\", \"searchable\": false, \"filterable\": false, \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"latitude\", \"type\": \"Edm.String\", \"searchable\": false, \"filterable\": false, \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"longitude\", \"type\": \"Edm.String\", \"searchable\": false, \"filterable\": false, \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"name\", \"type\": \"Edm.String\", \"filterable\": false, \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"postalCode\", \"type\": \"Edm.String\", \"searchable\": false, \"filterable\": false, \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"province\", \"type\": \"Edm.String\", \"searchable\": false, \"filterable\": false, \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"reviews_date\", \"type\": \"Edm.DateTimeOffset\", \"searchable\": false, \"filterable\": false, \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"reviews_dateAdded\", \"type\": \"Edm.DateTimeOffset\", \"searchable\": false, \"filterable\": false, \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"reviews_rating\", \"type\": \"Edm.String\", \"searchable\": false, \"filterable\": false, \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"reviews_text\", \"type\": \"Edm.String\", \"filterable\": false,  \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"reviews_title\", \"type\": \"Edm.String\", \"searchable\": false, \"filterable\": false, \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"reviews_username\", \"type\": \"Edm.String\", \"searchable\": false, \"filterable\": false, \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"AzureSearch_DocumentKey\", \"type\": \"Edm.String\", \"searchable\": false, \"filterable\": false, \"sortable\": false, \"facetable\": false, \"key\": true },\r\n        { \"name\": \"metadata_storage_content_type\", \"type\": \"Edm.String\", \"searchable\": false, \"filterable\": false, \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"metadata_storage_size\", \"type\": \"Edm.Int64\", \"searchable\": false, \"filterable\": false, \"sortable\": false, \"facetable\": false},\r\n        { \"name\": \"metadata_storage_last_modified\", \"type\": \"Edm.DateTimeOffset\", \"searchable\": false, \"filterable\": false, \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"metadata_storage_name\", \"type\": \"Edm.String\", \"searchable\": false, \"filterable\": false, \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"metadata_storage_path\", \"type\": \"Edm.String\", \"searchable\": false, \"filterable\": false, \"sortable\": false, \"facetable\": false },\r\n        { \"name\": \"Sentiment\", \"type\": \"Collection(Edm.Double)\", \"searchable\": false, \"filterable\": true, \"retrievable\": true, \"sortable\": false, \"facetable\": true },\r\n        { \"name\": \"Language\", \"type\": \"Edm.String\", \"filterable\": true, \"sortable\": false, \"facetable\": true },\r\n        { \"name\": \"Keyphrases\", \"type\": \"Collection(Edm.String)\", \"filterable\": true, \"sortable\": false, \"facetable\": true }\r\n    ]\r\n}\r\n"
+					"raw": "{\r\n  \"name\": \"{{index-name}}\",\r\n  \"fields\": [\r\n    {\r\n      \"name\": \"id\",\r\n      \"type\": \"Edm.String\",\r\n      \"facetable\": false,\r\n      \"filterable\": true,\r\n      \"key\": true,\r\n      \"retrievable\": true,\r\n      \"searchable\": true,\r\n      \"sortable\": false,\r\n      \"analyzer\": \"standard.lucene\",\r\n      \"indexAnalyzer\": null,\r\n      \"searchAnalyzer\": null,\r\n      \"synonymMaps\": [],\r\n      \"fields\": []\r\n    },\r\n    {\r\n      \"name\": \"content\",\r\n      \"type\": \"Edm.String\",\r\n      \"facetable\": false,\r\n      \"filterable\": true,\r\n      \"key\": false,\r\n      \"retrievable\": true,\r\n      \"searchable\": true,\r\n      \"sortable\": false,\r\n      \"analyzer\": \"standard.lucene\",\r\n      \"indexAnalyzer\": null,\r\n      \"searchAnalyzer\": null,\r\n      \"synonymMaps\": [],\r\n      \"fields\": []\r\n    },\r\n    {\r\n      \"name\": \"metadata_storage_content_type\",\r\n      \"type\": \"Edm.String\",\r\n      \"facetable\": false,\r\n      \"filterable\": true,\r\n      \"key\": false,\r\n      \"retrievable\": true,\r\n      \"searchable\": true,\r\n      \"sortable\": false,\r\n      \"analyzer\": \"standard.lucene\",\r\n      \"indexAnalyzer\": null,\r\n      \"searchAnalyzer\": null,\r\n      \"synonymMaps\": [],\r\n      \"fields\": []\r\n    },\r\n    {\r\n      \"name\": \"metadata_storage_size\",\r\n      \"type\": \"Edm.Int64\",\r\n      \"facetable\": false,\r\n      \"filterable\": true,\r\n      \"retrievable\": true,\r\n      \"sortable\": false,\r\n      \"analyzer\": null,\r\n      \"indexAnalyzer\": null,\r\n      \"searchAnalyzer\": null,\r\n      \"synonymMaps\": [],\r\n      \"fields\": []\r\n    },\r\n    {\r\n      \"name\": \"metadata_storage_last_modified\",\r\n      \"type\": \"Edm.DateTimeOffset\",\r\n      \"facetable\": false,\r\n      \"filterable\": true,\r\n      \"retrievable\": true,\r\n      \"sortable\": false,\r\n      \"analyzer\": null,\r\n      \"indexAnalyzer\": null,\r\n      \"searchAnalyzer\": null,\r\n      \"synonymMaps\": [],\r\n      \"fields\": []\r\n    },\r\n    {\r\n      \"name\": \"metadata_storage_content_md5\",\r\n      \"type\": \"Edm.String\",\r\n      \"facetable\": false,\r\n      \"filterable\": true,\r\n      \"key\": false,\r\n      \"retrievable\": true,\r\n      \"searchable\": true,\r\n      \"sortable\": false,\r\n      \"analyzer\": \"standard.lucene\",\r\n      \"indexAnalyzer\": null,\r\n      \"searchAnalyzer\": null,\r\n      \"synonymMaps\": [],\r\n      \"fields\": []\r\n    },\r\n    {\r\n      \"name\": \"metadata_storage_name\",\r\n      \"type\": \"Edm.String\",\r\n      \"facetable\": false,\r\n      \"filterable\": true,\r\n      \"key\": false,\r\n      \"retrievable\": true,\r\n      \"searchable\": true,\r\n      \"sortable\": false,\r\n      \"analyzer\": \"standard.lucene\",\r\n      \"indexAnalyzer\": null,\r\n      \"searchAnalyzer\": null,\r\n      \"synonymMaps\": [],\r\n      \"fields\": []\r\n    },\r\n    {\r\n      \"name\": \"metadata_storage_path\",\r\n      \"type\": \"Edm.String\",\r\n      \"facetable\": false,\r\n      \"filterable\": true,\r\n      \"key\": false,\r\n      \"retrievable\": true,\r\n      \"searchable\": true,\r\n      \"sortable\": false,\r\n      \"analyzer\": \"standard.lucene\",\r\n      \"indexAnalyzer\": null,\r\n      \"searchAnalyzer\": null,\r\n      \"synonymMaps\": [],\r\n      \"fields\": []\r\n    },\r\n    {\r\n      \"name\": \"metadata_storage_file_extension\",\r\n      \"type\": \"Edm.String\",\r\n      \"facetable\": false,\r\n      \"filterable\": true,\r\n      \"key\": false,\r\n      \"retrievable\": true,\r\n      \"searchable\": true,\r\n      \"sortable\": false,\r\n      \"analyzer\": \"standard.lucene\",\r\n      \"indexAnalyzer\": null,\r\n      \"searchAnalyzer\": null,\r\n      \"synonymMaps\": [],\r\n      \"fields\": []\r\n    },\r\n    {\r\n      \"name\": \"metadata_content_type\",\r\n      \"type\": \"Edm.String\",\r\n      \"facetable\": false,\r\n      \"filterable\": true,\r\n      \"key\": false,\r\n      \"retrievable\": true,\r\n      \"searchable\": true,\r\n      \"sortable\": false,\r\n      \"analyzer\": \"standard.lucene\",\r\n      \"indexAnalyzer\": null,\r\n      \"searchAnalyzer\": null,\r\n      \"synonymMaps\": [],\r\n      \"fields\": []\r\n    },\r\n    {\r\n      \"name\": \"metadata_language\",\r\n      \"type\": \"Edm.String\",\r\n      \"facetable\": false,\r\n      \"filterable\": true,\r\n      \"key\": false,\r\n      \"retrievable\": true,\r\n      \"searchable\": true,\r\n      \"sortable\": false,\r\n      \"analyzer\": \"standard.lucene\",\r\n      \"indexAnalyzer\": null,\r\n      \"searchAnalyzer\": null,\r\n      \"synonymMaps\": [],\r\n      \"fields\": []\r\n    },\r\n    {\r\n      \"name\": \"metadata_author\",\r\n      \"type\": \"Edm.String\",\r\n      \"facetable\": false,\r\n      \"filterable\": true,\r\n      \"key\": false,\r\n      \"retrievable\": true,\r\n      \"searchable\": true,\r\n      \"sortable\": false,\r\n      \"analyzer\": \"standard.lucene\",\r\n      \"indexAnalyzer\": null,\r\n      \"searchAnalyzer\": null,\r\n      \"synonymMaps\": [],\r\n      \"fields\": []\r\n    },\r\n    {\r\n      \"name\": \"metadata_title\",\r\n      \"type\": \"Edm.String\",\r\n      \"facetable\": false,\r\n      \"filterable\": true,\r\n      \"key\": false,\r\n      \"retrievable\": true,\r\n      \"searchable\": true,\r\n      \"sortable\": false,\r\n      \"analyzer\": \"standard.lucene\",\r\n      \"indexAnalyzer\": null,\r\n      \"searchAnalyzer\": null,\r\n      \"synonymMaps\": [],\r\n      \"fields\": []\r\n    },\r\n    {\r\n      \"name\": \"metadata_creation_date\",\r\n      \"type\": \"Edm.DateTimeOffset\",\r\n      \"facetable\": false,\r\n      \"filterable\": true,\r\n      \"retrievable\": true,\r\n      \"sortable\": false,\r\n      \"analyzer\": null,\r\n      \"indexAnalyzer\": null,\r\n      \"searchAnalyzer\": null,\r\n      \"synonymMaps\": [],\r\n      \"fields\": []\r\n    },\r\n    {\r\n      \"name\": \"ProductId\",\r\n      \"type\": \"Edm.String\",\r\n      \"facetable\": false,\r\n      \"filterable\": true,\r\n      \"key\": false,\r\n      \"retrievable\": true,\r\n      \"searchable\": true,\r\n      \"sortable\": false,\r\n      \"analyzer\": \"standard.lucene\",\r\n      \"indexAnalyzer\": null,\r\n      \"searchAnalyzer\": null,\r\n      \"synonymMaps\": [],\r\n      \"fields\": []\r\n    }\r\n  ],\r\n  \"suggesters\": [],\r\n  \"scoringProfiles\": [],\r\n  \"defaultScoringProfile\": \"\",\r\n  \"corsOptions\": null,\r\n  \"analyzers\": [],\r\n  \"charFilters\": [],\r\n  \"tokenFilters\": [],\r\n  \"tokenizers\": [],\r\n  \"@odata.etag\": \"\\\"0x8D81D66A8739FE1\\\"\"\r\n}"
 				},
 				"url": {
-					"raw": "https://{{search-service-name}}.search.windows.net/indexes/{{index-name}}?api-version={{api-version}}",
+					"raw": "https://{{search-service-name}}.search.windows.net/indexes/{{index-name}}1?api-version={{api-version}}",
 					"protocol": "https",
 					"host": [
 						"{{search-service-name}}",
@@ -36,7 +36,7 @@
 					],
 					"path": [
 						"indexes",
-						"{{index-name}}"
+						"{{index-name}}1"
 					],
 					"query": [
 						{
@@ -45,7 +45,7 @@
 						}
 					]
 				},
-				"description": "Creates an Azure Search Index appropriate for hotel reviews and knowledgestore\t"
+				"description": "Creates an Azure Search Index appropriate for invoices and knowledgestore\t"
 			},
 			"response": []
 		},
@@ -67,7 +67,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"name\" : \"{{datasource-name}}\",\n  \"description\" : \"Demo files to demonstrate knowledge store capabilities.\",\n  \"type\" : \"azureblob\",\n  \"credentials\" :\n  { \"connectionString\" :\n    \"{{storage-connection-string}}\"\n  },\n  \"container\" : { \"name\" : \"{{storage-container-name}}\" }\n}"
+					"raw": "{\n  \"name\": \"{{datasource-name}}\",\n  \"description\": \"Demo files to demonstrate knowledge store capabilities.\",\n  \"type\": \"azureblob\",\n  \"subtype\": null,\n  \"credentials\": {\n    \"connectionString\": \"{{storage-connection-string}}\"\n  },\n  \"container\": {\n    \"name\": \"{{storage-container-name}}\",\n    \"query\": \"Test\"\n  },\n  \"dataChangeDetectionPolicy\": null,\n  \"dataDeletionDetectionPolicy\": null,\n  \"encryptionKey\": null\n}"
 				},
 				"url": {
 					"raw": "https://{{search-service-name}}.search.windows.net/datasources?api-version={{api-version}}",
@@ -93,6 +93,15 @@
 		},
 		{
 			"name": "Create the Skillset",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true,
+					"user-agent": true,
+					"accept": true,
+					"accept-encoding": true,
+					"connection": true
+				}
+			},
 			"request": {
 				"method": "PUT",
 				"header": [
@@ -110,10 +119,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"@odata.context\": \"https://mcwanalyzeinvoice.search.windows.net/$metadata#skillsets/$entity\",\n  \"@odata.etag\": \"\\\"0x8D81DC452AFA789\\\"\",\n  \"name\": \"invoices-skillset\",\n  \"description\": \"Skillset created from the portal. skillsetName: invoices-skillset; contentField: content; enrichmentGranularity: document; knowledgeStoreStorageAccount: ;\",\n  \"skills\": [\n    {\n      \"@odata.type\": \"#Microsoft.Skills.Custom.WebApiSkill\",\n      \"name\": \"#5\",\n      \"description\": \"Use form recognizer to process the invoice\",\n      \"context\": \"/document\",\n      \"uri\": \"https://mcwformsanalyze.azurewebsites.net/api/GetInvoiceData?code=jUG9WdQi4gxGV/laTrUBtk5mMFz0Aw69JCJ7ji9j4g3AZaexGnRc/A==\",\n      \"httpMethod\": \"POST\",\n      \"timeout\": \"PT30S\",\n      \"batchSize\": 1,\n      \"degreeOfParallelism\": null,\n      \"inputs\": [\n        {\n          \"name\": \"metadata_storage_path\",\n          \"source\": \"/document/metadata_storage_path\"\n        }\n      ],\n      \"outputs\": [\n        {\n          \"name\": \"text\",\n          \"targetName\": \"formrecognizer\"\n        }\n      ],\n      \"httpHeaders\": {}\n    }\n  ],\n  \"cognitiveServices\": null,\n  \"knowledgeStore\": {\n    \"storageConnectionString\": \"DefaultEndpointsProtocol=https;AccountName=mcwsynapseforms;AccountKey=7pqSvsoLTsSvuQeBtrgID4cXrgWFf1FKa5A3U4wzmNia5BkZ8YximurAsN6I4k2unILCL+kmbOJnIKock6Thaw==;EndpointSuffix=core.windows.net\",\n    \"projections\": [\n      {\n        \"tables\": [],\n        \"objects\": [\n          {\n            \"storageContainer\": \"invoices-json\",\n            \"referenceKeyName\": null,\n            \"generatedKeyName\": \"invoice\",\n            \"source\": null,\n            \"sourceContext\": \"/document\",\n            \"inputs\": [\n              {\n                \"name\": \"lastUpdatedDateTime\",\n                \"source\": \"/document/lastUpdatedDateTime\",\n                \"sourceContext\": null,\n                \"inputs\": []\n              },\n              {\n                \"name\": \"filename\",\n                \"source\": \"/document/metadata_storage_name\",\n                \"sourceContext\": null,\n                \"inputs\": []\n              }\n            ]\n          }\n        ],\n        \"files\": []\n      }\n    ],\n    \"parameters\": {\n      \"synthesizeGeneratedKeyName\": true\n    }\n  },\n  \"encryptionKey\": null\n}"
+					"raw": "{\n  \"name\": \"{{skillset-name}}\",\n  \"description\": \"Skillset created from the portal. skillsetName: invoices-skillset; contentField: content; enrichmentGranularity: document; knowledgeStoreStorageAccount: ;\",\n  \"skills\": [\n    {\n      \"@odata.type\": \"#Microsoft.Skills.Custom.WebApiSkill\",\n      \"name\": \"#5\",\n      \"description\": \"Use form recognizer to process the invoice\",\n      \"context\": \"/document\",\n      \"uri\": \"{{skillset-function}}\",\n      \"httpMethod\": \"POST\",\n      \"timeout\": \"PT30S\",\n      \"batchSize\": 1,\n      \"degreeOfParallelism\": null,\n      \"inputs\": [\n        {\n          \"name\": \"metadata_storage_path\",\n          \"source\": \"/document/metadata_storage_path\"\n        }\n      ],\n      \"outputs\": [\n        {\n          \"name\": \"text\",\n          \"targetName\": \"formrecognizer\"\n        }\n      ],\n      \"httpHeaders\": {}\n    }\n  ],\n  \"cognitiveServices\": null,\n  \"knowledgeStore\": {\n    \"storageConnectionString\": \"{{storage-connection-string}}\",\n    \"projections\": [\n      {\n        \"tables\": [],\n        \"objects\": [\n          {\n            \"storageContainer\": \"invoices-json\",\n            \"referenceKeyName\": null,\n            \"generatedKeyName\": \"invoice\",\n            \"source\": null,\n            \"sourceContext\": \"/document\",\n            \"inputs\": [\n              {\n                \"name\": \"filename\",\n                \"source\": \"/document/metadata_storage_name\",\n                \"sourceContext\": null,\n                \"inputs\": []\n              },\n              {\n                \"name\": \"transactionid\",\n                \"source\": \"/document/formrecognizer/analyzeResult/readResults/0/lines/1/words/0/text\",\n                \"sourceContext\": null,\n                \"inputs\": []\n              },\n              {\n                \"name\": \"productid\",\n                \"source\": \"/document/formrecognizer/analyzeResult/readResults/0/lines/16/words/0/text\",\n                \"sourceContext\": null,\n                \"inputs\": []\n              },\n              {\n                \"name\": \"productprice\",\n                \"source\": \"/document/formrecognizer/analyzeResult/readResults/0/lines/17/words/0/text\",\n                \"sourceContext\": null,\n                \"inputs\": []\n              },\n              {\n                \"name\": \"quantity\",\n                \"source\": \"/document/formrecognizer/analyzeResult/readResults/0/lines/18/words/0/text\",\n                \"sourceContext\": null,\n                \"inputs\": []\n              },\n              {\n                \"name\": \"totalcharges\",\n                \"source\": \"/document/formrecognizer/analyzeResult/readResults/0/lines/19/words/0/text\",\n                \"sourceContext\": null,\n                \"inputs\": []\n              },\n              {\n                \"name\": \"customerid\",\n                \"source\": \"/document/formrecognizer/analyzeResult/readResults/0/lines/11/words/0/text\",\n                \"sourceContext\": null,\n                \"inputs\": []\n              }\n            ]\n          }\n        ],\n        \"files\": []\n      }\n    ],\n    \"parameters\": {\n      \"synthesizeGeneratedKeyName\": true\n    }\n  },\n  \"encryptionKey\": null\n}"
 				},
 				"url": {
-					"raw": "https://{{search-service-name}}.search.windows.net/skillsets/{{skillset-name}}?api-version={{api-version}}\n",
+					"raw": "https://{{search-service-name}}.search.windows.net/skillsets/{{skillset-name}}?api-version={{api-version}}",
 					"protocol": "https",
 					"host": [
 						"{{search-service-name}}",
@@ -128,7 +137,7 @@
 					"query": [
 						{
 							"key": "api-version",
-							"value": "{{api-version}}\n"
+							"value": "{{api-version}}"
 						}
 					]
 				}
@@ -156,7 +165,7 @@
 					"raw": "{\n  \"name\": \"{{indexer-name}}\",\n  \"description\": \"\",\n  \"dataSourceName\": \"{{datasource-name}}\",\n  \"skillsetName\": \"{{skillset-name}}\",\n  \"targetIndexName\": \"{{index-name}}\",\n  \"disabled\": null,\n  \"schedule\": null,\n  \"parameters\": {\n    \"batchSize\": null,\n    \"maxFailedItems\": 0,\n    \"maxFailedItemsPerBatch\": 0,\n    \"base64EncodeKeys\": null,\n    \"configuration\": {\n      \"dataToExtract\": \"contentAndMetadata\",\n      \"parsingMode\": \"default\"\n    }\n  },\n  \"fieldMappings\": [\n    {\n      \"sourceFieldName\": \"metadata_storage_path\",\n      \"targetFieldName\": \"id\",\n      \"mappingFunction\": {\n        \"name\": \"base64Encode\"\n      }\n    },\n    {\n      \"sourceFieldName\": \"metadata_storage_path\",\n      \"targetFieldName\": \"metadata_storage_path\"\n    },\n    {\n      \"sourceFieldName\": \"/document/formrecognizer/analyzeResult/readResults/0/lines/13/words/0/text\",\n      \"targetFieldName\": \"ProductId\"\n    }\n  ],\n  \"outputFieldMappings\": [],\n  \"encryptionKey\": null\n}"
 				},
 				"url": {
-					"raw": "https://{{search-service-name}}.search.windows.net/indexers/{{indexer-name}}?api-version={{api-version}}\n",
+					"raw": "https://{{search-service-name}}.search.windows.net/indexers/{{indexer-name}}?api-version={{api-version}}",
 					"protocol": "https",
 					"host": [
 						"{{search-service-name}}",
@@ -171,7 +180,7 @@
 					"query": [
 						{
 							"key": "api-version",
-							"value": "{{api-version}}\n"
+							"value": "{{api-version}}"
 						}
 					]
 				}
@@ -183,7 +192,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "7c817308-6e52-4355-90e9-8dc008af75c6",
+				"id": "a434202c-0155-4dbf-a1aa-3c2f34e5339d",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -193,7 +202,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "7c37226a-2302-4a0b-9b99-01eff5eecfe4",
+				"id": "9d6b99dd-5dd5-41b3-88f0-0ba0d11ec90a",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -203,69 +212,59 @@
 	],
 	"variable": [
 		{
-			"id": "87173b46-ae90-4bc5-b87f-80fb81f7cc64",
+			"id": "a9af3baa-cd3d-443b-997e-824f0e9fea62",
 			"key": "admin-key",
 			"value": "<SEARCH_SERVICE_ADMIN_KEY>"
 		},
 		{
-			"id": "40990d3e-5aa8-45bb-b6f6-443c5cf1af21",
+			"id": "b7637b66-7220-466c-a869-be38bc2e3792",
 			"key": "search-service-name",
 			"value": "<SEARCH_SERVICE_NAME>"
 		},
 		{
-			"id": "e43510a6-cc6d-46db-9b54-7ff34cd36ad6",
+			"id": "87b61e08-a0e7-4219-8cb9-e21b74be36db",
 			"key": "storage-account-name",
 			"value": "<STORAGE_ACCOUNT_NAME>"
 		},
 		{
-			"id": "4b3161cf-4065-43fe-bccf-3b3e09bee728",
+			"id": "b2865e01-ea46-4ec0-be93-d12f2bb52f38",
 			"key": "storage-connection-string",
 			"value": "<STORAGE_ACCOUNT_CONNECTION_STRING>"
 		},
 		{
-			"id": "1818b08b-c7f9-4415-ac1a-86353da97fe4",
+			"id": "732bcb8c-6d98-41fb-952c-b2b97d978c69",
 			"key": "api-version",
 			"value": "2020-06-30"
 		},
 		{
-			"id": "4ffc2afd-c20b-42e4-8c4a-072e024a5d01",
+			"id": "c494da6a-e2c8-45e5-a9fd-ab8f65848038",
 			"key": "datasource-name",
-			"value": "hotel-reviews-ds"
+			"value": "invoices"
 		},
 		{
-			"id": "0a5e4c40-c9e5-453e-8776-cdbd2b0ecc3b",
+			"id": "b5ae3e42-c9d9-44d3-8a89-2a5c71f4459c",
 			"key": "indexer-name",
-			"value": "hotel-reviews-ixr"
+			"value": "invoice-indexer"
 		},
 		{
-			"id": "3302fc6f-802f-4da9-bf20-2010baed5bbd",
+			"id": "bef9d813-2733-4229-9817-a6ac82179672",
 			"key": "index-name",
-			"value": "hotel-reviews-ix"
+			"value": "invoice-index"
 		},
 		{
-			"id": "567dae8d-f05d-49a6-83a1-4fd479d5c5aa",
+			"id": "9a260d36-db6a-483c-94a8-e1445ebc52a2",
 			"key": "skillset-name",
-			"value": "hotel-reviews-ss"
+			"value": "invoice-skillset"
 		},
 		{
-			"id": "251ee3a9-46f4-462b-98d3-e8d79c81ba06",
+			"id": "a8484ae7-b5e2-4496-9513-0fe2c20a5a7e",
 			"key": "storage-container-name",
-			"value": "hotel-reviews"
+			"value": "invoices"
 		},
 		{
-			"id": "a0988d5b-86fb-46c9-9b6c-94d71ea33330",
+			"id": "ef85d125-3641-4143-9ec2-490b6573dee6",
 			"key": "skillset-function",
 			"value": "<AZURE FUNCTION ENDPOINT>"
-		},
-		{
-			"id": "7ca6e5e7-965d-4f1a-8ab2-bb770b3ca0e1",
-			"key": "cognitive-service-key",
-			"value": "<COGNITIVE SERVICES KEY>"
-		},
-		{
-			"id": "4241c642-455e-4440-b6d5-d6aa63e4be12",
-			"key": "cognitive-service-path",
-			"value": "<COGNITIVE SERVICE PATH>"
 		}
 	],
 	"protocolProfileBehavior": {}
