@@ -51,7 +51,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
     - [Task 2: Query JSON data](#task-2-query-json-data)
   - [Exercise 5: Synapse Pipelines & Cognitive Search](#exercise-5-synapse-pipelines--cognitive-search)
     - [Task 1: Create the invoice storage container](#task-1-create-the-invoice-storage-container)
-    - [Task 2: Create and train an Azure Forms recognizer model and setup Cognitive Search](#task-2-create-and-train-an-azure-forms-recognizer-model-and-setup-cognitive-search)
+    - [Task 2: Create and train an Azure Forms Recognizer model and setup Cognitive Search](#task-2-create-and-train-an-azure-forms-recognizer-model-and-setup-cognitive-search)
     - [Task 3: Configure a skillset with Form Recognizer](#task-3-configure-a-skillset-with-form-recognizer)
     - [Task 4: Create the Synapse Pipeline](#task-4-create-the-synapse-pipeline)
   - [Exercise 6: Security](#exercise-6-security)
@@ -61,8 +61,8 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
   - [Exercise 7: Machine Learning](#exercise-7-machine-learning)
     - [Task 1: Training, consuming, and deploying models](#task-1-training-consuming-and-deploying-models)
   - [Exercise 8: Monitoring](#exercise-8-monitoring)
-    - [Task 1: Workload Importance](#task-1-workload-importance)
-    - [Task 2: Workload Isolation](#task-2-workload-isolation)
+    - [Task 1: Workload importance](#task-1-workload-importance)
+    - [Task 2: Workload isolation](#task-2-workload-isolation)
     - [Task 3: Monitoring with Dynamic Management Views](#task-3-monitoring-with-dynamic-management-views)
     - [Task 4: Orchestration Monitoring with the Monitor Hub](#task-4-orchestration-monitoring-with-the-monitor-hub)
     - [Task 5: Monitoring SQL Requests with the Monitor Hub](#task-5-monitoring-sql-requests-with-the-monitor-hub)
@@ -1090,7 +1090,7 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
     >**Example**: https://asastore{{suffix}.blob.core.windows.net/**invoices**?sv=2019-12-12&ss=bfqt&srt ...
 
-### Task 2: Create and train an Azure Forms recognizer model and setup Cognitive Search
+### Task 2: Create and train an Azure Forms Recognizer model and setup Cognitive Search
 
 1. Browse to your Azure Portal homepage, select **+ Create a resource**, then search for and select **Form Recognizer** from the search results.
 
@@ -1105,7 +1105,7 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
     | Field | Value |
     |-------|-------|
     | Name  | Enter a unique name (denoted by the green checkmark indicator) for the form recognition service. |
-    | Subscription | Select the lab subcription. |
+    | Subscription | Select the lab subscription. |
     | Location | Select  the lab region. |
     | Pricing | Select **Free F0**. |
     | Confirmation checkbox | Checked. |
@@ -1192,19 +1192,19 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
    ![The Azure Functions extension panel in VS Code is displayed highlighting the button to publish the function.](media/ex5-task1-002.png "The Azure Function panel")
 
-    1. Select the same subscription as your Synapse workspace.
+    - Select the same subscription as your Synapse workspace.
 
-    2. Choose to **Create new Function App in Azure...**.
+    - Choose to **Create new Function App in Azure...**.
 
-    3. Give this function a unique name, relative to form recognition.
+    - Give this function a unique name, relative to form recognition.
 
         ![The Create new function App in Azure dialog is shown with the name populated.](media/ex5-task1-003.png "The Create new function App in Azure dialog")
 
-    4. For the runtime select Python 3.7.
+    - For the runtime select Python 3.7.
 
         ![The python runtime version selection dialog is shown with Python 3.7 highlighted.](media/ex5-task1-004.png "Setting the Python runtime version")
 
-    5. Deploy the function to the same region as your Synapse workspace.
+    - Deploy the function to the same region as your Synapse workspace.
 
         ![The Region selection dialog is shown.](media/ex5-task1-005.png "The region selection dialog")
 
@@ -1240,7 +1240,7 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
 14. The first thing we need to do, is edit some properties that will affect each of the calls in the collection. Hover over the **Create a KnowledgeStore** collection, and select the ellipsis button **...**, and then select **Edit**.
 
-    ![In Postman, the ellipsis is expanded next to the Create a KnowledgeStore collection with the the edit menu option selected.](media/ex5-task3-008.png "Editing the Postman Collection")
+    ![In Postman, the ellipsis is expanded next to the Create a KnowledgeStore collection with the edit menu option selected.](media/ex5-task3-008.png "Editing the Postman Collection")
 
 15. In the Edit Collection screen, select the **Variables** tab.
 
@@ -1337,7 +1337,7 @@ In this exercise you will create a Synapse Pipeline that will orchestrate updati
 
     ![The Add trigger button is expanded with the New/Edit option selected.](media/ex5-task4-015.png "New Trigger menu item")
 
-10. On the Add triggers form, select  **+New** from the the **Choose trigger** dropdown.
+10. On the Add triggers form, select  **+New** from the **Choose trigger** dropdown.
 
     ![The Add triggers form is displayed with the Choose trigger dropdown expanded and the +New item is selected.](media/ex5-task4-016.png "Choosing to create a new trigger")
 
@@ -1757,11 +1757,11 @@ You can monitor active SQL requests using the SQL requests area of the Monitor H
 
 Pipeline runs can be monitored using the Monitor Hub and selecting Pipeline runs. Here you can filter pipeline runs and drill in to view the activity runs associated with the pipeline run and monitor the running of in-progress pipelines.
 
-### Task 1: Workload Importance
+### Task 1: Workload importance
 
 Running mixed workloads can pose resource challenges on busy systems. Solution architects seek ways to separate classic data warehousing activities (such as loading, transforming, and querying data) to ensure that enough resources exist to hit SLAs.
 
-Synapse SQL pool workload management in Azure Synapse consists of three high-level concepts: Workload Classification, Workload Importance and Workload Isolation. These capabilities give you more control over how your workload utilizes system resources.
+Synapse SQL pool workload management in Azure Synapse consists of three high-level concepts: workload classification, workload importance and workload isolation. These capabilities give you more control over how your workload utilizes system resources.
 
 Workload importance influences the order in which a request gets access to resources. On a busy system, a request with higher importance has first access to resources. Importance can also ensure ordered access to locks.
 
@@ -1827,7 +1827,7 @@ Setting importance in Synapse SQL for Azure Synapse allows you to influence the 
 
 13. Intermittently perform the preceding query until all queries have been run and no results are returned.
 
-14. We will give our `asa.sql.workload01` user queries priority by implementing the **Workload Importance** feature. In the query window, replace the script with the following:
+14. We will give our `asa.sql.workload01` user queries priority by implementing the **workload importance** feature. In the query window, replace the script with the following:
 
     ```sql
     IF EXISTS (SELECT * FROM sys.workload_management_workload_classifiers WHERE name = 'CEO')
@@ -1861,7 +1861,7 @@ Setting importance in Synapse SQL for Azure Synapse allows you to influence the 
 
     ![SQL query results showing asa.sql.workload01 queries with a higher importance than those queries from asa.sql.workload02.](media/sql-query-4-results.png "SQL script")
 
-### Task 2: Workload Isolation
+### Task 2: Workload isolation
 
 Workload isolation means resources are reserved, exclusively, for a workload group. Workload groups are containers for a set of requests and are the basis for how workload management, including workload isolation, is configured on a system. A simple workload management configuration can manage data loads and user queries.
 
