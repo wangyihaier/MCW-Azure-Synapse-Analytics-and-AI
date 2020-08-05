@@ -63,14 +63,14 @@ def process_form(value):
     logging.info(fullpath)
 
     # Endpoint URL for your form recognizer service
-    endpoint = r"https://<<formreaderservc>>.cognitiveservices.azure.com/"
+    endpoint = r"https://mcwformrecognizer.cognitiveservices.azure.com/"
     #Key for the Form Recognizer Service
-    apim_key = "<<Form Recognizer Key>>"
+    apim_key = "bc0c8f4327e64124862d915d9187d277"
     #Insert the ID for the form recognizer model
-    model_id = "<<Model ID for Form Recognizer>>"
+    model_id = "214abe60-51a7-43e9-bbfa-16856de34449"
     post_url = endpoint + "/formrecognizer/v2.0/custom/models/%s/analyze" % model_id
     #Azure storage connection string where files will be uploaded
-    connectionstring = "<<Azure Blob Storage Connection String>>"
+    connectionstring = "DefaultEndpointsProtocol=https;AccountName=asastorecep321;AccountKey=A2v/AebxRyOfHOg9ZKOBOiI09i++twmZJbao/mm3B+Pq0j5f9oIg/eFjV9YV4g3eI912kKCBSjcUb0ggxOMmHw==;EndpointSuffix=core.windows.net"
     path = fullpath.split(".net/",1)
     path = path[1]
     blobpath = path.split("/",1)
