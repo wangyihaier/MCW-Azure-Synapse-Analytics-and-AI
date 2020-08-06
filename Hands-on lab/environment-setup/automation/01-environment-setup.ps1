@@ -181,8 +181,8 @@ $params = @{
 }
 $workloadPipelines = [ordered]@{
         copy_products_pipeline = "ASAMCW - Exercise 2 - Copy Product Information"
-        execute_business_analyst_queries = "ASAMCW - Exercise 7 - ExecuteBusinessAnalystQueries"
-        execute_data_analyst_and_ceo_queries = "ASAMCW - Exercise 7 - ExecuteDataAnalystAndCEOQueries"
+        execute_business_analyst_queries = "ASAMCW - Exercise 8 - ExecuteBusinessAnalystQueries"
+        execute_data_analyst_and_ceo_queries = "ASAMCW - Exercise 8 - ExecuteDataAnalystAndCEOQueries"
 }
 
 foreach ($pipeline in $workloadPipelines.Keys) 
@@ -202,7 +202,7 @@ foreach ($pipeline in $workloadPipelines.Keys)
 Write-Information "Creating Spark notebooks..."
 
 $notebooks = [ordered]@{
-        "ASAMCW - Exercise 6 - Machine Learning" = ".\notebooks\ASAMCW - Exercise 6 - Machine Learning.ipynb"      
+        "ASAMCW - Exercise 7 - Machine Learning" = ".\notebooks\ASAMCW - Exercise 7 - Machine Learning.ipynb"      
 }
 
 $cellParams = [ordered]@{
@@ -417,9 +417,9 @@ $asaArtifacts = [ordered]@{
         "asamcw_product_csv" = "datasets"                
         "asamcw_product_asa" = "datasets"   
         "ASAMCW - Exercise 2 - Copy Product Information" = "pipelines"
-        "ASAMCW - Exercise 7 - ExecuteBusinessAnalystQueries" = "pipelines"   
-        "ASAMCW - Exercise 7 - ExecuteDataAnalystAndCEOQueries" = "pipelines"     
-        "ASAMCW - Exercise 6 - Machine Learning" = "notebooks"
+        "ASAMCW - Exercise 8 - ExecuteBusinessAnalystQueries" = "pipelines"   
+        "ASAMCW - Exercise 8 - ExecuteDataAnalystAndCEOQueries" = "pipelines"     
+        "ASAMCW - Exercise 7 - Machine Learning" = "notebooks"
         "$($keyVaultName)" = "linkedServices"
         "$($dataLakeAccountName)" = "linkedServices"
         "$($blobStorageAccountName)" = "linkedServices"

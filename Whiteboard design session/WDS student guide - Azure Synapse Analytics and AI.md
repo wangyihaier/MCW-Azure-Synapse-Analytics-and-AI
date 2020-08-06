@@ -120,6 +120,10 @@ To bring their entire operation into perspective, Wide World Importers would lik
 
 7. Azure Databricks and Azure Synapse Analytics seem to have overlapping capabilities, how does one choose between them?
 
+8. How does Azure support deploying the models as web services so that they can easily be invoked from client applications?
+
+9. What does the model re-training process look like in Azure? How can WWI data scientists train and evaluate new models but also ensure this re-training becomes part of the DevOps process used to deploy any updates to the application. Can Azure help them orchestrate updates to the client applications, the machine learning API's and the models that power the API's?
+
 ### Infographic for common scenarios
 
 ![Overview of Azure Synapse Analytics features and capabilities. Showing how one solution provides the user experience with Azure Synapse Studio, a platform for processing data with SQL and Spark, and integrated management of the data lake.](media/infographic.png "Azure Synapse Analytics Overview")
@@ -169,6 +173,8 @@ Directions: With all participants at your table, respond to the following questi
 4. Their data team is accustomed to leveraging open source packages that help them quickly pre-process the data, as well as enable their data scientists to train machine learning models using both Spark and Python. Explain how your solution would enable this.
 
 5. Does your solution allow their data engineers and data scientists to work within Jupyter notebooks? How are libraries managed?
+
+6. How does your solution address their need to keep their part costs table in the data warehouse updated by the supplier invoices?
 
 *Query*
 

@@ -206,7 +206,7 @@ According to Peter Guerin, Chief Technical Officer (CTO), Wide World Importers h
 
 In addition to those data sources, they have in-store IoT sensors producing telemetry data that tracks the traffic patterns of customers walking the aisles. Each store has 50 sensors, and they have 100 stores equipped to provide this real-time data. Using this data they want to understand in which departments (or groups of aisles) people are spending most of their time, and which of those they are not. They would like a solution to ensure that this data gets ingested and processed in near real time, allowing them to quickly identify patterns that can be shared between stores. For example, as stores open on the East Coast, patterns detected in early buying behavior could inform last minute offers and in store product placement of products in their West Coast stores that have yet to open.
 
-WWI would like the option to enable their specialists to create data ingest and data transformation pipelines with or without code. They would like to accomplish this using tools that simplify the building of these transformation pipelines using a graphical designer, while also allowing their team to implement with code when preferred by their team.
+WWI would like the option to enable their specialists to create data ingest and data transformation pipelines with or without code. They would like to accomplish this using tools that simplify the building of these transformation pipelines using a graphical designer, while also allowing their team to implement with code when preferred by their team. One particular pipeline they believe would be innovative would the one that keeps their product costs up to date automatically. WWI is thinking that if they could take the invoice provided to them by their suppliers, they could extract the part and costs and then update that in the data warehouse for downstream profitability calculations.
 
 Peter also mentioned that, in his experience, a point of frustration with the tools was how much setup was required before any preliminary exploratory data analysis could be performed. He would prefer a solution that allows WWI to quickly explore the raw ingested data to understand its contents.
 
@@ -245,6 +245,10 @@ To bring their entire operation into perspective, Wide World Importers would lik
 6. Would data be protected at rest and are there controls over the keys used to encrypt it?
 
 7. Azure Databricks and Azure Synapse Analytics seem to have overlapping capabilities, how does one choose between them?
+
+8. How does Azure support deploying the models as web services so that they can easily be invoked from client applications?
+
+9. What does the model re-training process look like in Azure? How can WWI data scientists train and evaluate new models but also ensure this re-training becomes part of the DevOps process used to deploy any updates to the application. Can Azure help them orchestrate updates to the client applications, the machine learning API's and the models that power the API's?
 
 ### Infographic for common scenarios
 
@@ -295,6 +299,8 @@ Directions: With all participants at your table, respond to the following questi
 4. Their data team is accustomed to leveraging open source packages that help them quickly pre-process the data, as well as enable their data scientists to train machine learning models using both Spark and Python. Explain how your solution would enable this.
 
 5. Does your solution allow their data engineers and data scientists to work within Jupyter notebooks? How are libraries managed?
+
+6. How does your solution address their need to keep their part costs table in the data warehouse updated by the supplier invoices?
 
 *Query*
 
@@ -490,7 +496,7 @@ The primary audience is the business decision makers and technology decision mak
     The serving layer can consist of a dedicated Azure Synapse SQL Pool to provide pre-provisioned compute capacity to serve both data from the relational data warehouse or data sourced from the data lake. Additionally, the serving layer can use Azure Synapse SQL serverless to provide ad-hoc compute capacity for querying data stored in the data lake. Either of these serving options can be used by Power BI reports created within Azure Synapse Analytics, or by external applications. The important take away from this architecture is that all of the components shown are completely managed within Azure Synapse Analytics.
 
     ![Diagram illustrating the high level process for the "cold path" of the data pipeline architecture described in the text above.](media/preferred-solution.png "Cold path of the data pipeline architecture")
-    
+
     The following diagram illustrates how they could handle the streaming data, the "hot path". Twitter tweet data needs to be pulled using a WebJob. This WebJob would load the tweets into Event Hubs so that they could be processed reliably using Stream Analytics. Stream Analytics can be used both to archive all tweets to the data lake for offline or batch analysis using Azure Synapse SQL provisioned within Azure Synapse Analytics, as well as to send live data to Power BI reports for real-time dashboards and reports. The in-store IoT sensors could ingest their data into IoT Hub directly, and by integrating with IoT Hub also benefit from the device management capabilities that IoT Hub enables. Ultimately this data would also be processed by another Stream Analytics job and served in the same way as the tweets.
 
     ![Diagram illustrating the process for handling streaming data, the "hot path" as described in the text above.](media/preferred-solution-streaming.png "Hot path approach to streaming data")
@@ -508,7 +514,7 @@ The primary audience is the business decision makers and technology decision mak
 2. What storage service would you recommend they use and how would you recommend they structure the folders so they can manage the data at the various levels of refinement?
 
     They should use Azure Data Lake Store (ADLS) Gen2 (Azure Storage with hierarchical file systems).
-    
+ 
     In ADLS, it is a best practice to have a dedicated Storage Account for production, and a separate Storage Account for dev and test workloads. This will ensure that dev or test workloads never interfere with production.  
 
     One common folder structure is to organize the data in separate folders by degree of refinement. For example a bronze folder contains the raw data, silver contains the cleaned, prepared and integrated data and gold contains data ready to support analytics, which might include final refinements such as pre-computed aggregates.
@@ -547,7 +553,19 @@ The primary audience is the business decision makers and technology decision mak
 
     These dependencies are specified using a PIP freeze formatted text document listing the desired library names and versions.
 
-    The data team can then launch notebooks attached to the Azure Synapse Spark pool and author the code that uses their favorite libraries.  
+    The data team can then launch notebooks attached to the Azure Synapse Spark pool and author the code that uses their favorite libraries.
+
+6. How does your solution address their need to keep their part costs table in the data warehouse updated by the supplier invoices?
+
+    WWI can accomplish this by a combination of a Synapse Pipeline with an Azure Cognitive Search Skillset that invokes the Form Recognizer service as a custom skill. The pipeline would work as follows:
+
+     - Invoice is uploaded to Azure Storage.
+     - This triggers a Synapse Pipeline.
+     - The Synapse Pipeline has a web activity that invokes an Azure Cognitive Search skillset.
+     - The first skill in the skillset invokes an Azure Function, passing it the URL to the PDF invoice. 
+     - The Azure Function invokes the Form Recognizer service, passing it the URL and SAS token to the PDF invoice. Forms recognizer returns the OCR results to the function.
+     - The Azure Function returns the results to skillset. The skillset then extracts only the product names and costs and sends that to a configure knowledge store that writes the extracted data to JSON files in Azure Storage.
+     - The Synapse pipeline reads these JSON files from Azure Storage in a Data Flow activity and performs an upsert against the product catalog table in the Synapse SQL Pool.
 
 *Query*
 
@@ -713,7 +731,7 @@ Their sales transaction dataset exceeds a billion rows. For their downstream rep
      - Runs a set of security checks that identify security misconfigurations.
      - Allows setting a security baseline that customize the results to suit your environment.
      - Provides a clear report which is very helpful for security audits.
- 
+
      The SQL Vulnerability Assessment is run from the Azure Portal. It takes a few seconds to run, and is entirely read-only. It does not make any changes to your database.
 
     When the scan completes, you will presented with a report. The report presents an overview of your security state; how many issues were found, and their respective severities. Results include warnings on deviations from best practices, as well as a snapshot of your security-related settings, such as database principals and roles and their associated permissions. The scan report also provides a map of sensitive data discovered in your database, and includes recommendations of the built-in methods available to protect it.
@@ -730,7 +748,7 @@ Their sales transaction dataset exceeds a billion rows. For their downstream rep
      - Automatically discovers columns containing potentially sensitive data.
      - Provides a simple way to review and apply the classification recommendations through the Azure portal.
      - Persists sensitive data labels in the database (as metadata attributes), audits and detects access to the sensitive data. It includes a built-in set of labels and information types; however users can chose to define custom labels across Azure tenant using Azure Security Center.
-   - This feature is accessed using the Azure Portal.
+     - This feature is accessed using the Azure Portal.
 
 6. From a network security standpoint, how should your solution be secured?
 
@@ -771,7 +789,13 @@ Their sales transaction dataset exceeds a billion rows. For their downstream rep
     - For customers primarily looking for a Spark solution and don’t have data warehousing needs, we recommend Azure Databricks. In case of Spark based ML scenarios, we also recommend using Azure Machine Learning from within Azure Databricks for experiment tracking, automated machine learning and MLOPs.
     - For customers who are heavily investing in Spark and have data warehousing needs, we recommend both Azure Databricks and Azure Synapse.
 
+8. How does Azure support deploying the models as web services so that they can easily be invoked from client applications? How does a model get deployed as a webservice?
 
+    By using Azure Machine Learning in the solution, WWI will be able to take the models trained elsewhere in the solution and deploy them as REST webservices that are hosted in the Azure Kubernetes Services or Azure Container Instances. They can deploy the webservices from AKS using the Azure Machine Learning SDK. Model deployment typically involves creating a scoring web service script that contains the logic of the web service. This script loads the model from disk and then uses the model for scoring and returns the scored result. By integrating with the Azure Machine Learning model registry, the scoring script can automatically pull the latest model directly from the Azure Machine Learning model registry when the webservice first starts up, ensuring that the web service is always using the latest model, if this is desired. Web services deployed in this fashion can be configured to expose a Swagger OpenAPI endpoint that makes it easy for developers by providing auto-generated documentation and the ability to create client libraries for invoking the web service using developer tools.
+
+9. What does the model re-training process look like in Azure? How can WWI data scientists train and evaluate new models but also ensure this re-training becomes part of the DevOps process used to deploy any updates to the application. Can Azure help them orchestrate updates to the client applications, the machine learning API's and the models that power the API's?
+
+    The model re-training process can be fully integrated with the DevOps process in an approach referred to as MLOps. This approach leverages Azure DevOps. The overall approach is to orchestrate continuous integration and continuous delivery Azure Pipelines from Azure DevOps. These pipelines are triggered by changes to artifacts that describe a machine learning pipeline, that is created with the Azure Machine Learning SDK. For example, checking in a change to the model training script executes the Azure Pipelines Build Pipeline, which trains (or re-trains) the model and creates the container image. Then this triggers an Azure Pipelines Release pipeline that deploys the model as a web service, by using the Docker image that was created in the Build pipeline. Once in production, the scoring web service is monitored using a combination of Application Insights and Azure Storage. This approach enables the deployment pipeline to be re-run to update any component of the solution, included models which have been re-trained.
 
 ## Customer quote (to be read back to the attendees at the end)
 
