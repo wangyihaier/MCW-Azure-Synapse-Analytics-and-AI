@@ -1731,7 +1731,7 @@ In this exercise, you will create multiple machine learning models. You will lea
 
 ### Task 1: Training, consuming, and deploying models
 
-1. Open the **ASAMCW - Exercise 6 - Machine Learning** notebook (select **Develop** from the left menu, from the **Develop** menu, expand the **Notebooks** section and select the notebook)
+1. Open the **ASAMCW - Exercise 7 - Machine Learning** notebook (select **Develop** from the left menu, from the **Develop** menu, expand the **Notebooks** section and select the notebook)
 
 2. Run the notebook step by step (DO NOT `RUN ALL`) to complete this exercise. Some of the most important tasks you will perform are:
 
@@ -1744,8 +1744,6 @@ In this exercise, you will create multiple machine learning models. You will lea
 - Consume the web service to make predictions on sample data
   
 > **Note**: Please note that each of these tasks will be addressed through several cells in the notebook.
-
-Please note that each of these tasks will be addressed through several cells in the notebook.
 
 ## Exercise 8: Monitoring
 
