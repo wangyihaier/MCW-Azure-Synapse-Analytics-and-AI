@@ -6,7 +6,7 @@ Now, this lab will demostrate how to perform the similar task using Spark. Here 
 
 ## Exercise : Create Notebook
 
-![Add Notebook](media/add_synapse_notebook.png)
+![Add Notebook](media/add_synapse_notebook.PNG)
 
 1. Add new notebook and name it as `ASAMCW_ETL_Exercise_2019_Sales`
 
